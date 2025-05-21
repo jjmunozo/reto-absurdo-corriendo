@@ -92,6 +92,15 @@ const Index = () => {
           />
         </section>
 
+        {/* Heatmap Section */}
+        <section className="mb-10">
+          <RunningHeatmap 
+            data={heatmapData} 
+            title="Calendario de Carreras" 
+            description="Actividad de carreras por mes en todo el año"
+          />
+        </section>
+
         {/* Charts Section */}
         <section className="mb-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
           <RunningChart 
@@ -107,15 +116,6 @@ const Index = () => {
             description="Carreras completadas por mes"
             dataKey="runs"
             yAxisLabel="Carreras"
-          />
-        </section>
-
-        {/* Heatmap Section */}
-        <section className="mb-10">
-          <RunningHeatmap 
-            data={heatmapData} 
-            title="Calendario de Carreras" 
-            description="Actividad de carreras durante los últimos 3 meses"
           />
         </section>
 
