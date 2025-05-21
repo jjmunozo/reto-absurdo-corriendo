@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { MapPin, TrendingUp, Clock, Flag, Activity } from 'lucide-react';
 import StatCard from '@/components/StatCard';
@@ -231,15 +232,6 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Calendar Section - Solo RunningYearCalendar */}
-        <section className="mb-10">
-          <RunningYearCalendar
-            runningData={runningData}
-            title="Calendario Detallado de Carreras"
-            description="Vista detallada por mes con leyenda de colores mejorada"
-          />
-        </section>
-
         {/* Charts Section */}
         <section className="mb-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
           <RunningChart 
@@ -258,12 +250,21 @@ const Index = () => {
           />
         </section>
 
-        {/* Recent Runs Table */}
+        {/* Recent Runs Table - MOVED ABOVE CALENDAR */}
         <section className="mb-10">
           <RecentRuns 
             runs={recentRuns} 
             title="Carreras Recientes" 
             description="Tus últimas 5 carreras registradas"
+          />
+        </section>
+
+        {/* Calendar Section - Solo RunningYearCalendar */}
+        <section className="mb-10">
+          <RunningYearCalendar
+            runningData={runningData}
+            title="Calendario Detallado de Carreras"
+            description="Vista detallada por mes con leyenda de colores mejorada"
           />
         </section>
       </main>
