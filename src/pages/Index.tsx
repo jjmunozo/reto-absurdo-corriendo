@@ -165,8 +165,8 @@ const Index = () => {
               </p>
             </div>
             <div className="mt-4 md:mt-0">
-              {/* Mostrar botón de conexión solo en modo admin */}
-              {adminMode && <StravaConnectButton />}
+              {/* Mostrar botón de conexión solo en modo admin y solo para conectar (no para desconectar) */}
+              {adminMode && <StravaConnectButton showDisconnectButton={false} />}
               
               {/* Link al panel de administración - visible con doble clic o pasando el mouse */}
               {!adminMode && (

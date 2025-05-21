@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,6 +17,7 @@ import {
   logout, 
   getAthleteInfo 
 } from '@/services/stravaService';
+import StravaConnectButton from '@/components/StravaConnectButton';
 
 const AdminPanel: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -182,14 +182,8 @@ const AdminPanel: React.FC = () => {
               )}
             </div>
             
-            {/* Botón de conexión/desconexión */}
-            <Button 
-              onClick={authenticated ? handleLogout : handleConnect}
-              variant={authenticated ? "destructive" : "default"}
-              className={authenticated ? undefined : "bg-[#FC4C02] hover:bg-[#d13e00]"}
-            >
-              {authenticated ? 'Desconectar' : 'Conectar con Strava'}
-            </Button>
+            {/* Botón de conexión/desconexión usando el componente StravaConnectButton */}
+            <StravaConnectButton showDisconnectButton={true} />
           </div>
           
           {/* Estado de actualización */}

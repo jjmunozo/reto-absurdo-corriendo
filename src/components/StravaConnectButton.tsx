@@ -18,23 +18,29 @@ import { STRAVA_REDIRECT_URI } from '@/services/stravaConfig';
 interface StravaConnectButtonProps {
   onConnected?: () => void;
   className?: string;
+  showDisconnectButton?: boolean;
 }
 
-const StravaConnectButton: React.FC<StravaConnectButtonProps> = ({ onConnected, className }) => {
+const StravaConnectButton: React.FC<StravaConnectButtonProps> = ({ 
+  onConnected, 
+  className, 
+  showDisconnectButton = false 
+}) => {
   const authenticated = isAuthenticated();
   const athlete = getAthleteInfo();
   const [showConnectionInfo, setShowConnectionInfo] = useState(false);
+  const adminMode = isAdminMode();
 
   // Si no estamos en modo admin, no mostrar el botón
-  if (!isAdminMode()) {
+  if (!adminMode) {
     return null;
   }
 
   const handleConnect = () => {
-    if (authenticated) {
+    if (authenticated && showDisconnectButton) {
       logout();
       window.location.reload();
-    } else {
+    } else if (!authenticated) {
       try {
         initiateStravaAuth();
       } catch (error) {
@@ -43,6 +49,11 @@ const StravaConnectButton: React.FC<StravaConnectButtonProps> = ({ onConnected, 
       }
     }
   };
+
+  // Si está autenticado pero no queremos mostrar el botón de desconectar, no mostrar nada
+  if (authenticated && !showDisconnectButton) {
+    return null;
+  }
 
   return (
     <div className="space-y-2">
