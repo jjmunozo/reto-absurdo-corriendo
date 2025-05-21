@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { MapPin, TrendingUp, Clock, Flag, Activity } from 'lucide-react';
 import StatCard from '@/components/StatCard';
@@ -47,7 +46,7 @@ const Index = () => {
             toast({
               title: "Sin actividades",
               description: "No se encontraron actividades de carrera en tu cuenta de Strava",
-              variant: "warning",
+              variant: "default",
             });
           }
         } catch (error) {
