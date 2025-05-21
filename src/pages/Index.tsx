@@ -1,9 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { MapPin, TrendingUp, Clock, Flag, Activity } from 'lucide-react';
 import StatCard from '@/components/StatCard';
 import RunningChart from '@/components/RunningChart';
 import RunningHeatmap from '@/components/RunningHeatmap';
+import RunningYearCalendar from '@/components/RunningYearCalendar';
 import RecentRuns from '@/components/RecentRuns';
 import StravaConnectButton from '@/components/StravaConnectButton';
 import StravaTroubleshooting from '@/components/StravaTroubleshooting';
@@ -238,6 +238,15 @@ const Index = () => {
             data={heatmapData} 
             title="Calendario de Carreras" 
             description="Actividad de carreras por mes en todo el año"
+          />
+        </section>
+        
+        {/* New Year Calendar Section */}
+        <section className="mb-10">
+          <RunningYearCalendar
+            runningData={runningData}
+            title="Calendario Detallado de Carreras"
+            description="Vista detallada por mes con leyenda de colores mejorada"
           />
         </section>
 
