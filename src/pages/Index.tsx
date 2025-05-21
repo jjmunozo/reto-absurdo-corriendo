@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { MapPin, TrendingUp, Clock, Flag, Activity } from 'lucide-react';
 import StatCard from '@/components/StatCard';
@@ -5,6 +6,7 @@ import RunningChart from '@/components/RunningChart';
 import RunningHeatmap from '@/components/RunningHeatmap';
 import RecentRuns from '@/components/RecentRuns';
 import StravaConnectButton from '@/components/StravaConnectButton';
+import StravaTroubleshooting from '@/components/StravaTroubleshooting';
 import { 
   runningData as defaultRunningData, 
   RunData 
@@ -117,6 +119,9 @@ const Index = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-running-primary"></div>
           </div>
         )}
+
+        {/* Strava Connection Troubleshooting - mostrar solo si no está autenticado */}
+        {!isAuthenticated() && <StravaTroubleshooting />}
 
         {/* Stats Summary Section */}
         <section className="mb-10 animate-fade-in">
