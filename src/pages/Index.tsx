@@ -1,21 +1,68 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapPin, TrendingUp, Clock, Flag, Activity } from 'lucide-react';
 import StatCard from '@/components/StatCard';
 import RunningChart from '@/components/RunningChart';
 import RunningHeatmap from '@/components/RunningHeatmap';
 import RecentRuns from '@/components/RecentRuns';
+import StravaConnectButton from '@/components/StravaConnectButton';
 import { 
-  runningData, 
-  calculateTotalStats, 
-  getHeatmapData,
-  getChartData,
+  runningData as defaultRunningData, 
+  RunData 
 } from '@/data/runningData';
+import { 
+  isAuthenticated,
+  getRunningData 
+} from '@/services/stravaService';
+import { 
+  calculateTotalStats,
+  calculateMonthlyStats,
+  generateHeatmapData,
+  prepareChartData,
+  fetchStravaRunningData
+} from '@/utils/stravaAdapter';
+import { toast } from '@/hooks/use-toast';
 
 const Index = () => {
-  const totalStats = calculateTotalStats();
-  const chartData = getChartData();
-  const heatmapData = getHeatmapData();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [runningData, setRunningData] = useState<RunData[]>(defaultRunningData);
+  const [usingStravaData, setUsingStravaData] = useState<boolean>(false);
+
+  // Cargar datos de Strava si el usuario está autenticado
+  useEffect(() => {
+    const loadStravaData = async () => {
+      if (isAuthenticated()) {
+        try {
+          setLoading(true);
+          const data = await fetchStravaRunningData();
+          if (data.length > 0) {
+            setRunningData(data);
+            setUsingStravaData(true);
+            toast({
+              title: "Datos cargados",
+              description: `Se cargaron ${data.length} actividades de tu cuenta de Strava`,
+            });
+          }
+        } catch (error) {
+          console.error("Error cargando datos de Strava:", error);
+          toast({
+            title: "Error",
+            description: "No se pudieron cargar los datos de Strava",
+            variant: "destructive",
+          });
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadStravaData();
+  }, []);
+
+  const totalStats = calculateTotalStats(runningData);
+  const monthlyStats = calculateMonthlyStats(runningData);
+  const chartData = prepareChartData(monthlyStats);
+  const heatmapData = generateHeatmapData(runningData);
   const recentRuns = runningData.slice(0, 5);
 
   // Formatear ritmo
@@ -37,13 +84,30 @@ const Index = () => {
       {/* Hero Section */}
       <header className="bg-gradient-to-r from-running-primary to-running-dark text-white py-12 px-4 md:px-8">
         <div className="container mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold mb-2">El reto más absurdo</h1>
-          <p className="text-lg opacity-90">Seguimiento de mis estadísticas de correr</p>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
+              <h1 className="text-4xl md:text-5xl font-bold mb-2">El reto más absurdo</h1>
+              <p className="text-lg opacity-90">
+                Seguimiento de mis estadísticas de correr
+                {usingStravaData && <span className="ml-2 text-sm bg-white bg-opacity-20 px-2 py-1 rounded">Datos de Strava</span>}
+              </p>
+            </div>
+            <div className="mt-4 md:mt-0">
+              <StravaConnectButton />
+            </div>
+          </div>
         </div>
       </header>
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
+        {/* Loading State */}
+        {loading && (
+          <div className="flex justify-center my-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-running-primary"></div>
+          </div>
+        )}
+
         {/* Stats Summary Section */}
         <section className="mb-10 animate-fade-in">
           <h2 className="text-2xl font-bold mb-6">Resumen Total</h2>
@@ -117,6 +181,20 @@ const Index = () => {
             description="Tus últimas 5 carreras registradas"
           />
         </section>
+
+        {!usingStravaData && !isAuthenticated() && (
+          <section className="mb-10 p-6 bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="text-center">
+              <h3 className="text-xl font-bold mb-2">Conecta con Strava para ver tus datos reales</h3>
+              <p className="text-gray-600 mb-4">
+                Actualmente estás viendo datos de ejemplo. Conecta tu cuenta de Strava para ver tus propias estadísticas de carrera.
+              </p>
+              <div className="flex justify-center">
+                <StravaConnectButton />
+              </div>
+            </div>
+          </section>
+        )}
       </main>
 
       {/* Footer */}
