@@ -9,6 +9,8 @@ interface StatCardProps {
   subtitle?: string;
   className?: string;
   icon?: React.ReactNode;
+  variant?: 'default' | 'secondary';
+  onClick?: () => void;
 }
 
 const StatCard: React.FC<StatCardProps> = ({
@@ -16,17 +18,35 @@ const StatCard: React.FC<StatCardProps> = ({
   value,
   subtitle,
   className,
-  icon
+  icon,
+  variant = 'default',
+  onClick
 }) => {
   return (
-    <Card className={cn('p-4 h-full', className)}>
+    <Card 
+      className={cn(
+        'p-4 h-full', 
+        variant === 'secondary' && 'border-running-light border-opacity-50',
+        onClick && 'cursor-pointer hover:border-running-primary transition-colors',
+        className
+      )}
+      onClick={onClick}
+    >
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <h3 className="text-2xl font-bold mt-1">{value}</h3>
+          <p className={cn(
+            "text-sm font-medium",
+            variant === 'default' ? 'text-muted-foreground' : 'text-gray-600'
+          )}>{title}</p>
+          <h3 className={cn(
+            "text-2xl font-bold mt-1",
+            variant === 'secondary' && 'text-running-primary'
+          )}>{value}</h3>
           {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}
         </div>
-        {icon && <div className="text-running-primary">{icon}</div>}
+        {icon && <div className={cn(
+          variant === 'default' ? 'text-running-primary' : 'text-running-light'
+        )}>{icon}</div>}
       </div>
     </Card>
   );
