@@ -34,12 +34,15 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
       
       if (!distance) return {};
       
-      return { backgroundColor: '', className: getDistanceColorClass(distance) };
+      return { 
+        backgroundColor: '', 
+        className: cn(getDistanceColorClass(distance), "rounded-md")
+      };
     }
   };
 
   return (
-    <div className="border rounded-lg p-2">
+    <div className="border rounded-lg p-2 shadow-sm">
       <div className="flex justify-between items-center mb-1">
         <h3 className="font-medium">{getMonthName(monthIndex)}</h3>
         <div className="text-sm text-muted-foreground">
@@ -53,16 +56,16 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
         className="p-0"
         classNames={{
           day: cn(
-            "h-7 w-7 p-0 font-normal text-[0.8rem]"
+            "h-7 w-7 p-0 font-normal text-[0.8rem] rounded-md transition-colors"
           ),
           day_selected: cn(
-            "bg-running-primary text-primary-foreground hover:bg-running-primary hover:text-primary-foreground focus:bg-running-primary focus:text-primary-foreground"
+            "bg-running-primary text-primary-foreground hover:bg-running-primary hover:text-primary-foreground focus:bg-running-primary focus:text-primary-foreground rounded-md"
           ),
           head_cell: cn(
             "text-muted-foreground rounded-md w-7 font-normal text-[0.7rem]"
           ),
           cell: cn(
-            "h-7 w-7 text-center text-sm p-0",
+            "h-7 w-7 text-center text-sm p-0 rounded-md",
           ),
           month: "space-y-2"
         }}
