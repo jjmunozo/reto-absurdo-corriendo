@@ -39,16 +39,21 @@ export interface StravaActivity {
   workout_type?: number;
   location_city?: string;
   location_country?: string;
+  map?: {
+    summary_polyline?: string;
+    id?: string;
+  };
 }
 
 // Configuración de la API de Strava
-const STRAVA_CLIENT_ID = '160774'; // Aquí deberás poner tu Client ID
-const STRAVA_CLIENT_SECRET = '5836512c42bdd300ac801e4b2d81bdff5228d281'; // Aquí deberás poner tu Client Secret
+const STRAVA_CLIENT_ID = '160774'; // Tu Client ID de Strava
+const STRAVA_CLIENT_SECRET = '5836512c42bdd300ac801e4b2d81bdff5228d281'; // Tu Client Secret de Strava
 const STRAVA_REDIRECT_URI = window.location.origin + '/auth/strava/callback';
 const STRAVA_AUTH_URL = `https://www.strava.com/oauth/authorize?client_id=${STRAVA_CLIENT_ID}&redirect_uri=${encodeURIComponent(STRAVA_REDIRECT_URI)}&response_type=code&scope=read,activity:read_all`;
 
 // Constantes para localStorage
 const TOKEN_STORAGE_KEY = 'strava_tokens';
+const ATHLETE_STORAGE_KEY = 'strava_athlete';
 
 /**
  * Inicia el flujo de autorización de Strava redirigiendo al usuario a la página de autenticación
@@ -81,12 +86,15 @@ export const exchangeCodeForToken = async (code: string): Promise<StravaTokenRes
 
     const data: StravaTokenResponse = await response.json();
     
-    // Guardar tokens en localStorage para futuras solicitudes
+    // Guardar tokens y datos del atleta en localStorage
     localStorage.setItem(TOKEN_STORAGE_KEY, JSON.stringify({
       access_token: data.access_token,
       refresh_token: data.refresh_token,
       expires_at: data.expires_at,
     }));
+    
+    // Guardar datos del atleta por separado
+    localStorage.setItem(ATHLETE_STORAGE_KEY, JSON.stringify(data.athlete));
     
     return data;
   } catch (error) {
@@ -149,6 +157,14 @@ export const getAccessToken = async (): Promise<string> => {
 };
 
 /**
+ * Obtiene información del atleta autenticado
+ */
+export const getAthleteInfo = (): StravaAthlete | null => {
+  const athleteData = localStorage.getItem(ATHLETE_STORAGE_KEY);
+  return athleteData ? JSON.parse(athleteData) : null;
+};
+
+/**
  * Comprueba si el usuario está autenticado con Strava
  */
 export const isAuthenticated = (): boolean => {
@@ -160,6 +176,7 @@ export const isAuthenticated = (): boolean => {
  */
 export const logout = (): void => {
   localStorage.removeItem(TOKEN_STORAGE_KEY);
+  localStorage.removeItem(ATHLETE_STORAGE_KEY);
 };
 
 /**
@@ -207,11 +224,31 @@ export const getAthleteActivities = async (
  */
 export const getAllRunningActivities = async (): Promise<StravaActivity[]> => {
   try {
-    // Obtenemos todas las actividades
-    const activities = await getAthleteActivities();
+    // Obtener todas las actividades
+    const allActivities: StravaActivity[] = [];
+    let page = 1;
+    const per_page = 100;
+    let hasMoreActivities = true;
     
-    // Filtramos solo las de tipo "Run"
-    const runningActivities = activities.filter(activity => activity.type === 'Run');
+    // Obtener todas las páginas de actividades
+    while (hasMoreActivities) {
+      const activities = await getAthleteActivities(undefined, undefined, page, per_page);
+      
+      if (activities.length === 0) {
+        hasMoreActivities = false;
+      } else {
+        allActivities.push(...activities);
+        page++;
+      }
+      
+      // Evitar demasiadas peticiones a la API
+      if (page > 5) {
+        hasMoreActivities = false;
+      }
+    }
+    
+    // Filtrar solo las de tipo "Run"
+    const runningActivities = allActivities.filter(activity => activity.type === 'Run');
     
     return runningActivities;
   } catch (error) {
@@ -261,6 +298,31 @@ export const getRunningData = async (): Promise<import('@/data/runningData').Run
     return runningActivities.map(convertStravaActivityToRunData);
   } catch (error) {
     console.error('Error obteniendo datos de carrera:', error);
+    throw error;
+  }
+};
+
+/**
+ * Obtiene datos del atleta incluyendo estadísticas
+ */
+export const getAthleteStats = async (athleteId: number): Promise<any> => {
+  try {
+    const accessToken = await getAccessToken();
+    
+    const response = await fetch(`https://www.strava.com/api/v3/athletes/${athleteId}/stats`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error obteniendo estadísticas del atleta: ${response.status}`);
+    }
+
+    const stats = await response.json();
+    return stats;
+  } catch (error) {
+    console.error('Error obteniendo estadísticas del atleta:', error);
     throw error;
   }
 };

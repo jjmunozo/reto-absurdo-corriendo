@@ -34,11 +34,11 @@ const StravaCallback: React.FC = () => {
         }
 
         // Intercambiar el código por un token
-        await exchangeCodeForToken(code);
+        const data = await exchangeCodeForToken(code);
         
         toast({
           title: 'Conexión exitosa',
-          description: '¡Tu cuenta de Strava ha sido conectada correctamente!',
+          description: `¡Bienvenido, ${data.athlete.firstname}! Tu cuenta de Strava ha sido conectada correctamente.`,
         });
         
         // Redirigir al usuario a la página principal
@@ -62,11 +62,12 @@ const StravaCallback: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <div className="bg-white p-8 rounded shadow-md max-w-md w-full">
+      <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
         {loading && (
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-running-primary mx-auto"></div>
             <p className="mt-4 text-lg">Conectando con Strava...</p>
+            <p className="mt-2 text-sm text-gray-500">Procesando tu autenticación, por favor espera.</p>
           </div>
         )}
         
@@ -81,7 +82,7 @@ const StravaCallback: React.FC = () => {
             <p className="text-gray-600">{error}</p>
             <button 
               onClick={() => navigate('/')} 
-              className="mt-4 px-4 py-2 bg-running-primary text-white rounded hover:bg-running-dark"
+              className="mt-4 px-4 py-2 bg-running-primary text-white rounded hover:bg-running-dark transition-colors"
             >
               Volver al inicio
             </button>

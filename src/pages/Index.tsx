@@ -12,7 +12,7 @@ import {
 } from '@/data/runningData';
 import { 
   isAuthenticated,
-  getRunningData 
+  getAthleteInfo
 } from '@/services/stravaService';
 import { 
   calculateTotalStats,
@@ -27,6 +27,7 @@ const Index = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [runningData, setRunningData] = useState<RunData[]>(defaultRunningData);
   const [usingStravaData, setUsingStravaData] = useState<boolean>(false);
+  const athlete = getAthleteInfo();
 
   // Cargar datos de Strava si el usuario está autenticado
   useEffect(() => {
@@ -41,6 +42,12 @@ const Index = () => {
             toast({
               title: "Datos cargados",
               description: `Se cargaron ${data.length} actividades de tu cuenta de Strava`,
+            });
+          } else {
+            toast({
+              title: "Sin actividades",
+              description: "No se encontraron actividades de carrera en tu cuenta de Strava",
+              variant: "warning",
             });
           }
         } catch (error) {
@@ -88,8 +95,12 @@ const Index = () => {
             <div>
               <h1 className="text-4xl md:text-5xl font-bold mb-2">El reto más absurdo</h1>
               <p className="text-lg opacity-90">
-                Seguimiento de mis estadísticas de correr
-                {usingStravaData && <span className="ml-2 text-sm bg-white bg-opacity-20 px-2 py-1 rounded">Datos de Strava</span>}
+                Seguimiento de mis estadísticas de carrera
+                {usingStravaData && athlete && (
+                  <span className="ml-2 text-sm bg-white bg-opacity-20 px-2 py-1 rounded">
+                    Datos de {athlete.firstname} {athlete.lastname}
+                  </span>
+                )}
               </p>
             </div>
             <div className="mt-4 md:mt-0">
@@ -197,10 +208,33 @@ const Index = () => {
         )}
       </main>
 
+      {/* Guía para principiantes */}
+      {!usingStravaData && (
+        <section className="container mx-auto px-4 py-8 mb-10">
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h2 className="text-xl font-bold mb-4">Guía para principiantes</h2>
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-bold text-lg">Paso 1: Crear una cuenta en Strava</h3>
+                <p className="text-gray-600">Si aún no tienes una cuenta en Strava, ve a <a href="https://www.strava.com" target="_blank" rel="noopener noreferrer" className="text-running-primary underline">strava.com</a> y regístrate.</p>
+              </div>
+              <div>
+                <h3 className="font-bold text-lg">Paso 2: Conectar tu cuenta</h3>
+                <p className="text-gray-600">Haz clic en el botón "Conectar con Strava" en la parte superior de esta página y sigue las instrucciones para autorizar la aplicación.</p>
+              </div>
+              <div>
+                <h3 className="font-bold text-lg">Paso 3: Revisar tus datos</h3>
+                <p className="text-gray-600">Una vez conectado, tus actividades de carrera se cargarán automáticamente y podrás ver todas tus estadísticas.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Footer */}
       <footer className="bg-gray-100 py-6 px-4">
         <div className="container mx-auto text-center text-gray-600">
-          <p className="text-sm">&copy; 2025 El reto más absurdo | Inspirado por <a href="https://www.surferdiary.com/stats" className="underline hover:text-running-primary">SurferDiary.com</a></p>
+          <p className="text-sm">&copy; 2024 El reto más absurdo | Inspirado por <a href="https://www.surferdiary.com/stats" className="underline hover:text-running-primary">SurferDiary.com</a></p>
         </div>
       </footer>
     </div>

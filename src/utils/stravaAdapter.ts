@@ -1,14 +1,22 @@
 
 import { RunData, MonthlyStats } from '@/data/runningData';
-import { getRunningData } from '@/services/stravaService';
+import { getRunningData, getAthleteInfo, getAthleteStats, isAuthenticated } from '@/services/stravaService';
 
 /**
  * Obtiene datos de carrera desde Strava y los convierte al formato de la aplicación
  */
 export const fetchStravaRunningData = async (): Promise<RunData[]> => {
   try {
+    if (!isAuthenticated()) {
+      return [];
+    }
+    
     const runData = await getRunningData();
-    return runData;
+    
+    // Ordenar por fecha (más reciente primero)
+    return runData.sort((a, b) => {
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
   } catch (error) {
     console.error('Error obteniendo datos de Strava:', error);
     return [];
@@ -44,21 +52,51 @@ export const calculateMonthlyStats = (runData: RunData[]): MonthlyStats[] => {
     const date = new Date(run.date);
     const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
     
-    if (monthStats[monthKey]) {
-      monthStats[monthKey].distance += run.distance;
-      monthStats[monthKey].runs += 1;
-      monthStats[monthKey].time += run.duration;
+    // Asegurarse de que exista el mes en el objeto (por si hay datos de años anteriores)
+    if (!monthStats[monthKey]) {
+      // Si estamos en un año anterior, crear la entrada para ese mes
+      const monthIndex = date.getMonth();
+      monthStats[monthKey] = {
+        month: monthNames[monthIndex],
+        distance: 0,
+        runs: 0,
+        time: 0
+      };
     }
+    
+    // Actualizar estadísticas para el mes
+    monthStats[monthKey].distance += run.distance;
+    monthStats[monthKey].runs += 1;
+    monthStats[monthKey].time += run.duration;
   });
   
   // Convertir objeto a array y ordenar por mes (de más reciente a más antiguo)
-  return Object.values(monthStats).reverse();
+  return Object.entries(monthStats)
+    .map(([key, value]) => value)
+    .sort((a, b) => {
+      const monthOrder: Record<string, number> = {};
+      monthNames.forEach((month, index) => {
+        monthOrder[month] = index;
+      });
+      return monthOrder[a.month] - monthOrder[b.month];
+    });
 };
 
 /**
  * Calcula estadísticas totales a partir de los datos de carrera
  */
 export const calculateTotalStats = (runData: RunData[]) => {
+  if (runData.length === 0) {
+    return {
+      totalDistance: 0,
+      totalRuns: 0,
+      totalTime: 0,
+      totalElevation: 0,
+      avgPace: 0,
+      longestRun: 0,
+    };
+  }
+  
   return {
     totalDistance: runData.reduce((sum, run) => sum + run.distance, 0),
     totalRuns: runData.length,
@@ -73,11 +111,11 @@ export const calculateTotalStats = (runData: RunData[]) => {
  * Prepara los datos para el heatmap
  */
 export const generateHeatmapData = (runData: RunData[]) => {
-  // Obtenemos los últimos 90 días
+  // Obtenemos los últimos 365 días para mostrar un año completo
   const today = new Date();
   const heatmapData = [];
   
-  for (let i = 90; i >= 0; i--) {
+  for (let i = 365; i >= 0; i--) {
     const date = new Date();
     date.setDate(today.getDate() - i);
     const dateString = date.toISOString().split('T')[0];
@@ -98,5 +136,6 @@ export const generateHeatmapData = (runData: RunData[]) => {
  * Prepara los datos para los gráficos
  */
 export const prepareChartData = (monthlyStats: MonthlyStats[]) => {
-  return monthlyStats;
+  // Ordenar los datos por mes (de enero a diciembre)
+  return [...monthlyStats];
 };
