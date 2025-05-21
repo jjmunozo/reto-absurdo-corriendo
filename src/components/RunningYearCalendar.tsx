@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Legend } from 'lucide-react';
 import { RunData } from '@/data/runningData';
+import { Badge } from '@/components/ui/badge';
 
 interface RunningYearCalendarProps {
   runningData: RunData[];
@@ -64,16 +65,22 @@ const RunningYearCalendar: React.FC<RunningYearCalendarProps> = ({
       
       if (!distance) return {};
       
-      // Color más intenso según la distancia recorrida
-      let bgColorClass = 'bg-running-light opacity-30';
-      if (distance >= 15) bgColorClass = 'bg-running-primary';
-      else if (distance >= 10) bgColorClass = 'bg-running-primary opacity-70';
-      else if (distance >= 5) bgColorClass = 'bg-running-light opacity-70';
-      
-      return {
-        backgroundColor: '',
-        className: bgColorClass
-      };
+      // Nuevos rangos de distancia con colores correspondientes
+      if (distance >= 50) {
+        return { backgroundColor: '', className: 'bg-orange-500' }; // 50km+ naranja intenso
+      } else if (distance >= 42) {
+        return { backgroundColor: '', className: 'bg-running-secondary' }; // 42-50km verde intenso
+      } else if (distance >= 30) {
+        return { backgroundColor: '', className: 'bg-running-secondary opacity-70' }; // 30-42km verde
+      } else if (distance >= 20) {
+        return { backgroundColor: '', className: 'bg-running-primary' }; // 20-30km azul intenso
+      } else if (distance >= 15) {
+        return { backgroundColor: '', className: 'bg-running-primary opacity-80' }; // 15-20km azul estándar
+      } else if (distance >= 10) {
+        return { backgroundColor: '', className: 'bg-running-primary opacity-60' }; // 10-15km azul medio
+      } else {
+        return { backgroundColor: '', className: 'bg-running-light opacity-50' }; // <10km azul claro
+      }
     }
   };
   
@@ -87,6 +94,48 @@ const RunningYearCalendar: React.FC<RunningYearCalendarProps> = ({
   const getMonthName = (monthIndex: number): string => {
     const months = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
     return months[monthIndex];
+  };
+
+  // Componente de leyenda para las distancias
+  const DistanceLegend = () => {
+    return (
+      <div className="mt-2 pb-1 px-2 border-b">
+        <div className="flex items-center gap-1.5 mb-2">
+          <Legend className="h-4 w-4 text-muted-foreground" />
+          <span className="text-sm font-medium">Distancias (km)</span>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5 text-xs">
+          <div className="flex items-center gap-1.5">
+            <div className="h-3 w-3 bg-running-light opacity-50 rounded"></div>
+            <span className="text-muted-foreground">&lt;10km</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="h-3 w-3 bg-running-primary opacity-60 rounded"></div>
+            <span className="text-muted-foreground">10-15km</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="h-3 w-3 bg-running-primary opacity-80 rounded"></div>
+            <span className="text-muted-foreground">15-20km</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="h-3 w-3 bg-running-primary rounded"></div>
+            <span className="text-muted-foreground">20-30km</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="h-3 w-3 bg-running-secondary opacity-70 rounded"></div>
+            <span className="text-muted-foreground">30-42km</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="h-3 w-3 bg-running-secondary rounded"></div>
+            <span className="text-muted-foreground">42-50km</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="h-3 w-3 bg-orange-500 rounded"></div>
+            <span className="text-muted-foreground">50km+</span>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -115,6 +164,10 @@ const RunningYearCalendar: React.FC<RunningYearCalendarProps> = ({
           </button>
         </div>
       </CardHeader>
+      
+      {/* Leyenda de colores */}
+      <DistanceLegend />
+      
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {Array.from({ length: 12 }).map((_, monthIndex) => (

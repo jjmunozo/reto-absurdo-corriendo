@@ -64,8 +64,8 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				running: {
-					primary: '#3B82F6',
-					secondary: '#10B981',
+					primary: '#3B82F6', // azul para distancias estándar
+					secondary: '#10B981', // verde para distancias de maratón
 					accent: '#60A5FA',
 					light: '#93C5FD',
 					dark: '#1E40AF'
