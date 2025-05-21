@@ -5,7 +5,6 @@ import StatCard from '@/components/StatCard';
 import RunningChart from '@/components/RunningChart';
 import RunningHeatmap from '@/components/RunningHeatmap';
 import RecentRuns from '@/components/RecentRuns';
-import RunningYearCalendar from '@/components/RunningYearCalendar';
 import { 
   runningData, 
   calculateTotalStats, 
@@ -81,15 +80,6 @@ const Index = () => {
               icon={<Flag size={24} />}
             />
           </div>
-        </section>
-
-        {/* Calendar Year Section */}
-        <section className="mb-10">
-          <RunningYearCalendar 
-            runningData={runningData}
-            title="Calendario Anual de Carreras" 
-            description="Visualización de todas tus carreras durante el año"
-          />
         </section>
 
         {/* Heatmap Section */}
