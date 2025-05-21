@@ -42,8 +42,8 @@ export interface StravaActivity {
 }
 
 // Configuración de la API de Strava
-const STRAVA_CLIENT_ID = ''; // Aquí deberás poner tu Client ID
-const STRAVA_CLIENT_SECRET = ''; // Aquí deberás poner tu Client Secret
+const STRAVA_CLIENT_ID = '160774'; // Aquí deberás poner tu Client ID
+const STRAVA_CLIENT_SECRET = '5836512c42bdd300ac801e4b2d81bdff5228d281'; // Aquí deberás poner tu Client Secret
 const STRAVA_REDIRECT_URI = window.location.origin + '/auth/strava/callback';
 const STRAVA_AUTH_URL = `https://www.strava.com/oauth/authorize?client_id=${STRAVA_CLIENT_ID}&redirect_uri=${encodeURIComponent(STRAVA_REDIRECT_URI)}&response_type=code&scope=read,activity:read_all`;
 
