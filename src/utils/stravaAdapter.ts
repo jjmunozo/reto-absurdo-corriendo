@@ -1,22 +1,32 @@
 
 import { RunData, MonthlyStats } from '@/data/runningData';
 import { getRunningData, getAthleteInfo, getAthleteStats, isAuthenticated } from '@/services/stravaService';
+import { loadRunningDataFromJson, isAdminMode } from '@/services/dataExportService';
 
 /**
  * Obtiene datos de carrera desde Strava y los convierte al formato de la aplicación
  */
 export const fetchStravaRunningData = async (): Promise<RunData[]> => {
   try {
-    if (!isAuthenticated()) {
-      return [];
+    // Si no estamos en modo admin, intentar cargar datos del JSON
+    if (!isAdminMode()) {
+      const cachedData = loadRunningDataFromJson();
+      if (cachedData && cachedData.length > 0) {
+        return cachedData;
+      }
     }
     
-    const runData = await getRunningData();
+    // Si estamos en modo admin o no hay datos en caché, intentar obtener desde Strava
+    if (isAuthenticated()) {
+      const runData = await getRunningData();
+      
+      // Ordenar por fecha (más reciente primero)
+      return runData.sort((a, b) => {
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      });
+    }
     
-    // Ordenar por fecha (más reciente primero)
-    return runData.sort((a, b) => {
-      return new Date(b.date).getTime() - new Date(a.date).getTime();
-    });
+    return [];
   } catch (error) {
     console.error('Error obteniendo datos de Strava:', error);
     return [];

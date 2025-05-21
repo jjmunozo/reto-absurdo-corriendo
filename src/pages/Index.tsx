@@ -7,6 +7,7 @@ import RunningHeatmap from '@/components/RunningHeatmap';
 import RecentRuns from '@/components/RecentRuns';
 import StravaConnectButton from '@/components/StravaConnectButton';
 import StravaTroubleshooting from '@/components/StravaTroubleshooting';
+import AdminPanel from '@/components/AdminPanel';
 import { 
   runningData as defaultRunningData, 
   RunData 
@@ -15,6 +16,11 @@ import {
   isAuthenticated,
   getAthleteInfo
 } from '@/services/stravaService';
+import {
+  isAdminMode,
+  formatLastUpdateTime,
+  setupAutoUpdater
+} from '@/services/dataExportService';
 import { 
   calculateTotalStats,
   calculateMonthlyStats,
@@ -28,44 +34,93 @@ const Index = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [runningData, setRunningData] = useState<RunData[]>(defaultRunningData);
   const [usingStravaData, setUsingStravaData] = useState<boolean>(false);
+  const [showAdmin, setShowAdmin] = useState<boolean>(false);
   const athlete = getAthleteInfo();
+  const adminMode = isAdminMode();
 
-  // Cargar datos de Strava si el usuario está autenticado
+  // Función para verificar si estamos en la ruta admin
+  useEffect(() => {
+    const checkAdminRoute = () => {
+      const hashParams = window.location.hash.substring(1);
+      if (hashParams === 'admin') {
+        setShowAdmin(true);
+      }
+    };
+
+    // Verificar al cargar y también al cambiar el hash
+    checkAdminRoute();
+    window.addEventListener('hashchange', checkAdminRoute);
+    
+    return () => {
+      window.removeEventListener('hashchange', checkAdminRoute);
+    };
+  }, []);
+
+  // Cargar datos (de caché o de Strava según el caso)
   useEffect(() => {
     const loadStravaData = async () => {
-      if (isAuthenticated()) {
-        try {
-          setLoading(true);
-          const data = await fetchStravaRunningData();
-          if (data.length > 0) {
-            setRunningData(data);
-            setUsingStravaData(true);
+      try {
+        setLoading(true);
+        const data = await fetchStravaRunningData();
+        if (data.length > 0) {
+          setRunningData(data);
+          setUsingStravaData(true);
+          
+          // Solo mostrar toast en modo administrador
+          if (adminMode) {
             toast({
               title: "Datos cargados",
-              description: `Se cargaron ${data.length} actividades de tu cuenta de Strava`,
-            });
-          } else {
-            toast({
-              title: "Sin actividades",
-              description: "No se encontraron actividades de carrera en tu cuenta de Strava",
-              variant: "default",
+              description: `Se cargaron ${data.length} actividades de carrera`,
             });
           }
-        } catch (error) {
-          console.error("Error cargando datos de Strava:", error);
+        } else if (adminMode) {
+          // Solo mostrar error en modo administrador
+          toast({
+            title: "Sin actividades",
+            description: "No se encontraron actividades de carrera",
+            variant: "default",
+          });
+        }
+      } catch (error) {
+        console.error("Error cargando datos:", error);
+        if (adminMode) {
           toast({
             title: "Error",
-            description: "No se pudieron cargar los datos de Strava",
+            description: "No se pudieron cargar los datos",
             variant: "destructive",
           });
-        } finally {
-          setLoading(false);
         }
+      } finally {
+        setLoading(false);
       }
     };
 
     loadStravaData();
-  }, []);
+    
+    // Configurar actualizador automático si estamos en modo admin
+    if (adminMode && isAuthenticated()) {
+      setupAutoUpdater();
+    }
+  }, [adminMode]);
+
+  // Si estamos en la ruta admin, mostrar el panel de administración
+  if (showAdmin) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-8">
+        <div className="container mx-auto">
+          <div className="mb-8">
+            <h1 className="text-2xl font-bold mb-2">Panel de Administración</h1>
+            <p className="text-gray-600">
+              <a href="#" className="text-running-primary hover:underline">
+                &larr; Volver a la página principal
+              </a>
+            </p>
+          </div>
+          <AdminPanel />
+        </div>
+      </div>
+    );
+  }
 
   const totalStats = calculateTotalStats(runningData);
   const monthlyStats = calculateMonthlyStats(runningData);
@@ -102,10 +157,26 @@ const Index = () => {
                     Datos de {athlete.firstname} {athlete.lastname}
                   </span>
                 )}
+                {usingStravaData && (
+                  <span className="block text-sm mt-1">
+                    Última actualización: {formatLastUpdateTime()}
+                  </span>
+                )}
               </p>
             </div>
             <div className="mt-4 md:mt-0">
-              <StravaConnectButton />
+              {/* Mostrar botón de conexión solo en modo admin */}
+              {adminMode && <StravaConnectButton />}
+              
+              {/* Link al panel de administración - visible con doble clic o pasando el mouse */}
+              {!adminMode && (
+                <div 
+                  className="text-xs opacity-30 hover:opacity-100 cursor-default transition-opacity mt-2 text-right"
+                  onDoubleClick={() => window.location.href = "#admin"}
+                >
+                  v1.0.1
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -120,8 +191,8 @@ const Index = () => {
           </div>
         )}
 
-        {/* Strava Connection Troubleshooting - mostrar solo si no está autenticado */}
-        {!isAuthenticated() && <StravaTroubleshooting />}
+        {/* Mostrar StravaTroubleshooting solo en modo admin */}
+        {adminMode && !isAuthenticated() && <StravaTroubleshooting />}
 
         {/* Stats Summary Section */}
         <section className="mb-10 animate-fade-in">
@@ -196,44 +267,7 @@ const Index = () => {
             description="Tus últimas 5 carreras registradas"
           />
         </section>
-
-        {!usingStravaData && !isAuthenticated() && (
-          <section className="mb-10 p-6 bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="text-center">
-              <h3 className="text-xl font-bold mb-2">Conecta con Strava para ver tus datos reales</h3>
-              <p className="text-gray-600 mb-4">
-                Actualmente estás viendo datos de ejemplo. Conecta tu cuenta de Strava para ver tus propias estadísticas de carrera.
-              </p>
-              <div className="flex justify-center">
-                <StravaConnectButton />
-              </div>
-            </div>
-          </section>
-        )}
       </main>
-
-      {/* Guía para principiantes */}
-      {!usingStravaData && (
-        <section className="container mx-auto px-4 py-8 mb-10">
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h2 className="text-xl font-bold mb-4">Guía para principiantes</h2>
-            <div className="space-y-4">
-              <div>
-                <h3 className="font-bold text-lg">Paso 1: Crear una cuenta en Strava</h3>
-                <p className="text-gray-600">Si aún no tienes una cuenta en Strava, ve a <a href="https://www.strava.com" target="_blank" rel="noopener noreferrer" className="text-running-primary underline">strava.com</a> y regístrate.</p>
-              </div>
-              <div>
-                <h3 className="font-bold text-lg">Paso 2: Conectar tu cuenta</h3>
-                <p className="text-gray-600">Haz clic en el botón "Conectar con Strava" en la parte superior de esta página y sigue las instrucciones para autorizar la aplicación.</p>
-              </div>
-              <div>
-                <h3 className="font-bold text-lg">Paso 3: Revisar tus datos</h3>
-                <p className="text-gray-600">Una vez conectado, tus actividades de carrera se cargarán automáticamente y podrás ver todas tus estadísticas.</p>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Footer */}
       <footer className="bg-gray-100 py-6 px-4">

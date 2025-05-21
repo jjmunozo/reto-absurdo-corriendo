@@ -8,3 +8,4 @@ export * from '@/types/stravaTypes';
 export * from './stravaAuthService';
 export * from './stravaActivitiesService';
 export * from './stravaUtils';
+export * from './dataExportService';
