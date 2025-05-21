@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react';
 import { Calendar } from '@/components/ui/calendar';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { CalendarIcon, Legend } from 'lucide-react';
+import { CalendarIcon, BookOpen } from 'lucide-react';
 import { RunData } from '@/data/runningData';
 import { Badge } from '@/components/ui/badge';
 
@@ -101,7 +100,7 @@ const RunningYearCalendar: React.FC<RunningYearCalendarProps> = ({
     return (
       <div className="mt-2 pb-1 px-2 border-b">
         <div className="flex items-center gap-1.5 mb-2">
-          <Legend className="h-4 w-4 text-muted-foreground" />
+          <BookOpen className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm font-medium">Distancias (km)</span>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5 text-xs">
