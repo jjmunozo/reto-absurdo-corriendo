@@ -88,6 +88,18 @@ const StravaConnectButton: React.FC<StravaConnectButtonProps> = ({ onConnected, 
                     No incluyas http://, https:// ni barras al final.
                   </p>
                 </div>
+                <div>
+                  <h3 className="font-medium">Sugerencias si tienes problemas</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Si encuentras el error "accounts.google.com refused to connect":
+                  </p>
+                  <ul className="list-disc list-inside text-sm text-muted-foreground ml-2 mt-1">
+                    <li>Limpia cookies y caché del navegador</li>
+                    <li>Prueba con otro navegador</li>
+                    <li>Desactiva extensiones temporalmente</li>
+                    <li>Inicia sesión directamente con credenciales de Strava</li>
+                  </ul>
+                </div>
               </div>
             </DialogContent>
           </Dialog>
@@ -102,6 +114,7 @@ const StravaConnectButton: React.FC<StravaConnectButtonProps> = ({ onConnected, 
               <li>Tener una cuenta en Strava</li>
               <li>Que tu navegador permita popups</li>
               <li>Que tu conexión a internet esté funcionando correctamente</li>
+              <li>Limpiar cookies y caché si ves errores al iniciar sesión con Google</li>
             </ul>
           </AlertDescription>
         </Alert>
