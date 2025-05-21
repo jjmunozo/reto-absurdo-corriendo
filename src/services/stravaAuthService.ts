@@ -8,6 +8,7 @@ import {
   STRAVA_AUTH_URL, 
   STRAVA_CLIENT_ID, 
   STRAVA_CLIENT_SECRET,
+  STRAVA_REDIRECT_URI,
   TOKEN_STORAGE_KEY,
   ATHLETE_STORAGE_KEY
 } from './stravaConfig';
@@ -18,7 +19,7 @@ import {
 export const initiateStravaAuth = (): void => {
   // Registrar información de depuración
   console.log('Dominio actual:', window.location.origin);
-  console.log('URI de redirección completa:', `${window.location.origin}/auth/strava/callback`);
+  console.log('URI de redirección completa:', STRAVA_REDIRECT_URI);
   console.log('URL de autenticación de Strava:', STRAVA_AUTH_URL);
   
   // Redirigir al usuario a la página de autenticación de Strava

@@ -13,6 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { STRAVA_REDIRECT_URI } from '@/services/stravaConfig';
 
 interface StravaConnectButtonProps {
   onConnected?: () => void;
@@ -79,7 +80,7 @@ const StravaConnectButton: React.FC<StravaConnectButtonProps> = ({ onConnected, 
                   <h3 className="font-medium">Información técnica</h3>
                   <div className="bg-muted p-3 rounded text-xs mt-2 font-mono">
                     <p>Dominio actual: <span className="text-blue-500">{window.location.host}</span></p>
-                    <p>URI de redirección: <span className="text-blue-500">{window.location.origin}/auth/strava/callback</span></p>
+                    <p>URI de redirección: <span className="text-blue-500">{STRAVA_REDIRECT_URI}</span></p>
                   </div>
                 </div>
                 <div>
@@ -95,15 +96,24 @@ const StravaConnectButton: React.FC<StravaConnectButtonProps> = ({ onConnected, 
                   </p>
                 </div>
                 <div>
+                  <h3 className="font-medium">URL de redirección exacta</h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    En tu configuración de Strava, asegúrate que una de las URLs de redirección autorizadas sea exactamente:
+                  </p>
+                  <div className="bg-muted p-3 rounded text-xs mt-2 font-mono overflow-x-auto">
+                    <p>{STRAVA_REDIRECT_URI}</p>
+                  </div>
+                </div>
+                <div>
                   <h3 className="font-medium">Sugerencias si tienes problemas</h3>
                   <p className="text-sm text-muted-foreground mt-1">
-                    Si encuentras el error "accounts.google.com refused to connect":
+                    Si encuentras el error "Bad Request" o "invalid redirect_uri":
                   </p>
                   <ul className="list-disc list-inside text-sm text-muted-foreground ml-2 mt-1">
-                    <li>Limpia cookies y caché del navegador</li>
-                    <li>Prueba con otro navegador</li>
-                    <li>Desactiva extensiones temporalmente</li>
-                    <li>Inicia sesión directamente con credenciales de Strava</li>
+                    <li>Verifica que la URL de callback sea exactamente igual a la configurada</li>
+                    <li>Asegúrate de tener varias URLs de redirección en tu app de Strava si usas diferentes entornos</li>
+                    <li>Verifica que no haya espacios o caracteres especiales</li>
+                    <li>Asegúrate que la app de Strava esté aprobada si es necesario</li>
                   </ul>
                 </div>
               </div>
@@ -120,7 +130,7 @@ const StravaConnectButton: React.FC<StravaConnectButtonProps> = ({ onConnected, 
               <li>Tener una cuenta en Strava</li>
               <li>Que tu navegador permita popups</li>
               <li>Que tu conexión a internet esté funcionando correctamente</li>
-              <li>Limpiar cookies y caché si ves errores al iniciar sesión con Google</li>
+              <li>Que la URL de redirección <code className="bg-gray-100 px-1 rounded">{STRAVA_REDIRECT_URI}</code> esté configurada en tu app de Strava</li>
             </ul>
           </AlertDescription>
         </Alert>
