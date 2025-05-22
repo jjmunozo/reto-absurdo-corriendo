@@ -163,19 +163,26 @@ export const calculateRunsPerHour = (runData: RunData[]): { hour: string, runs: 
   
   // Contar carreras por hora
   runData.forEach(run => {
-    // Obtener la hora de la fecha (formato: YYYY-MM-DD)
-    const dateObj = new Date(run.date);
-    // En datos reales de Strava, tendríamos la hora en el objeto, 
-    // aquí simulamos una hora basada en la fecha
-    // Nota: En datos reales usaríamos run.start_date_local o similar
-    
-    // Para simular, usamos un método simple: tomamos el día del mes módulo 24 como la hora
-    // En un caso real, se extraería la hora correcta del campo de fecha-hora completo
-    const hourOfDay = dateObj.getDate() % 24; 
-    
-    // Incrementar contador para esa hora
-    if (hoursData[hourOfDay]) {
-      hoursData[hourOfDay].runs += 1;
+    // Si tenemos el campo startTimeLocal (fecha-hora completa)
+    if (run.startTimeLocal) {
+      // Extraer la hora del string ISO (formato: YYYY-MM-DDTHH:MM:SSZ)
+      const dateObj = new Date(run.startTimeLocal);
+      const hourOfDay = dateObj.getHours();
+      
+      // Incrementar contador para esa hora
+      if (hoursData[hourOfDay]) {
+        hoursData[hourOfDay].runs += 1;
+      }
+    } else {
+      // Compatibilidad con datos antiguos que no tienen startTimeLocal
+      // En este caso, usamos una aproximación basada en la fecha
+      const dateObj = new Date(run.date);
+      // Usamos un valor basado en el día como aproximación
+      const hourOfDay = dateObj.getDate() % 24;
+      
+      if (hoursData[hourOfDay]) {
+        hoursData[hourOfDay].runs += 1;
+      }
     }
   });
   
