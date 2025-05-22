@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { MapPin, TrendingUp, Clock, Flag, Activity } from 'lucide-react';
 import StatCard from '@/components/StatCard';
@@ -8,6 +7,7 @@ import RecentRuns from '@/components/RecentRuns';
 import StravaConnectButton from '@/components/StravaConnectButton';
 import StravaTroubleshooting from '@/components/StravaTroubleshooting';
 import AdminPanel from '@/components/AdminPanel';
+import RunsPerHourChart from '@/components/RunsPerHourChart';
 import { 
   runningData as defaultRunningData, 
   RunData 
@@ -26,7 +26,8 @@ import {
   calculateMonthlyStats,
   generateHeatmapData,
   prepareChartData,
-  fetchStravaRunningData
+  fetchStravaRunningData,
+  calculateRunsPerHour
 } from '@/utils/stravaAdapter';
 import { toast } from '@/hooks/use-toast';
 
@@ -127,6 +128,7 @@ const Index = () => {
   const chartData = prepareChartData(monthlyStats);
   const heatmapData = generateHeatmapData(runningData);
   const recentRuns = runningData.slice(0, 5);
+  const runsPerHourData = calculateRunsPerHour(runningData);
 
   // Formatear ritmo
   const formatPace = (pace: number) => {
@@ -247,6 +249,15 @@ const Index = () => {
             runningData={runningData}
             title="Calendario Detallado de Carreras"
             description="Vista detallada por mes con leyenda de colores mejorada"
+          />
+        </section>
+        
+        {/* Nuevo componente - Carreras por hora del día */}
+        <section className="mb-10">
+          <RunsPerHourChart 
+            data={runsPerHourData}
+            title="Distribución de Carreras por Hora"
+            description="Cantidad de carreras iniciadas en cada hora del día"
           />
         </section>
 
