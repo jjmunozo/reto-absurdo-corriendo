@@ -52,7 +52,7 @@ const RecentRuns: React.FC<RecentRunsProps> = ({
               <TableHead>Tiempo</TableHead>
               <TableHead>Ritmo</TableHead>
               <TableHead>Elevación</TableHead>
-              <TableHead>Ubicación</TableHead>
+              <TableHead>Descripción</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
