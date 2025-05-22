@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { MapPin, TrendingUp, Clock, Flag, Activity } from 'lucide-react';
 import StatCard from '@/components/StatCard';
@@ -242,6 +243,15 @@ const Index = () => {
             description="Tus últimas 5 carreras registradas"
           />
         </section>
+        
+        {/* Nuevo componente - Carreras por hora del día - MOVED HERE */}
+        <section className="mb-10">
+          <RunsPerHourChart 
+            data={runsPerHourData}
+            title="Distribución de Carreras por Hora"
+            description="Cantidad de carreras iniciadas en cada hora del día"
+          />
+        </section>
 
         {/* Calendar Section - RunningYearCalendar */}
         <section className="mb-10">
@@ -251,17 +261,8 @@ const Index = () => {
             description="Vista detallada por mes con leyenda de colores mejorada"
           />
         </section>
-        
-        {/* Nuevo componente - Carreras por hora del día */}
-        <section className="mb-10">
-          <RunsPerHourChart 
-            data={runsPerHourData}
-            title="Distribución de Carreras por Hora"
-            description="Cantidad de carreras iniciadas en cada hora del día"
-          />
-        </section>
 
-        {/* Charts Section - MOVED TO BOTTOM */}
+        {/* Charts Section - STILL AT BOTTOM */}
         <section className="mb-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
           <RunningChart 
             data={chartData} 
