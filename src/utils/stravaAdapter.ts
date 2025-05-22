@@ -1,8 +1,7 @@
-
 import { RunData, MonthlyStats } from '@/data/runningData';
 import { getRunningData, getAthleteInfo, getAthleteStats, isAuthenticated } from '@/services/stravaService';
 import { loadRunningDataFromJson, isAdminMode } from '@/services/dataExportService';
-import { toZonedTime, zonedTimeToUtc, format } from 'date-fns-tz';
+import { toZonedTime, fromZonedTime, format } from 'date-fns-tz';
 
 /**
  * Obtiene datos de carrera desde Strava y los convierte al formato de la aplicación
