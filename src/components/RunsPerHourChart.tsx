@@ -26,7 +26,7 @@ const RunsPerHourChart: React.FC<RunsPerHourChartProps> = ({ data, title, descri
 
   // Función para mostrar solo algunas horas en el eje X para evitar sobrecarga visual
   const formatXAxis = (hour: string) => {
-    // Mostrar solo algunas horas para evitar sobrecarga visual
+    // Mostrar cada 3 horas para evitar sobrecarga visual
     const hourNum = parseInt(hour.split(':')[0]);
     if (hourNum % 3 === 0) {
       return hour;

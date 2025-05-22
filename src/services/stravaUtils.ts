@@ -61,14 +61,21 @@ export const getLocationFromActivity = (activity: StravaActivity): string => {
  * Asegurándose de mantener la fecha-hora original sin modificaciones
  */
 export const convertStravaActivityToRunData = (activity: StravaActivity): RunData => {
+  // Preservar la fecha-hora original exactamente como viene de Strava
+  // start_date_local ya viene en la zona horaria local del usuario según la API de Strava
+  const startTimeLocal = activity.start_date_local;
+  
+  // Log para ayudar en la depuración
+  console.log(`Converting activity: ${activity.id}, Start time local: ${startTimeLocal}`);
+  
   return {
     id: activity.id,
-    date: activity.start_date_local.split('T')[0],  // Formato YYYY-MM-DD
+    date: startTimeLocal.split('T')[0],  // Formato YYYY-MM-DD
     distance: activity.distance / 1000,  // Convertir de metros a kilómetros
     duration: Math.round(activity.moving_time / 60),  // Convertir de segundos a minutos
     elevation: Math.round(activity.total_elevation_gain),  // Metros
     avgPace: calculatePace(activity.distance, activity.moving_time),  // Calcular ritmo en min/km
     location: getLocationFromActivity(activity),
-    startTimeLocal: activity.start_date_local  // Guardar la fecha-hora completa
+    startTimeLocal: startTimeLocal  // Guardar la fecha-hora completa sin modificaciones
   };
 };

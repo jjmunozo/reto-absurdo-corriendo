@@ -1,7 +1,8 @@
+
 import { RunData, MonthlyStats } from '@/data/runningData';
 import { getRunningData, getAthleteInfo, getAthleteStats, isAuthenticated } from '@/services/stravaService';
 import { loadRunningDataFromJson, isAdminMode } from '@/services/dataExportService';
-import { toZonedTime } from 'date-fns-tz';
+import { toZonedTime, zonedTimeToUtc, format } from 'date-fns-tz';
 
 /**
  * Obtiene datos de carrera desde Strava y los convierte al formato de la aplicación
@@ -167,25 +168,27 @@ export const calculateRunsPerHour = (runData: RunData[]): { hour: string, runs: 
   
   // Contar carreras por hora
   runData.forEach(run => {
-    // Si tenemos el campo startTimeLocal (fecha-hora completa)
-    if (run.startTimeLocal) {
-      // Convertir la fecha a la zona horaria de Costa Rica
-      const dateObj = toZonedTime(new Date(run.startTimeLocal), timeZone);
-      const hourOfDay = dateObj.getHours();
-      
-      // Incrementar contador para esa hora
-      if (hoursData[hourOfDay]) {
-        hoursData[hourOfDay].runs += 1;
+    try {
+      // Si tenemos el campo startTimeLocal (fecha-hora completa)
+      if (run.startTimeLocal) {
+        // Convertir la fecha a la zona horaria de Costa Rica
+        const dateObj = new Date(run.startTimeLocal);
+        const crDateObj = toZonedTime(dateObj, timeZone);
+        const hourOfDay = crDateObj.getHours();
+        
+        // Debug para ver las fechas transformadas
+        console.log(`Run: ${run.date}, Start Time: ${run.startTimeLocal}, CR Time: ${format(crDateObj, 'yyyy-MM-dd HH:mm:ss', { timeZone })}, Hour: ${hourOfDay}`);
+        
+        // Incrementar contador para esa hora
+        if (hourOfDay >= 0 && hourOfDay < 24) {
+          hoursData[hourOfDay].runs += 1;
+        }
+      } else {
+        // Compatibilidad con datos antiguos que no tienen startTimeLocal
+        console.warn(`Run sin startTimeLocal: ${run.date}`);
       }
-    } else {
-      // Compatibilidad con datos antiguos que no tienen startTimeLocal
-      const dateObj = new Date(run.date);
-      // Usamos un valor basado en el día como aproximación
-      const hourOfDay = dateObj.getDate() % 24;
-      
-      if (hoursData[hourOfDay]) {
-        hoursData[hourOfDay].runs += 1;
-      }
+    } catch (error) {
+      console.error(`Error procesando hora para carrera ${run.date}:`, error);
     }
   });
   
