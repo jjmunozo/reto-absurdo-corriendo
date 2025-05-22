@@ -232,7 +232,25 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Charts Section */}
+        {/* Recent Runs Table */}
+        <section className="mb-10">
+          <RecentRuns 
+            runs={recentRuns} 
+            title="Carreras Recientes" 
+            description="Tus últimas 5 carreras registradas"
+          />
+        </section>
+
+        {/* Calendar Section - RunningYearCalendar */}
+        <section className="mb-10">
+          <RunningYearCalendar
+            runningData={runningData}
+            title="Calendario Detallado de Carreras"
+            description="Vista detallada por mes con leyenda de colores mejorada"
+          />
+        </section>
+
+        {/* Charts Section - MOVED TO BOTTOM */}
         <section className="mb-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
           <RunningChart 
             data={chartData} 
@@ -247,24 +265,6 @@ const Index = () => {
             description="Carreras completadas por mes"
             dataKey="runs"
             yAxisLabel="Carreras"
-          />
-        </section>
-
-        {/* Recent Runs Table - MOVED ABOVE CALENDAR */}
-        <section className="mb-10">
-          <RecentRuns 
-            runs={recentRuns} 
-            title="Carreras Recientes" 
-            description="Tus últimas 5 carreras registradas"
-          />
-        </section>
-
-        {/* Calendar Section - Solo RunningYearCalendar */}
-        <section className="mb-10">
-          <RunningYearCalendar
-            runningData={runningData}
-            title="Calendario Detallado de Carreras"
-            description="Vista detallada por mes con leyenda de colores mejorada"
           />
         </section>
       </main>
