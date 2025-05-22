@@ -23,6 +23,17 @@ const RecentRuns: React.FC<RecentRunsProps> = ({
     });
   };
 
+  // Formatear hora
+  const formatTime = (dateTimeString: string) => {
+    if (!dateTimeString) return "-";
+    
+    const date = new Date(dateTimeString);
+    return date.toLocaleTimeString('es-ES', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
   // Formatear ritmo
   const formatPace = (pace: number) => {
     const minutes = Math.floor(pace);
@@ -31,7 +42,7 @@ const RecentRuns: React.FC<RecentRunsProps> = ({
   };
 
   // Formatear tiempo
-  const formatTime = (minutes: number) => {
+  const formatDuration = (minutes: number) => {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
@@ -48,6 +59,7 @@ const RecentRuns: React.FC<RecentRunsProps> = ({
           <TableHeader>
             <TableRow>
               <TableHead>Fecha</TableHead>
+              <TableHead>Hora</TableHead>
               <TableHead>Distancia</TableHead>
               <TableHead>Tiempo</TableHead>
               <TableHead>Ritmo</TableHead>
@@ -59,8 +71,9 @@ const RecentRuns: React.FC<RecentRunsProps> = ({
             {runs.map((run) => (
               <TableRow key={run.id}>
                 <TableCell>{formatDate(run.date)}</TableCell>
+                <TableCell>{formatTime(run.startTimeLocal)}</TableCell>
                 <TableCell>{run.distance.toFixed(1)}km</TableCell>
-                <TableCell>{formatTime(run.duration)}</TableCell>
+                <TableCell>{formatDuration(run.duration)}</TableCell>
                 <TableCell>{formatPace(run.avgPace)}/km</TableCell>
                 <TableCell>{run.elevation}m</TableCell>
                 <TableCell className="max-w-[150px] truncate">{run.location}</TableCell>
