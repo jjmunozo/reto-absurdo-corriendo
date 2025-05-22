@@ -72,6 +72,7 @@ const RunningYearCalendar: React.FC<RunningYearCalendarProps> = ({
               monthIndex={monthIndex}
               runDates={runDates}
               stats={monthlyStats[monthIndex]}
+              runningData={runningData}
             />
           ))}
         </div>

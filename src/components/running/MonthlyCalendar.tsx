@@ -3,12 +3,20 @@ import React from 'react';
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { getMonthName, getDistanceColorClass } from '@/utils/calendarUtils';
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger 
+} from '@/components/ui/tooltip';
+import { RunData } from '@/data/runningData';
 
 interface MonthlyCalendarProps {
   year: number;
   monthIndex: number;
   runDates: Record<string, number>;
   stats: { days: number; distance: number };
+  runningData: RunData[];
 }
 
 /**
@@ -18,7 +26,8 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   year,
   monthIndex,
   runDates,
-  stats
+  stats,
+  runningData
 }) => {
   // Function to personalize the appearance of days
   const modifiers = {
@@ -27,6 +36,25 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
       .filter(date => date.getMonth() === monthIndex),
   };
   
+  // Find run by date
+  const getRunByDate = (dateStr: string): RunData | undefined => {
+    return runningData.find(run => run.date === dateStr);
+  };
+  
+  // Format pace for display
+  const formatPace = (pace: number) => {
+    const minutes = Math.floor(pace);
+    const seconds = Math.round((pace - minutes) * 60);
+    return `${minutes}'${seconds.toString().padStart(2, '0')}"`;
+  };
+  
+  // Format time
+  const formatTime = (minutes: number) => {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+  };
+
   const modifiersStyles = {
     runDay: (date: Date) => {
       const dateStr = date.toISOString().split('T')[0];
@@ -39,6 +67,50 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
         className: cn(getDistanceColorClass(distance), "rounded-md")
       };
     }
+  };
+  
+  const renderDayContents = (day: Date) => {
+    const dateStr = day.toISOString().split('T')[0];
+    const distance = runDates[dateStr] || 0;
+    
+    if (!distance) {
+      return <span>{day.getDate()}</span>;
+    }
+    
+    const run = getRunByDate(dateStr);
+    
+    if (!run) {
+      return <span>{day.getDate()}</span>;
+    }
+    
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="w-full h-full flex items-center justify-center cursor-pointer">
+              {day.getDate()}
+            </span>
+          </TooltipTrigger>
+          <TooltipContent className="bg-white p-2 max-w-xs w-[240px]">
+            <div className="space-y-1">
+              <div className="font-semibold border-b pb-1">{run.date}</div>
+              <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-sm">
+                <span className="text-muted-foreground">Distancia:</span>
+                <span>{run.distance.toFixed(1)}km</span>
+                <span className="text-muted-foreground">Tiempo:</span>
+                <span>{formatTime(run.duration)}</span>
+                <span className="text-muted-foreground">Ritmo:</span>
+                <span>{formatPace(run.avgPace)}</span>
+                <span className="text-muted-foreground">Elevación:</span>
+                <span>{run.elevation}m</span>
+                <span className="text-muted-foreground">Ubicación:</span>
+                <span className="truncate">{run.location}</span>
+              </div>
+            </div>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
   };
 
   return (
@@ -80,6 +152,15 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
         toMonth={new Date(year, 11)}
         modifiers={modifiers}
         modifiersStyles={modifiersStyles}
+        components={{
+          Day: ({ date, ...props }) => {
+            return (
+              <div {...props}>
+                {renderDayContents(date)}
+              </div>
+            );
+          }
+        }}
       />
     </div>
   );
