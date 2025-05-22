@@ -1,6 +1,7 @@
 import { RunData, MonthlyStats } from '@/data/runningData';
 import { getRunningData, getAthleteInfo, getAthleteStats, isAuthenticated } from '@/services/stravaService';
 import { loadRunningDataFromJson, isAdminMode } from '@/services/dataExportService';
+import { toZonedTime } from 'date-fns-tz';
 
 /**
  * Obtiene datos de carrera desde Strava y los convierte al formato de la aplicación
@@ -150,7 +151,7 @@ export const prepareChartData = (monthlyStats: MonthlyStats[]) => {
 };
 
 /**
- * Calcula la cantidad de carreras por hora del día
+ * Calcula la cantidad de carreras por hora del día, utilizando la zona horaria de Costa Rica
  * @param runData Datos de carrera
  * @returns Array con la cantidad de carreras por hora
  */
@@ -161,12 +162,15 @@ export const calculateRunsPerHour = (runData: RunData[]): { hour: string, runs: 
     runs: 0
   }));
   
+  // La zona horaria de Costa Rica es UTC-6
+  const timeZone = 'America/Costa_Rica';
+  
   // Contar carreras por hora
   runData.forEach(run => {
     // Si tenemos el campo startTimeLocal (fecha-hora completa)
     if (run.startTimeLocal) {
-      // Extraer la hora del string ISO (formato: YYYY-MM-DDTHH:MM:SSZ)
-      const dateObj = new Date(run.startTimeLocal);
+      // Convertir la fecha a la zona horaria de Costa Rica
+      const dateObj = toZonedTime(new Date(run.startTimeLocal), timeZone);
       const hourOfDay = dateObj.getHours();
       
       // Incrementar contador para esa hora
@@ -175,7 +179,6 @@ export const calculateRunsPerHour = (runData: RunData[]): { hour: string, runs: 
       }
     } else {
       // Compatibilidad con datos antiguos que no tienen startTimeLocal
-      // En este caso, usamos una aproximación basada en la fecha
       const dateObj = new Date(run.date);
       // Usamos un valor basado en el día como aproximación
       const hourOfDay = dateObj.getDate() % 24;

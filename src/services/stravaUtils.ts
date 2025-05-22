@@ -58,6 +58,7 @@ export const getLocationFromActivity = (activity: StravaActivity): string => {
 
 /**
  * Convierte una actividad de Strava al formato de RunData de nuestra aplicación
+ * Asegurándose de mantener la fecha-hora original sin modificaciones
  */
 export const convertStravaActivityToRunData = (activity: StravaActivity): RunData => {
   return {
