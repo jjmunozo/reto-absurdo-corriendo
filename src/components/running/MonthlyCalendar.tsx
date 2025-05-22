@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { getMonthName, getDistanceColorClass } from '@/utils/calendarUtils';
@@ -30,7 +30,7 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   runningData
 }) => {
   console.log(`Rendering calendar for ${getMonthName(monthIndex)} ${year}`);
-  console.log(`RunDates available:`, Object.keys(runDates).length);
+  console.log(`Available runDates:`, Object.keys(runDates));
   
   // Function to get the ISO date string format (YYYY-MM-DD) from a Date object
   const getDateString = (date: Date): string => {
@@ -38,23 +38,36 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   };
   
   // Filter run days for this specific month and year
-  const runDaysForMonth = Object.keys(runDates)
-    .filter(dateStr => {
-      const date = new Date(dateStr);
-      return date.getMonth() === monthIndex && date.getFullYear() === year;
-    })
-    .map(dateStr => new Date(dateStr));
-  
-  console.log(`Run days for month ${monthIndex + 1}:`, runDaysForMonth.length);
+  const runDaysForMonth = useMemo(() => {
+    const days = Object.entries(runDates)
+      .filter(([dateStr]) => {
+        const date = new Date(dateStr);
+        const isMatchingYear = date.getFullYear() === year;
+        const isMatchingMonth = date.getMonth() === monthIndex;
+        
+        console.log(`Date check: ${dateStr} - Year match: ${isMatchingYear}, Month match: ${isMatchingMonth}`);
+        return isMatchingYear && isMatchingMonth;
+      })
+      .map(([dateStr]) => new Date(dateStr));
+    
+    console.log(`Run days for ${getMonthName(monthIndex)} ${year}:`, days.length);
+    console.log(`Run days dates:`, days.map(d => getDateString(d)));
+    
+    return days;
+  }, [runDates, year, monthIndex]);
   
   // Function to personalize the appearance of days
-  const modifiers = {
+  const modifiers = useMemo(() => ({
     runDay: runDaysForMonth,
-  };
+  }), [runDaysForMonth]);
   
   // Find run by date
   const getRunByDate = (dateStr: string): RunData | undefined => {
-    return runningData.find(run => run.date === dateStr);
+    const run = runningData.find(run => run.date === dateStr);
+    if (run) {
+      console.log(`Found run for ${dateStr}:`, run);
+    }
+    return run;
   };
   
   // Format pace for display
@@ -78,6 +91,7 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
       
       if (!distance) return {};
       
+      console.log(`Styling day ${dateStr} with distance ${distance}`);
       return { 
         backgroundColor: '', 
         className: cn(getDistanceColorClass(distance), "rounded-md")

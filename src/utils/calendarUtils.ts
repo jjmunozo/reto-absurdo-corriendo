@@ -38,6 +38,26 @@ export const getDistanceColorClass = (distance: number): string => {
 };
 
 /**
+ * Ensures consistent date string format (YYYY-MM-DD)
+ * @param date - Date object or string
+ * @returns Formatted date string
+ */
+export const formatDateString = (date: Date | string): string => {
+  if (typeof date === 'string') {
+    // If already a string, ensure it's in the correct format
+    if (/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+      return date; // Already in YYYY-MM-DD format
+    }
+    
+    // Parse the string into a Date object
+    date = new Date(date);
+  }
+  
+  // Format to YYYY-MM-DD
+  return date.toISOString().split('T')[0];
+};
+
+/**
  * Creates a map of dates to distances
  * @param runningData - Array of run data
  * @param year - Year to filter by
@@ -50,25 +70,38 @@ export const createRunDatesMap = (
   // Create a proper date-indexed object with runs
   const runDatesMap: Record<string, number> = {};
   
+  console.log(`Creating run dates map for year ${year}`);
+  console.log(`Input data: ${runningData.length} runs`);
+  
   // Process each run and add it to the map if it belongs to the selected year
   runningData.forEach(run => {
+    if (!run.date) {
+      console.warn('Found run without date:', run);
+      return;
+    }
+    
     // Make sure we're parsing dates consistently
     const runDate = new Date(run.date);
+    const runYear = runDate.getFullYear();
     
     // Check if run is from the selected year
-    if (runDate.getFullYear() === year) {
+    if (runYear === year) {
       // Use ISO format date (YYYY-MM-DD) as key
-      const dateKey = run.date;
+      const dateKey = formatDateString(run.date);
       
       // Add or update the distance for this date
       runDatesMap[dateKey] = (runDatesMap[dateKey] || 0) + run.distance;
       
       // Debug log to see what's being added
-      console.log(`Added run for date ${dateKey} with distance ${run.distance}km`);
+      console.log(`Added run for date ${dateKey} with distance ${run.distance}km (Year: ${runYear})`);
+    } else {
+      console.log(`Skipping run for ${run.date} - year ${runYear} doesn't match target ${year}`);
     }
   });
   
-  console.log(`Total run dates for year ${year}:`, Object.keys(runDatesMap).length);
+  console.log(`Total run dates map for year ${year}:`, Object.keys(runDatesMap).length);
+  console.log(`Run dates:`, Object.keys(runDatesMap));
+  
   return runDatesMap;
 };
 
@@ -96,8 +129,11 @@ export const calculateMonthlyStats = (
       const month = date.getMonth();
       stats[month].days += 1;
       stats[month].distance += distance;
+      
+      console.log(`Added stats for ${dateStr} (month ${month}): +1 day, +${distance}km`);
     }
   });
   
+  console.log(`Monthly stats for year ${year}:`, stats);
   return stats;
 };

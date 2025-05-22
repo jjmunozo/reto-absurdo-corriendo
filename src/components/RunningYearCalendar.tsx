@@ -7,7 +7,7 @@ import { RunData } from '@/data/runningData';
 import DistanceLegend from '@/components/running/DistanceLegend';
 import MonthlyCalendar from '@/components/running/MonthlyCalendar';
 import YearNavigation from '@/components/running/YearNavigation';
-import { createRunDatesMap, calculateMonthlyStats } from '@/utils/calendarUtils';
+import { createRunDatesMap, calculateMonthlyStats, formatDateString } from '@/utils/calendarUtils';
 
 interface RunningYearCalendarProps {
   runningData: RunData[];
@@ -34,13 +34,28 @@ const RunningYearCalendar: React.FC<RunningYearCalendarProps> = ({
     // Log a few example runs to verify the data format
     if (runningData.length > 0) {
       console.log('Example runs:', runningData.slice(0, 3));
+      
+      // Check if the dates are correctly formatted
+      const dateFormatCheck = runningData.slice(0, 5).map(run => ({
+        date: run.date,
+        dateObj: new Date(run.date),
+        year: new Date(run.date).getFullYear(),
+        month: new Date(run.date).getMonth(),
+        formatted: formatDateString(run.date),
+      }));
+      
+      console.log('Date format check:', dateFormatCheck);
+    } else {
+      console.warn('No running data available');
     }
   }, [runningData]);
   
   // Get all days with running activity
   const runDates = useMemo(() => {
     console.log(`Creating run dates map for year ${year} with ${runningData.length} runs`);
-    return createRunDatesMap(runningData, year);
+    const result = createRunDatesMap(runningData, year);
+    console.log(`RunDates keys (${Object.keys(result).length}):`, Object.keys(result));
+    return result;
   }, [runningData, year]);
   
   // Calculate monthly statistics
