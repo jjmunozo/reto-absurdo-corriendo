@@ -1,7 +1,8 @@
+
 import { RunData, MonthlyStats } from '@/data/runningData';
 import { getRunningData, getAthleteInfo, getAthleteStats, isAuthenticated } from '@/services/stravaService';
 import { loadRunningDataFromJson, isAdminMode } from '@/services/dataExportService';
-import { toZonedTime, fromZonedTime, format } from 'date-fns-tz';
+import { toZonedTime, format } from 'date-fns-tz';
 
 /**
  * Obtiene datos de carrera desde Strava y los convierte al formato de la aplicación
@@ -152,6 +153,7 @@ export const prepareChartData = (monthlyStats: MonthlyStats[]) => {
 
 /**
  * Calcula la cantidad de carreras por hora del día, utilizando la zona horaria de Costa Rica
+ * con manejo adecuado de la zona horaria y DST
  * @param runData Datos de carrera
  * @returns Array con la cantidad de carreras por hora
  */
@@ -170,13 +172,16 @@ export const calculateRunsPerHour = (runData: RunData[]): { hour: string, runs: 
     try {
       // Si tenemos el campo startTimeLocal (fecha-hora completa)
       if (run.startTimeLocal) {
-        // Convertir la fecha a la zona horaria de Costa Rica
+        // No necesitamos hacer ajustes adicionales porque convertStravaActivityToRunData
+        // ya aplicó la corrección de +6 horas y ajustó a la zona horaria de Costa Rica
         const dateObj = new Date(run.startTimeLocal);
+        
+        // Aseguramos que se interprete correctamente en la zona horaria de Costa Rica
         const crDateObj = toZonedTime(dateObj, timeZone);
         const hourOfDay = crDateObj.getHours();
         
         // Debug para ver las fechas transformadas
-        console.log(`Run: ${run.date}, Start Time: ${run.startTimeLocal}, CR Time: ${format(crDateObj, 'yyyy-MM-dd HH:mm:ss', { timeZone })}, Hour: ${hourOfDay}`);
+        console.log(`Run hora: ${run.date}, Start Time: ${run.startTimeLocal}, CR Time: ${format(crDateObj, 'yyyy-MM-dd HH:mm:ss', { timeZone })}, Hour: ${hourOfDay}`);
         
         // Incrementar contador para esa hora
         if (hourOfDay >= 0 && hourOfDay < 24) {
@@ -193,3 +198,4 @@ export const calculateRunsPerHour = (runData: RunData[]): { hour: string, runs: 
   
   return hoursData;
 };
+

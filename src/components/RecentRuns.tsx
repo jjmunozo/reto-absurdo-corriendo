@@ -23,14 +23,19 @@ const RecentRuns: React.FC<RecentRunsProps> = ({
     });
   };
 
-  // Formatear hora
+  // Formatear hora usando la zona horaria correcta de Costa Rica
   const formatTime = (dateTimeString: string) => {
     if (!dateTimeString) return "-";
     
+    // Crear un objeto Date a partir del string ISO
     const date = new Date(dateTimeString);
-    return date.toLocaleTimeString('es-ES', {
+    
+    // Formatear usando opciones específicas para Costa Rica (es-CR)
+    // Note: La configuración regional es-CR incluirá ajustes específicos para Costa Rica
+    return date.toLocaleTimeString('es-CR', {
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
+      hour12: true // Formato de 12 horas con AM/PM, común en Costa Rica
     });
   };
 
@@ -41,7 +46,7 @@ const RecentRuns: React.FC<RecentRunsProps> = ({
     return `${minutes}'${seconds.toString().padStart(2, '0')}"`;
   };
 
-  // Formatear tiempo
+  // Formatear duración
   const formatDuration = (minutes: number) => {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
@@ -87,3 +92,4 @@ const RecentRuns: React.FC<RecentRunsProps> = ({
 };
 
 export default RecentRuns;
+
