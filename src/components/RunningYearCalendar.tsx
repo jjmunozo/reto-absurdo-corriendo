@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CalendarIcon } from 'lucide-react';
 import { RunData } from '@/data/runningData';
@@ -23,25 +23,37 @@ const RunningYearCalendar: React.FC<RunningYearCalendarProps> = ({
   title,
   description
 }) => {
-  const [year, setYear] = useState(new Date().getFullYear());
+  // Get current year as default
+  const currentYear = new Date().getFullYear();
+  const [year, setYear] = useState(currentYear);
+  
+  // Debug the incoming data
+  useEffect(() => {
+    console.log(`RunningYearCalendar: Received ${runningData.length} runs`);
+    
+    // Log a few example runs to verify the data format
+    if (runningData.length > 0) {
+      console.log('Example runs:', runningData.slice(0, 3));
+    }
+  }, [runningData]);
   
   // Get all days with running activity
-  const runDates = useMemo(() => 
-    createRunDatesMap(runningData, year), 
-    [runningData, year]
-  );
+  const runDates = useMemo(() => {
+    console.log(`Creating run dates map for year ${year} with ${runningData.length} runs`);
+    return createRunDatesMap(runningData, year);
+  }, [runningData, year]);
   
   // Calculate monthly statistics
-  const monthlyStats = useMemo(() => 
-    calculateMonthlyStats(runDates, year), 
-    [runDates, year]
-  );
+  const monthlyStats = useMemo(() => {
+    console.log(`Calculating monthly stats for year ${year}`);
+    return calculateMonthlyStats(runDates, year);
+  }, [runDates, year]);
   
   // Change to previous year
   const prevYear = () => setYear(year - 1);
   
   // Change to next year
-  const nextYear = () => setYear(year + 1);
+  const nextYear = () => setYear(Math.min(currentYear, year + 1));
 
   return (
     <Card className="w-full">

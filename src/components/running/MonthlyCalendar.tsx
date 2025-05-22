@@ -29,11 +29,27 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   stats,
   runningData
 }) => {
+  console.log(`Rendering calendar for ${getMonthName(monthIndex)} ${year}`);
+  console.log(`RunDates available:`, Object.keys(runDates).length);
+  
+  // Function to get the ISO date string format (YYYY-MM-DD) from a Date object
+  const getDateString = (date: Date): string => {
+    return date.toISOString().split('T')[0];
+  };
+  
+  // Filter run days for this specific month and year
+  const runDaysForMonth = Object.keys(runDates)
+    .filter(dateStr => {
+      const date = new Date(dateStr);
+      return date.getMonth() === monthIndex && date.getFullYear() === year;
+    })
+    .map(dateStr => new Date(dateStr));
+  
+  console.log(`Run days for month ${monthIndex + 1}:`, runDaysForMonth.length);
+  
   // Function to personalize the appearance of days
   const modifiers = {
-    runDay: Object.keys(runDates)
-      .map(date => new Date(date))
-      .filter(date => date.getMonth() === monthIndex),
+    runDay: runDaysForMonth,
   };
   
   // Find run by date
@@ -57,7 +73,7 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
 
   const modifiersStyles = {
     runDay: (date: Date) => {
-      const dateStr = date.toISOString().split('T')[0];
+      const dateStr = getDateString(date);
       const distance = runDates[dateStr] || 0;
       
       if (!distance) return {};
@@ -70,7 +86,7 @@ const MonthlyCalendar: React.FC<MonthlyCalendarProps> = ({
   };
   
   const renderDayContents = (day: Date) => {
-    const dateStr = day.toISOString().split('T')[0];
+    const dateStr = getDateString(day);
     const distance = runDates[dateStr] || 0;
     
     if (!distance) {

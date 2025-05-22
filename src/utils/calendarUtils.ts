@@ -47,13 +47,29 @@ export const createRunDatesMap = (
   runningData: Array<{date: string; distance: number}>, 
   year: number
 ): Record<string, number> => {
-  return runningData.reduce((dates: Record<string, number>, run) => {
-    // Solo considerar fechas del año seleccionado
-    if (new Date(run.date).getFullYear() === year) {
-      dates[run.date] = run.distance;
+  // Create a proper date-indexed object with runs
+  const runDatesMap: Record<string, number> = {};
+  
+  // Process each run and add it to the map if it belongs to the selected year
+  runningData.forEach(run => {
+    // Make sure we're parsing dates consistently
+    const runDate = new Date(run.date);
+    
+    // Check if run is from the selected year
+    if (runDate.getFullYear() === year) {
+      // Use ISO format date (YYYY-MM-DD) as key
+      const dateKey = run.date;
+      
+      // Add or update the distance for this date
+      runDatesMap[dateKey] = (runDatesMap[dateKey] || 0) + run.distance;
+      
+      // Debug log to see what's being added
+      console.log(`Added run for date ${dateKey} with distance ${run.distance}km`);
     }
-    return dates;
-  }, {});
+  });
+  
+  console.log(`Total run dates for year ${year}:`, Object.keys(runDatesMap).length);
+  return runDatesMap;
 };
 
 /**
