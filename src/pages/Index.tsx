@@ -198,7 +198,7 @@ const Index = () => {
                 ) : (
                   "Seguimiento de mis estadísticas de carrera"
                 )}
-                {usingStravaData && (
+                {usingStravaData && runningData.length > 0 && (
                   <span className="block text-sm mt-1">
                     Última actualización: {formatLastUpdateTime()}
                   </span>

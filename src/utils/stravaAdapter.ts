@@ -1,7 +1,8 @@
-
 import { RunData, MonthlyStats } from '@/data/runningData';
 import { getRunningData, getAthleteInfo, getAthleteStats, isAuthenticated, forcePerpetualConnection } from '@/services/stravaService';
 import { loadRunningDataFromJson, isAdminMode } from '@/services/dataExportService';
+import { isUsingRealData } from '@/services/stravaPerpetualService';
+import { hasRealDataCaptured } from '@/services/stravaRealDataCapture';
 import { toZonedTime, format } from 'date-fns-tz';
 import { logDiagnostics } from './stravaDiagnostics';
 
@@ -12,6 +13,8 @@ export const fetchStravaRunningData = async (): Promise<RunData[]> => {
   console.log('🚀 fetchStravaRunningData: Iniciando...');
   console.log('🔧 Admin Mode:', isAdminMode());
   console.log('🔐 Authenticated:', isAuthenticated());
+  console.log('📊 Has Real Data:', hasRealDataCaptured());
+  console.log('🎯 Using Real Data:', isUsingRealData());
   
   try {
     // En modo no-admin, asegurar conexión perpetua
@@ -20,7 +23,35 @@ export const fetchStravaRunningData = async (): Promise<RunData[]> => {
       forcePerpetualConnection();
     }
     
-    // Primero intentar cargar datos del JSON (caché)
+    // Si tenemos datos reales capturados, intentar obtener datos frescos de Strava
+    if (hasRealDataCaptured() && isAuthenticated()) {
+      console.log('🏃 Tenemos datos reales - obteniendo datos frescos de Strava...');
+      
+      try {
+        // Ejecutar diagnósticos si estamos en modo admin
+        if (isAdminMode()) {
+          await logDiagnostics();
+        }
+        
+        const runData = await getRunningData();
+        console.log(`🏃 Datos frescos obtenidos desde Strava: ${runData.length} actividades`);
+        
+        if (runData.length > 0) {
+          // Ordenar por fecha (más reciente primero)
+          const sortedData = runData.sort((a, b) => {
+            return new Date(b.date).getTime() - new Date(a.date).getTime();
+          });
+          
+          console.log('✅ Retornando datos frescos de Strava');
+          return sortedData;
+        }
+      } catch (error) {
+        console.error('❌ Error obteniendo datos frescos de Strava:', error);
+        // Continuar con fallback a datos en caché
+      }
+    }
+    
+    // Fallback: Intentar cargar datos del JSON (caché)
     console.log('📁 Intentando cargar datos desde JSON...');
     const cachedData = loadRunningDataFromJson();
     if (cachedData && cachedData.length > 0) {
@@ -28,40 +59,6 @@ export const fetchStravaRunningData = async (): Promise<RunData[]> => {
       return cachedData;
     } else {
       console.log('📁 No hay datos en el JSON o está vacío');
-    }
-    
-    // Si no hay datos en caché, intentar obtener desde Strava
-    if (isAuthenticated()) {
-      console.log('🏃 Obteniendo datos desde Strava...');
-      
-      // Ejecutar diagnósticos si estamos en modo admin
-      if (isAdminMode()) {
-        await logDiagnostics();
-      }
-      
-      const runData = await getRunningData();
-      console.log(`🏃 Datos obtenidos desde Strava: ${runData.length} actividades`);
-      
-      if (runData.length > 0) {
-        // Log de muestra de datos
-        console.log('🏃 Muestra de datos:', {
-          first: runData[0],
-          last: runData[runData.length - 1],
-          total: runData.length
-        });
-        
-        // Ordenar por fecha (más reciente primero)
-        const sortedData = runData.sort((a, b) => {
-          return new Date(b.date).getTime() - new Date(a.date).getTime();
-        });
-        
-        console.log('🏃 Datos ordenados correctamente');
-        return sortedData;
-      } else {
-        console.log('⚠️ No se obtuvieron datos de Strava');
-      }
-    } else {
-      console.log('🔐 Usuario no autenticado, no se pueden obtener datos de Strava');
     }
     
     console.log('📁 Fallback: Retornando array vacío');

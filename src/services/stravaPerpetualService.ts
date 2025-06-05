@@ -61,6 +61,9 @@ export const initializePerpetualConnection = (): void => {
       
       console.log('✅ Conexión perpetua inicializada con datos reales de:', 
         `${realAthlete.firstname} ${realAthlete.lastname}`);
+      
+      // Marcar que estamos usando datos reales
+      localStorage.setItem('using_real_data', 'true');
       return;
     }
   }
@@ -75,6 +78,7 @@ export const initializePerpetualConnection = (): void => {
   
   localStorage.setItem(TOKEN_STORAGE_KEY, JSON.stringify(fallbackTokens));
   localStorage.setItem(ATHLETE_STORAGE_KEY, JSON.stringify(FALLBACK_ATHLETE_DATA));
+  localStorage.setItem('using_real_data', 'false');
   
   console.log('✅ Conexión perpetua inicializada con datos de fallback');
 };
@@ -90,9 +94,25 @@ export const isPerpetualConnectionActive = (): boolean => {
 };
 
 /**
+ * Verifica si estamos usando datos reales
+ */
+export const isUsingRealData = (): boolean => {
+  return localStorage.getItem('using_real_data') === 'true' && hasRealDataCaptured();
+};
+
+/**
  * Obtiene un token de acceso válido para la conexión perpetua
  */
 export const getPerpetualAccessToken = async (): Promise<string> => {
+  // Si tenemos datos reales, usar esos tokens directamente
+  if (hasRealDataCaptured()) {
+    const realToken = getRealAccessToken();
+    if (realToken) {
+      console.log('🔑 Usando token real capturado');
+      return realToken;
+    }
+  }
+  
   const tokensStr = localStorage.getItem(TOKEN_STORAGE_KEY);
   
   if (!tokensStr) {
@@ -106,48 +126,6 @@ export const getPerpetualAccessToken = async (): Promise<string> => {
   }
   
   const tokens = JSON.parse(tokensStr);
-  const now = Math.floor(Date.now() / 1000);
-  
-  // Si el token ha expirado, intentar refrescarlo solo si tenemos datos reales
-  if (now >= tokens.expires_at && hasRealDataCaptured()) {
-    try {
-      console.log('🔄 Refrescando token perpetuo con datos reales...');
-      
-      const response = await fetch('https://www.strava.com/oauth/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          client_id: STRAVA_CLIENT_ID,
-          client_secret: STRAVA_CLIENT_SECRET,
-          refresh_token: tokens.refresh_token,
-          grant_type: 'refresh_token',
-        }),
-      });
-
-      if (!response.ok) {
-        console.warn('⚠️ Error refrescando token, usando token actual');
-        return tokens.access_token;
-      }
-
-      const newTokens: StravaTokenResponse = await response.json();
-      
-      // Actualizar tokens en localStorage
-      localStorage.setItem(TOKEN_STORAGE_KEY, JSON.stringify({
-        access_token: newTokens.access_token,
-        refresh_token: newTokens.refresh_token,
-        expires_at: newTokens.expires_at,
-      }));
-      
-      console.log('✅ Token perpetuo refrescado');
-      return newTokens.access_token;
-    } catch (error) {
-      console.warn('⚠️ Error refrescando token perpetuo:', error);
-      return tokens.access_token;
-    }
-  }
-  
   return tokens.access_token;
 };
 
@@ -155,6 +133,15 @@ export const getPerpetualAccessToken = async (): Promise<string> => {
  * Obtiene información del atleta para la conexión perpetua
  */
 export const getPerpetualAthleteInfo = (): StravaAthlete => {
+  // Si tenemos datos reales, usar esos datos directamente
+  if (hasRealDataCaptured()) {
+    const realAthlete = getRealAthleteData();
+    if (realAthlete) {
+      console.log('👤 Usando datos reales del atleta:', realAthlete.firstname, realAthlete.lastname);
+      return realAthlete;
+    }
+  }
+  
   const athleteData = localStorage.getItem(ATHLETE_STORAGE_KEY);
   
   if (!athleteData) {
