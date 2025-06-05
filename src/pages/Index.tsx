@@ -62,9 +62,17 @@ const Index = () => {
   useEffect(() => {
     const loadStravaData = async () => {
       try {
+        console.log('🏠 Index: Iniciando carga de datos...');
+        console.log('🔧 Admin mode:', adminMode);
+        console.log('🔐 Authenticated:', isAuthenticated());
+        
         setLoading(true);
         const data = await fetchStravaRunningData();
+        
+        console.log('🏠 Index: Datos recibidos:', data.length, 'actividades');
+        
         if (data.length > 0) {
+          console.log('🏠 Index: Actualizando estado con datos de Strava');
           setRunningData(data);
           setUsingStravaData(true);
           
@@ -75,16 +83,19 @@ const Index = () => {
               description: `Se cargaron ${data.length} actividades de carrera`,
             });
           }
-        } else if (adminMode) {
-          // Solo mostrar error en modo administrador
-          toast({
-            title: "Sin actividades",
-            description: "No se encontraron actividades de carrera",
-            variant: "default",
-          });
+        } else {
+          console.log('🏠 Index: Sin datos, usando datos por defecto');
+          if (adminMode) {
+            // Solo mostrar error en modo administrador
+            toast({
+              title: "Sin actividades",
+              description: "No se encontraron actividades de carrera. Usando datos por defecto.",
+              variant: "default",
+            });
+          }
         }
       } catch (error) {
-        console.error("Error cargando datos:", error);
+        console.error("🏠 Index: Error cargando datos:", error);
         if (adminMode) {
           toast({
             title: "Error",

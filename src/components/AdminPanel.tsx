@@ -1,7 +1,9 @@
+
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
 import { 
   exportRunningData, 
@@ -18,6 +20,7 @@ import {
   getAthleteInfo 
 } from '@/services/stravaService';
 import StravaConnectButton from '@/components/StravaConnectButton';
+import StravaDebugPanel from '@/components/StravaDebugPanel';
 
 const AdminPanel: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -158,76 +161,101 @@ const AdminPanel: React.FC = () => {
     );
   }
   
-  // Panel de administración
+  // Panel de administración con tabs
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Panel de Administración de Strava</CardTitle>
-        <CardDescription>
-          Gestiona la sincronización de datos con Strava
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-6">
-          {/* Estado de conexión */}
-          <div className="space-y-2">
-            <h3 className="text-lg font-medium">Estado de conexión</h3>
-            <div className="flex items-center gap-2">
-              <div className={`w-3 h-3 rounded-full ${authenticated ? 'bg-green-500' : 'bg-red-500'}`}></div>
-              <span>{authenticated ? 'Conectado' : 'Desconectado'}</span>
-              {authenticated && athlete && (
-                <span className="ml-2 text-sm text-muted-foreground">
-                  ({athlete.firstname} {athlete.lastname})
-                </span>
-              )}
-            </div>
-            
-            {/* Botón de conexión/desconexión usando el componente StravaConnectButton */}
-            <StravaConnectButton showDisconnectButton={true} />
-          </div>
-          
-          {/* Estado de actualización */}
-          <div className="space-y-2">
-            <h3 className="text-lg font-medium">Estado de actualización</h3>
-            <div>
-              <span className="text-sm text-muted-foreground">
-                Última actualización: {lastUpdateTime}
-              </span>
-            </div>
-            <div className="space-y-2">
-              <Button 
-                onClick={handleExportData} 
-                disabled={!authenticated || loading}
-              >
-                {loading ? 'Actualizando...' : 'Actualizar datos manualmente'}
-              </Button>
-              <div className="text-sm text-muted-foreground">
-                <p>La actualización automática ocurre cada 6 horas</p>
+    <div className="w-full space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Panel de Administración de Strava</CardTitle>
+          <CardDescription>
+            Gestiona la sincronización de datos con Strava
+          </CardDescription>
+        </CardHeader>
+      </Card>
+
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="overview">Resumen</TabsTrigger>
+          <TabsTrigger value="debug">Diagnóstico</TabsTrigger>
+          <TabsTrigger value="settings">Configuración</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="overview" className="space-y-6">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="space-y-6">
+                {/* Estado de conexión */}
+                <div className="space-y-2">
+                  <h3 className="text-lg font-medium">Estado de conexión</h3>
+                  <div className="flex items-center gap-2">
+                    <div className={`w-3 h-3 rounded-full ${authenticated ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                    <span>{authenticated ? 'Conectado' : 'Desconectado'}</span>
+                    {authenticated && athlete && (
+                      <span className="ml-2 text-sm text-muted-foreground">
+                        ({athlete.firstname} {athlete.lastname})
+                      </span>
+                    )}
+                  </div>
+                  
+                  <StravaConnectButton showDisconnectButton={true} />
+                </div>
+                
+                {/* Estado de actualización */}
+                <div className="space-y-2">
+                  <h3 className="text-lg font-medium">Estado de actualización</h3>
+                  <div>
+                    <span className="text-sm text-muted-foreground">
+                      Última actualización: {lastUpdateTime}
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    <Button 
+                      onClick={handleExportData} 
+                      disabled={!authenticated || loading}
+                    >
+                      {loading ? 'Actualizando...' : 'Actualizar datos manualmente'}
+                    </Button>
+                    <div className="text-sm text-muted-foreground">
+                      <p>La actualización automática ocurre cada 6 horas</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-          
-          {/* Opciones adicionales */}
-          <div className="space-y-2">
-            <h3 className="text-lg font-medium">Opciones</h3>
-            <Button 
-              variant="outline"
-              onClick={() => {
-                setAdminMode(false);
-                setShowAdminPanel(false);
-                stopAutoUpdater();
-                toast({
-                  title: "Modo administrador desactivado",
-                  description: "Has salido del modo de administración",
-                });
-              }}
-            >
-              Salir del modo administrador
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="debug">
+          <StravaDebugPanel />
+        </TabsContent>
+        
+        <TabsContent value="settings" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Configuración</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <Button 
+                  variant="outline"
+                  onClick={() => {
+                    setAdminMode(false);
+                    setShowAdminPanel(false);
+                    stopAutoUpdater();
+                    toast({
+                      title: "Modo administrador desactivado",
+                      description: "Has salido del modo de administración",
+                    });
+                  }}
+                >
+                  Salir del modo administrador
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 

@@ -3,33 +3,78 @@ import { RunData, MonthlyStats } from '@/data/runningData';
 import { getRunningData, getAthleteInfo, getAthleteStats, isAuthenticated } from '@/services/stravaService';
 import { loadRunningDataFromJson, isAdminMode } from '@/services/dataExportService';
 import { toZonedTime, format } from 'date-fns-tz';
+import { logDiagnostics } from './stravaDiagnostics';
 
 /**
  * Obtiene datos de carrera desde Strava y los convierte al formato de la aplicación
  */
 export const fetchStravaRunningData = async (): Promise<RunData[]> => {
+  console.log('🚀 fetchStravaRunningData: Iniciando...');
+  console.log('🔧 Admin Mode:', isAdminMode());
+  console.log('🔐 Authenticated:', isAuthenticated());
+  
   try {
     // Si no estamos en modo admin, intentar cargar datos del JSON
     if (!isAdminMode()) {
+      console.log('📁 Modo no-admin: Cargando datos desde JSON...');
       const cachedData = loadRunningDataFromJson();
       if (cachedData && cachedData.length > 0) {
+        console.log(`📁 Datos del JSON cargados: ${cachedData.length} actividades`);
         return cachedData;
+      } else {
+        console.log('📁 No hay datos en el JSON o está vacío');
       }
     }
     
     // Si estamos en modo admin o no hay datos en caché, intentar obtener desde Strava
     if (isAuthenticated()) {
-      const runData = await getRunningData();
+      console.log('🏃 Obteniendo datos desde Strava...');
       
-      // Ordenar por fecha (más reciente primero)
-      return runData.sort((a, b) => {
-        return new Date(b.date).getTime() - new Date(a.date).getTime();
-      });
+      // Ejecutar diagnósticos si estamos en modo admin
+      if (isAdminMode()) {
+        await logDiagnostics();
+      }
+      
+      const runData = await getRunningData();
+      console.log(`🏃 Datos obtenidos desde Strava: ${runData.length} actividades`);
+      
+      if (runData.length > 0) {
+        // Log de muestra de datos
+        console.log('🏃 Muestra de datos:', {
+          first: runData[0],
+          last: runData[runData.length - 1],
+          total: runData.length
+        });
+        
+        // Ordenar por fecha (más reciente primero)
+        const sortedData = runData.sort((a, b) => {
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
+        });
+        
+        console.log('🏃 Datos ordenados correctamente');
+        return sortedData;
+      } else {
+        console.log('⚠️ No se obtuvieron datos de Strava');
+      }
+    } else {
+      console.log('🔐 Usuario no autenticado, no se pueden obtener datos de Strava');
     }
     
+    console.log('📁 Fallback: Retornando array vacío');
     return [];
   } catch (error) {
-    console.error('Error obteniendo datos de Strava:', error);
+    console.error('❌ Error obteniendo datos de Strava:', error);
+    
+    // En caso de error, intentar cargar datos del JSON como fallback
+    if (isAdminMode()) {
+      console.log('📁 Fallback por error: Intentando cargar datos del JSON...');
+      const cachedData = loadRunningDataFromJson();
+      if (cachedData && cachedData.length > 0) {
+        console.log(`📁 Fallback exitoso: ${cachedData.length} actividades del JSON`);
+        return cachedData;
+      }
+    }
+    
     return [];
   }
 };
@@ -158,6 +203,8 @@ export const prepareChartData = (monthlyStats: MonthlyStats[]) => {
  * @returns Array con la cantidad de carreras por hora
  */
 export const calculateRunsPerHour = (runData: RunData[]): { hour: string, runs: number }[] => {
+  console.log('⏰ calculateRunsPerHour: Procesando', runData.length, 'carreras');
+  
   // Inicializar array con todas las horas (0-23)
   const hoursData = Array.from({ length: 24 }).map((_, index) => ({
     hour: index.toString().padStart(2, '0') + ':00',
@@ -181,7 +228,7 @@ export const calculateRunsPerHour = (runData: RunData[]): { hour: string, runs: 
         const hourOfDay = crDateObj.getHours();
         
         // Debug para ver las fechas transformadas
-        console.log(`Run hora: ${run.date}, Start Time: ${run.startTimeLocal}, CR Time: ${format(crDateObj, 'yyyy-MM-dd HH:mm:ss', { timeZone })}, Hour: ${hourOfDay}`);
+        console.log(`⏰ Run hora: ${run.date}, Start Time: ${run.startTimeLocal}, CR Time: ${format(crDateObj, 'yyyy-MM-dd HH:mm:ss', { timeZone })}, Hour: ${hourOfDay}`);
         
         // Incrementar contador para esa hora
         if (hourOfDay >= 0 && hourOfDay < 24) {
@@ -189,13 +236,13 @@ export const calculateRunsPerHour = (runData: RunData[]): { hour: string, runs: 
         }
       } else {
         // Compatibilidad con datos antiguos que no tienen startTimeLocal
-        console.warn(`Run sin startTimeLocal: ${run.date}`);
+        console.warn(`⏰ Run sin startTimeLocal: ${run.date}`);
       }
     } catch (error) {
-      console.error(`Error procesando hora para carrera ${run.date}:`, error);
+      console.error(`⏰ Error procesando hora para carrera ${run.date}:`, error);
     }
   });
   
+  console.log('⏰ Resultado final por horas:', hoursData.filter(h => h.runs > 0));
   return hoursData;
 };
-
