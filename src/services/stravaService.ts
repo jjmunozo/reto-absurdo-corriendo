@@ -20,6 +20,7 @@ import {
   forcePerpetualConnection
 } from './stravaPerpetualService';
 import { isAdminMode } from './dataExportService';
+import * as stravaAuthService from './stravaAuthService';
 
 /**
  * Versión mejorada de isAuthenticated que siempre retorna true para conexión perpetua
@@ -35,7 +36,6 @@ export const isAuthenticated = (): boolean => {
   }
   
   // En modo admin, usar la lógica original
-  const stravaAuthService = await import('./stravaAuthService');
   return stravaAuthService.isAuthenticated();
 };
 
@@ -52,7 +52,6 @@ export const getAthleteInfo = () => {
   }
   
   // En modo admin, usar la lógica original
-  const stravaAuthService = await import('./stravaAuthService');
   return stravaAuthService.getAthleteInfo();
 };
 
@@ -69,7 +68,6 @@ export const getAccessToken = async (): Promise<string> => {
   }
   
   // En modo admin, usar la lógica original
-  const stravaAuthService = await import('./stravaAuthService');
   return await stravaAuthService.getAccessToken();
 };
 
