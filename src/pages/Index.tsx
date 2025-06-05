@@ -19,6 +19,7 @@ import { toast } from '@/hooks/use-toast';
 
 const Index = () => {
   const [showAdmin, setShowAdmin] = useState<boolean>(false);
+  const [lastUpdateTime, setLastUpdateTime] = useState<Date>(new Date());
   
   // Usar el nuevo hook para obtener datos de Strava
   const { runs, isLoading, isError, error, refresh } = useStravaRuns();
@@ -41,6 +42,13 @@ const Index = () => {
       window.removeEventListener('hashchange', checkAdminRoute);
     };
   }, []);
+
+  // Actualizar la fecha de última actualización cuando los datos cambian
+  useEffect(() => {
+    if (runs.length > 0 && !isLoading) {
+      setLastUpdateTime(new Date());
+    }
+  }, [runs, isLoading]);
 
   // Mostrar toast si hay error
   useEffect(() => {
@@ -85,6 +93,18 @@ const Index = () => {
     return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
   };
 
+  // Formatear fecha de última actualización
+  const formatLastUpdate = (date: Date) => {
+    return date.toLocaleString('es-ES', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
@@ -112,7 +132,7 @@ const Index = () => {
                 )}
                 {!isLoading && runs.length > 0 && (
                   <span className="block text-sm mt-1">
-                    {runs.length} carreras registradas
+                    Última actualización: {formatLastUpdate(lastUpdateTime)}
                   </span>
                 )}
               </p>
