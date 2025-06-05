@@ -24,7 +24,6 @@ interface ContributionGridProps {
  */
 const ContributionGrid: React.FC<ContributionGridProps> = ({ data, year }) => {
   const monthNames = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-  const dayNames = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
   // Get the color class based on the level (0-4)
   const getColorClass = (level: number): string => {
@@ -47,14 +46,6 @@ const ContributionGrid: React.FC<ContributionGridProps> = ({ data, year }) => {
       month: 'long', 
       day: 'numeric' 
     });
-  };
-
-  // Format time
-  const formatTime = (minutes: number) => {
-    if (minutes === 0) return '';
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
   };
 
   // Group data by weeks
@@ -126,9 +117,8 @@ const ContributionGrid: React.FC<ContributionGridProps> = ({ data, year }) => {
   return (
     <div className="overflow-x-auto">
       <div className="min-w-fit">
-        {/* Month labels */}
-        <div className="flex mb-2">
-          <div className="w-8"></div> {/* Space for day labels */}
+        {/* Month labels with more spacing */}
+        <div className="flex mb-4">
           <div className="flex relative" style={{ width: weeks.length * 14 }}>
             {monthLabels.map(({ month, week }) => (
               <div
@@ -142,58 +132,40 @@ const ContributionGrid: React.FC<ContributionGridProps> = ({ data, year }) => {
           </div>
         </div>
 
-        {/* Main grid */}
-        <div className="flex">
-          {/* Day labels */}
-          <div className="flex flex-col mr-2">
-            {dayNames.map((day, index) => (
-              <div
-                key={day}
-                className={`h-3 flex items-center text-xs text-gray-600 ${
-                  index % 2 === 1 ? '' : 'opacity-0'
-                }`}
-                style={{ fontSize: '10px' }}
-              >
-                {index % 2 === 1 ? day : ''}
-              </div>
-            ))}
-          </div>
-
-          {/* Contribution squares */}
-          <div className="flex gap-1">
-            {weeks.map((week, weekIndex) => (
-              <div key={weekIndex} className="flex flex-col gap-1">
-                {week.map((day, dayIndex) => (
-                  <TooltipProvider key={`${weekIndex}-${dayIndex}`}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div
-                          className={`w-3 h-3 rounded-sm border border-gray-200 dark:border-gray-700 ${
-                            day.date ? getColorClass(day.level) : 'bg-transparent border-transparent'
-                          } transition-colors cursor-pointer hover:ring-1 hover:ring-gray-400`}
-                        />
-                      </TooltipTrigger>
-                      {day.date && (
-                        <TooltipContent className="bg-white p-2 max-w-xs">
-                          <div className="space-y-1">
-                            <div className="font-semibold">{formatDate(day.date)}</div>
-                            {day.runs > 0 ? (
-                              <div className="text-sm">
-                                <div>{day.runs} entrenamiento{day.runs > 1 ? 's' : ''}</div>
-                                <div>{day.distance.toFixed(1)}km totales</div>
-                              </div>
-                            ) : (
-                              <div className="text-sm text-gray-500">Sin entrenamientos</div>
-                            )}
-                          </div>
-                        </TooltipContent>
-                      )}
-                    </Tooltip>
-                  </TooltipProvider>
-                ))}
-              </div>
-            ))}
-          </div>
+        {/* Contribution squares only - no day labels */}
+        <div className="flex gap-1">
+          {weeks.map((week, weekIndex) => (
+            <div key={weekIndex} className="flex flex-col gap-1">
+              {week.map((day, dayIndex) => (
+                <TooltipProvider key={`${weekIndex}-${dayIndex}`}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div
+                        className={`w-3 h-3 rounded-sm border border-gray-200 dark:border-gray-700 ${
+                          day.date ? getColorClass(day.level) : 'bg-transparent border-transparent'
+                        } transition-colors cursor-pointer hover:ring-1 hover:ring-gray-400`}
+                      />
+                    </TooltipTrigger>
+                    {day.date && (
+                      <TooltipContent className="bg-white p-2 max-w-xs">
+                        <div className="space-y-1">
+                          <div className="font-semibold">{formatDate(day.date)}</div>
+                          {day.runs > 0 ? (
+                            <div className="text-sm">
+                              <div>{day.runs} entrenamiento{day.runs > 1 ? 's' : ''}</div>
+                              <div>{day.distance.toFixed(1)}km totales</div>
+                            </div>
+                          ) : (
+                            <div className="text-sm text-gray-500">Sin entrenamientos</div>
+                          )}
+                        </div>
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                </TooltipProvider>
+              ))}
+            </div>
+          ))}
         </div>
       </div>
     </div>
