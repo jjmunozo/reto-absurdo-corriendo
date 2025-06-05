@@ -5,71 +5,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from '@/hooks/use-toast';
-import { 
-  exportRunningData, 
-  formatLastUpdateTime, 
-  setupAutoUpdater, 
-  stopAutoUpdater, 
-  isAdminMode,
-  setAdminMode
-} from '@/services/dataExportService';
-import { 
-  isAuthenticated, 
-  initiateStravaAuth, 
-  logout, 
-  getAthleteInfo 
-} from '@/services/stravaService';
-import StravaConnectButton from '@/components/StravaConnectButton';
-import StravaDebugPanel from '@/components/StravaDebugPanel';
-import StravaDataCapture from '@/components/StravaDataCapture';
+import { useStravaRuns } from '@/hooks/useStravaRuns';
 
 const AdminPanel: React.FC = () => {
-  const [loading, setLoading] = useState(false);
   const [password, setPassword] = useState('');
   const [showAdminPanel, setShowAdminPanel] = useState(false);
-  const [lastUpdateTime, setLastUpdateTime] = useState(formatLastUpdateTime());
-  const athlete = getAthleteInfo();
-  const authenticated = isAuthenticated();
-  
-  // Verificar si ya estamos en modo admin
-  useEffect(() => {
-    setShowAdminPanel(isAdminMode());
-    
-    // Configurar actualizador automático
-    if (isAdminMode() && isAuthenticated()) {
-      setupAutoUpdater();
-    }
-    
-    // Efecto de limpieza
-    return () => {
-      stopAutoUpdater();
-    };
-  }, []);
-  
-  // Actualizar lastUpdateTime cada 30 segundos
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setLastUpdateTime(formatLastUpdateTime());
-    }, 30000);
-    
-    return () => clearInterval(intervalId);
-  }, []);
+  const { runs, isLoading, isError, refresh } = useStravaRuns();
   
   const handleAdminLogin = () => {
-    // En un entorno real, esto debería validarse en el servidor
-    // Para esta implementación, usaremos una clave simple codificada
     if (password === 'admin123') {
-      setAdminMode(true);
       setShowAdminPanel(true);
       toast({
         title: "Modo administrador activado",
-        description: "Ahora puedes gestionar los datos de Strava",
+        description: "Panel de administración del nuevo sistema Strava",
       });
-      
-      // Iniciar actualizador automático si hay autenticación
-      if (isAuthenticated()) {
-        setupAutoUpdater();
-      }
     } else {
       toast({
         title: "Contraseña incorrecta",
@@ -78,74 +27,18 @@ const AdminPanel: React.FC = () => {
       });
     }
   };
-  
-  const handleExportData = async () => {
-    if (!isAuthenticated()) {
-      toast({
-        title: "Error",
-        description: "Necesitas conectar con Strava primero",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    setLoading(true);
-    try {
-      const data = await exportRunningData();
-      setLastUpdateTime(formatLastUpdateTime());
-      toast({
-        title: "Datos exportados",
-        description: `Se exportaron ${data.length} actividades correctamente`,
-      });
-    } catch (error) {
-      console.error("Error exportando datos:", error);
-      toast({
-        title: "Error",
-        description: "No se pudieron exportar los datos",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-  
-  const handleConnect = () => {
-    try {
-      initiateStravaAuth();
-    } catch (error) {
-      console.error("Error iniciando autenticación:", error);
-      toast({
-        title: "Error",
-        description: "No se pudo conectar con Strava",
-        variant: "destructive",
-      });
-    }
-  };
-  
-  const handleLogout = () => {
-    logout();
-    stopAutoUpdater(); // Detener actualizaciones automáticas
-    toast({
-      title: "Desconectado",
-      description: "Se ha cerrado la sesión de Strava",
-    });
-    window.location.reload();
-  };
 
   const handleBackToMain = () => {
-    // Remover el hash #admin de la URL
     window.location.hash = '';
-    // Forzar recarga para actualizar la vista
     window.location.reload();
   };
   
-  // Si no estamos en modo admin y no es la URL de admin, mostrar el formulario de acceso
   if (!showAdminPanel) {
     return (
       <Card className="w-full max-w-md mx-auto">
         <CardHeader>
           <CardTitle>Acceso Administrativo</CardTitle>
-          <CardDescription>Ingresa la contraseña para gestionar los datos de Strava</CardDescription>
+          <CardDescription>Ingresa la contraseña para ver el panel de administración</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -169,23 +62,20 @@ const AdminPanel: React.FC = () => {
     );
   }
   
-  // Panel de administración con tabs
   return (
     <div className="w-full space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Panel de Administración de Strava</CardTitle>
+          <CardTitle>Panel de Administración - Sistema Nuevo</CardTitle>
           <CardDescription>
-            Gestiona la sincronización de datos con Strava
+            El sistema ahora usa una API backend para obtener datos de Strava automáticamente
           </CardDescription>
         </CardHeader>
       </Card>
 
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="overview">Resumen</TabsTrigger>
-          <TabsTrigger value="capture">Capturar Datos</TabsTrigger>
-          <TabsTrigger value="debug">Diagnóstico</TabsTrigger>
           <TabsTrigger value="settings">Configuración</TabsTrigger>
         </TabsList>
         
@@ -193,53 +83,37 @@ const AdminPanel: React.FC = () => {
           <Card>
             <CardContent className="pt-6">
               <div className="space-y-6">
-                {/* Estado de conexión */}
                 <div className="space-y-2">
-                  <h3 className="text-lg font-medium">Estado de conexión</h3>
-                  <div className="flex items-center gap-2">
-                    <div className={`w-3 h-3 rounded-full ${authenticated ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                    <span>{authenticated ? 'Conectado' : 'Desconectado'}</span>
-                    {authenticated && athlete && (
-                      <span className="ml-2 text-sm text-muted-foreground">
-                        ({athlete.firstname} {athlete.lastname})
-                      </span>
-                    )}
+                  <h3 className="text-lg font-medium">Estado del Sistema</h3>
+                  <div className="space-y-2">
+                    <p><strong>Estado:</strong> {isLoading ? 'Cargando...' : isError ? 'Error' : 'Conectado'}</p>
+                    <p><strong>Actividades cargadas:</strong> {runs.length}</p>
+                    <p><strong>Última actualización:</strong> {new Date().toLocaleString()}</p>
+                    <p><strong>Tipo de sistema:</strong> API Backend (sin autenticación de usuarios)</p>
                   </div>
                   
-                  <StravaConnectButton showDisconnectButton={true} />
+                  <Button 
+                    onClick={() => refresh()}
+                    disabled={isLoading}
+                    className="mt-4"
+                  >
+                    {isLoading ? 'Actualizando...' : 'Refrescar Datos'}
+                  </Button>
                 </div>
-                
-                {/* Estado de actualización */}
+
                 <div className="space-y-2">
-                  <h3 className="text-lg font-medium">Estado de actualización</h3>
-                  <div>
-                    <span className="text-sm text-muted-foreground">
-                      Última actualización: {lastUpdateTime}
-                    </span>
-                  </div>
-                  <div className="space-y-2">
-                    <Button 
-                      onClick={handleExportData} 
-                      disabled={!authenticated || loading}
-                    >
-                      {loading ? 'Actualizando...' : 'Actualizar datos manualmente'}
-                    </Button>
-                    <div className="text-sm text-muted-foreground">
-                      <p>La actualización automática ocurre cada 6 horas</p>
-                    </div>
+                  <h3 className="text-lg font-medium">Información del Sistema</h3>
+                  <div className="bg-gray-50 p-4 rounded-lg text-sm space-y-1">
+                    <p>• Los datos se actualizan automáticamente cada 6 horas</p>
+                    <p>• No se requiere autenticación de usuarios</p>
+                    <p>• Los tokens se refrescan automáticamente</p>
+                    <p>• Cache inteligente con SWR (refresco cada 10 min)</p>
+                    <p>• Obtiene TODAS las actividades históricas</p>
                   </div>
                 </div>
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-        
-        <TabsContent value="capture">
-          <StravaDataCapture />
-        </TabsContent>
-        
-        <TabsContent value="debug">
-          <StravaDebugPanel />
         </TabsContent>
         
         <TabsContent value="settings" className="space-y-6">
@@ -259,16 +133,14 @@ const AdminPanel: React.FC = () => {
                 <Button 
                   variant="outline"
                   onClick={() => {
-                    setAdminMode(false);
                     setShowAdminPanel(false);
-                    stopAutoUpdater();
                     toast({
-                      title: "Modo administrador desactivado",
-                      description: "Has salido del modo de administración",
+                      title: "Sesión cerrada",
+                      description: "Has salido del panel de administración",
                     });
                   }}
                 >
-                  Salir del modo administrador
+                  Cerrar sesión de administrador
                 </Button>
               </div>
             </CardContent>
