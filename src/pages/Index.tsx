@@ -5,6 +5,7 @@ import RunningChart from '@/components/RunningChart';
 import RunningYearCalendar from '@/components/RunningYearCalendar';
 import RecentRuns from '@/components/RecentRuns';
 import RunsPerHourChart from '@/components/RunsPerHourChart';
+import AdminPanel from '@/components/AdminPanel';
 import { RunData } from '@/data/runningData';
 import { useStravaRuns } from '@/hooks/useStravaRuns';
 import { 
@@ -15,7 +16,6 @@ import {
   calculateRunsPerHour
 } from '@/utils/stravaAdapter';
 import { toast } from '@/hooks/use-toast';
-import StravaConfigDiagnostic from '@/components/StravaConfigDiagnostic';
 
 const Index = () => {
   const [showAdmin, setShowAdmin] = useState<boolean>(false);
@@ -29,6 +29,8 @@ const Index = () => {
       const hashParams = window.location.hash.substring(1);
       if (hashParams === 'admin') {
         setShowAdmin(true);
+      } else {
+        setShowAdmin(false);
       }
     };
 
@@ -51,41 +53,12 @@ const Index = () => {
     }
   }, [isError, error]);
 
-  // Si estamos en la ruta admin, mostrar mensaje simple
+  // Si estamos en la ruta admin, mostrar el panel de administración
   if (showAdmin) {
     return (
       <div className="min-h-screen bg-gray-50 p-8">
         <div className="container mx-auto">
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold mb-2">Panel de Administración</h1>
-            <p className="text-gray-600">
-              <a href="#" className="text-running-primary hover:underline">
-                &larr; Volver a la página principal
-              </a>
-            </p>
-          </div>
-          
-          <div className="space-y-6">
-            <StravaConfigDiagnostic />
-            
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h2 className="text-xl font-semibold mb-4">Estado del Sistema</h2>
-              <p className="text-gray-600 mb-4">
-                El sistema ahora usa un servicio frontend para obtener datos de Strava.
-              </p>
-              <div className="space-y-2">
-                <p><strong>Estado:</strong> {isLoading ? 'Cargando...' : isError ? 'Error' : 'Conectado'}</p>
-                <p><strong>Actividades:</strong> {runs.length}</p>
-                <p><strong>Última actualización:</strong> {new Date().toLocaleString()}</p>
-              </div>
-              <button 
-                onClick={() => refresh()}
-                className="mt-4 bg-running-primary text-white px-4 py-2 rounded hover:bg-running-dark"
-              >
-                Refrescar Datos
-              </button>
-            </div>
-          </div>
+          <AdminPanel />
         </div>
       </div>
     );
