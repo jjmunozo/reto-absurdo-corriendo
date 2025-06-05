@@ -2,6 +2,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
+const supabase = createClient(
+  Deno.env.get("SUPABASE_URL")!,
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+);
+const JUAN_ATHLETE_ID = "juan"; // ajustá si usás otro id
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -26,60 +32,70 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    const supabase = createClient(supabaseUrl, supabaseServiceKey)
+    console.log('🔧 Iniciando sincronización con tokens persistentes...')
 
-    // Obtener credenciales de los secrets configurados
-    const stravaClientId = '160774'
-    const stravaClientSecret = Deno.env.get('STRAVA_CLIENT_SECRET')
-    const juanAccessToken = Deno.env.get('JUAN_STRAVA_ACCESS_TOKEN')
-    const juanRefreshToken = Deno.env.get('JUAN_STRAVA_REFRESH_TOKEN')
-    const juanAthleteId = Deno.env.get('JUAN_STRAVA_ATHLETE_ID') || '160774'
+    // ► Leemos tokens guardados (o semilla de env vars)
+    const { data: connection } = await supabase
+      .from("strava_connections")
+      .select("access_token, refresh_token, expires_at")
+      .eq("athlete_id", JUAN_ATHLETE_ID)
+      .single();
 
-    console.log('🔧 Iniciando sincronización con credenciales configuradas...')
-    console.log(`📊 Cliente ID: ${stravaClientId}`)
-    console.log(`👤 Athlete ID: ${juanAthleteId}`)
-    console.log(`🔑 Secrets disponibles:`, {
-      hasClientSecret: !!stravaClientSecret,
-      hasAccessToken: !!juanAccessToken,
-      hasRefreshToken: !!juanRefreshToken
+    let accessToken =
+      connection?.access_token ?? Deno.env.get("JUAN_STRAVA_ACCESS_TOKEN");
+    let refreshToken =
+      connection?.refresh_token ?? Deno.env.get("JUAN_STRAVA_REFRESH_TOKEN");
+    let expiresAt = Number(connection?.expires_at ?? 0); // unix-seconds
+
+    console.log('🔑 Estado de tokens:', {
+      hasConnection: !!connection,
+      hasAccessToken: !!accessToken,
+      hasRefreshToken: !!refreshToken,
+      expiresAt: expiresAt,
+      currentTime: Math.floor(Date.now() / 1000)
     })
 
-    if (!stravaClientSecret || !juanAccessToken || !juanRefreshToken) {
-      throw new Error('Faltan credenciales de Strava. Verifica que todos los secrets estén configurados.')
+    if (!accessToken || !refreshToken) {
+      throw new Error('No se encontraron tokens de Strava. Verifica que estén configurados en la base de datos o como secrets.')
     }
 
-    let accessToken = juanAccessToken
-    let refreshToken = juanRefreshToken
+    const now = Math.floor(Date.now() / 1000);
+    const needsRefresh = now > expiresAt - 300; // 5 min antes de vencer
 
-    // Intentar refrescar el token de acceso
-    console.log('🔄 Refrescando token de acceso...')
-    try {
-      const refreshResponse = await fetch('https://www.strava.com/oauth/token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+    if (needsRefresh) {
+      console.log('🔄 Refrescando token (expira pronto o ya expiró)...')
+      const r = await fetch("https://www.strava.com/oauth/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          client_id: stravaClientId,
-          client_secret: stravaClientSecret,
+          client_id: Deno.env.get("STRAVA_CLIENT_ID") || '160774',
+          client_secret: Deno.env.get("STRAVA_CLIENT_SECRET"),
+          grant_type: "refresh_token",
           refresh_token: refreshToken,
-          grant_type: 'refresh_token',
         }),
-      })
-
-      if (refreshResponse.ok) {
-        const refreshData = await refreshResponse.json()
-        accessToken = refreshData.access_token
-        refreshToken = refreshData.refresh_token
-        console.log('✅ Token refrescado exitosamente')
-      } else {
-        const errorText = await refreshResponse.text()
-        console.warn('⚠️ No se pudo refrescar token, usando token existente:', errorText)
+      });
+      
+      if (!r.ok) {
+        const errorText = await r.text()
+        throw new Error(`No se pudo refrescar token: ${errorText}`)
       }
-    } catch (refreshError) {
-      console.warn('⚠️ Error al refrescar token, usando token existente:', refreshError)
+      
+      const t = await r.json();
+      accessToken  = t.access_token;
+      refreshToken = t.refresh_token;
+      expiresAt    = t.expires_at;        // unix-seconds
+
+      console.log('✅ Token refrescado exitosamente, guardando en DB...')
+
+      // guardar / actualizar fila
+      await supabase.from("strava_connections").upsert({
+        athlete_id: JUAN_ATHLETE_ID,
+        access_token: accessToken,
+        refresh_token: refreshToken,
+        expires_at: expiresAt,
+      });
+    } else {
+      console.log('⏰ Token aún válido, no necesita refresh')
     }
 
     // Obtener actividades de Strava
@@ -135,7 +151,7 @@ serve(async (req) => {
       .filter(activity => activity.type === 'Run')
       .map(activity => ({
         id: activity.id,
-        athlete_id: juanAthleteId,
+        athlete_id: '160774',
         name: activity.name,
         distance: activity.distance,
         moving_time: activity.moving_time,
@@ -165,33 +181,12 @@ serve(async (req) => {
       console.log('✅ Actividades guardadas exitosamente')
     }
 
-    // Actualizar información de conexión con los nuevos tokens
-    console.log('🔗 Actualizando información de conexión...')
-    const connectionData = {
-      athlete_id: juanAthleteId,
-      strava_athlete_id: parseInt(juanAthleteId),
-      access_token: accessToken,
-      refresh_token: refreshToken,
-      expires_at: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString(),
-      athlete_data: { firstname: 'Juan', lastname: 'Running Data' },
-      scope: 'read,activity:read_all'
-    }
-
-    const { error: connectionError } = await supabase
-      .from('strava_connections')
-      .upsert(connectionData, { onConflict: 'athlete_id' })
-
-    if (connectionError) {
-      console.warn('⚠️ Error al actualizar conexión:', connectionError)
-    } else {
-      console.log('✅ Conexión actualizada exitosamente')
-    }
-
     const result = {
       success: true,
       activities_synced: runningActivities.length,
       total_activities: allActivities.length,
-      athlete_id: juanAthleteId,
+      athlete_id: JUAN_ATHLETE_ID,
+      token_refreshed: needsRefresh,
       timestamp: new Date().toISOString()
     }
 
