@@ -34,18 +34,17 @@ serve(async (req) => {
     const juanAccessToken = Deno.env.get('JUAN_STRAVA_ACCESS_TOKEN')!
     const juanRefreshToken = Deno.env.get('JUAN_STRAVA_REFRESH_TOKEN')!
     const juanAthleteId = Deno.env.get('JUAN_STRAVA_ATHLETE_ID')!
-    const stravaClientId = Deno.env.get('STRAVA_CLIENT_ID') || '160774'
+    const stravaClientId = '160774'
     const stravaClientSecret = Deno.env.get('STRAVA_CLIENT_SECRET')!
 
     console.log(`Syncing activities for Juan (athlete ID: ${juanAthleteId})`)
 
-    // Verificar si el token ha expirado y refrescarlo si es necesario
-    let accessToken = juanAccessToken
-    let refreshToken = juanRefreshToken
-
     // Intentar refrescar el token proactivamente
     console.log('Refreshing token proactively...')
     
+    let accessToken = juanAccessToken
+    let refreshToken = juanRefreshToken
+
     const refreshResponse = await fetch('https://www.strava.com/oauth/token', {
       method: 'POST',
       headers: {
@@ -64,8 +63,13 @@ serve(async (req) => {
       accessToken = refreshData.access_token
       refreshToken = refreshData.refresh_token
       console.log('Token refreshed successfully')
+      
+      // Actualizar tokens en variables de entorno para próximas ejecuciones
+      // Nota: En producción real necesitarías una forma de persistir estos tokens
     } else {
-      console.log('Using existing token (refresh failed or not needed)')
+      const errorText = await refreshResponse.text()
+      console.error('Token refresh failed:', errorText)
+      throw new Error(`Failed to refresh token: ${refreshResponse.status} - ${errorText}`)
     }
 
     // Obtener actividades de Strava
@@ -85,7 +89,9 @@ serve(async (req) => {
       )
 
       if (!activitiesResponse.ok) {
-        throw new Error(`Failed to fetch activities: ${activitiesResponse.status}`)
+        const errorText = await activitiesResponse.text()
+        console.error(`Failed to fetch activities (page ${page}):`, errorText)
+        throw new Error(`Failed to fetch activities: ${activitiesResponse.status} - ${errorText}`)
       }
 
       const activities: StravaActivity[] = await activitiesResponse.json()
@@ -127,11 +133,11 @@ serve(async (req) => {
 
       if (insertError) {
         console.error('Error inserting activities:', insertError)
-        throw new Error('Failed to save activities')
+        throw new Error(`Failed to save activities: ${insertError.message}`)
       }
     }
 
-    // Guardar/actualizar información de conexión de Juan
+    // Guardar/actualizar información de conexión de Juan con los nuevos tokens
     const connectionData = {
       user_id: juanAthleteId,
       strava_athlete_id: parseInt(juanAthleteId),
@@ -148,6 +154,7 @@ serve(async (req) => {
 
     if (connectionError) {
       console.error('Error updating connection:', connectionError)
+      // No lanzar error aquí ya que las actividades se guardaron correctamente
     }
 
     console.log('Activities synced successfully')
@@ -157,7 +164,8 @@ serve(async (req) => {
         success: true, 
         activities_synced: runningActivities.length,
         total_activities: allActivities.length,
-        athlete_id: juanAthleteId
+        athlete_id: juanAthleteId,
+        token_refreshed: true
       }),
       { 
         headers: { 
@@ -171,7 +179,8 @@ serve(async (req) => {
     console.error('Error in sync-strava-activities function:', error)
     return new Response(
       JSON.stringify({ 
-        error: error.message || 'Internal server error' 
+        error: error.message || 'Internal server error',
+        details: error.toString()
       }),
       { 
         status: 400,

@@ -67,24 +67,36 @@ export const useJuanStravaData = () => {
     setError(null)
 
     try {
+      console.log('Iniciando sincronización con Strava...')
+      
       const { data, error } = await supabase.functions.invoke('sync-strava-activities')
 
+      console.log('Respuesta de sincronización:', { data, error })
+
       if (error) {
-        throw error
+        console.error('Error en invoke:', error)
+        throw new Error(`Error de función: ${error.message}`)
       }
 
-      if (data.error) {
+      if (data?.error) {
+        console.error('Error en respuesta:', data.error)
         throw new Error(data.error)
       }
 
+      if (!data?.success) {
+        throw new Error('La sincronización no fue exitosa')
+      }
+
+      console.log('Sincronización exitosa, recargando actividades...')
       // Recargar actividades después de la sincronización
       await loadActivities()
       
       return data
     } catch (error: any) {
       console.error('Error syncing activities:', error)
-      setError(error.message || 'Error al sincronizar actividades')
-      throw error
+      const errorMessage = error.message || 'Error al sincronizar actividades'
+      setError(errorMessage)
+      throw new Error(errorMessage)
     } finally {
       setIsSyncing(false)
     }
