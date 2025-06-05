@@ -1,9 +1,11 @@
 
 // Placeholder para mantener compatibilidad con archivos read-only
-// El nuevo sistema no requiere estos servicios
 
 export const isAuthenticated = () => false;
 export const getAthleteInfo = () => null;
+export const getAccessToken = () => {
+  throw new Error('Sistema actualizado: usa useStravaRuns hook en su lugar');
+};
 export const initiateStravaAuth = () => {
   console.log('Sistema actualizado: ya no se requiere autenticación');
 };
