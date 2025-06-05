@@ -23,7 +23,7 @@ export const useJuanStravaData = () => {
       setIsLoading(true)
       setError(null)
       
-      console.log('Loading activities from database...')
+      console.log('🔄 Cargando actividades de la base de datos...')
       
       const { data, error: fetchError } = await supabase
         .from('strava_activities')
@@ -33,12 +33,12 @@ export const useJuanStravaData = () => {
         .order('start_date_local', { ascending: false })
 
       if (fetchError) {
-        console.error('Error loading activities:', fetchError)
+        console.error('❌ Error al cargar actividades:', fetchError)
         setError('Error al cargar las actividades')
         return
       }
 
-      console.log(`Loaded ${data?.length || 0} activities from database`)
+      console.log(`✅ Cargadas ${data?.length || 0} actividades de la base de datos`)
 
       // Convertir al formato RunData
       const runData: RunData[] = (data || []).map(activity => {
@@ -59,9 +59,9 @@ export const useJuanStravaData = () => {
 
       setActivities(runData)
       setLastSync(new Date())
-      console.log(`Activities converted to RunData format: ${runData.length} activities`)
+      console.log(`✅ Actividades convertidas a formato RunData: ${runData.length} actividades`)
     } catch (error) {
-      console.error('Error loading activities:', error)
+      console.error('❌ Error al cargar actividades:', error)
       setError('Error al cargar las actividades')
     } finally {
       setIsLoading(false)
@@ -73,19 +73,19 @@ export const useJuanStravaData = () => {
     setError(null)
 
     try {
-      console.log('Iniciando sincronización con Strava...')
+      console.log('🔄 Iniciando sincronización con Strava...')
       
       const { data, error } = await supabase.functions.invoke('sync-strava-activities')
 
-      console.log('Respuesta de sincronización:', { data, error })
+      console.log('📊 Respuesta de sincronización:', { data, error })
 
       if (error) {
-        console.error('Error en invoke:', error)
+        console.error('❌ Error en invoke:', error)
         throw new Error(`Error de función: ${error.message}`)
       }
 
       if (data?.error) {
-        console.error('Error en respuesta:', data.error)
+        console.error('❌ Error en respuesta:', data.error)
         throw new Error(data.error)
       }
 
@@ -93,13 +93,13 @@ export const useJuanStravaData = () => {
         throw new Error('La sincronización no fue exitosa')
       }
 
-      console.log('Sincronización exitosa, recargando actividades...')
+      console.log('✅ Sincronización exitosa, recargando actividades...')
       // Recargar actividades después de la sincronización
       await loadActivities()
       
       return data
     } catch (error: any) {
-      console.error('Error syncing activities:', error)
+      console.error('❌ Error al sincronizar actividades:', error)
       const errorMessage = error.message || 'Error al sincronizar actividades'
       setError(errorMessage)
       throw new Error(errorMessage)
