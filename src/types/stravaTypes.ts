@@ -14,10 +14,19 @@ export interface StravaTokenResponse {
 
 export interface StravaAthlete {
   id: number;
-  username: string;
+  username?: string;
   firstname: string;
   lastname: string;
   profile: string;  // URL de la imagen de perfil
+  profile_medium?: string; // URL de la imagen de perfil mediana
+  city?: string;
+  state?: string;
+  country?: string;
+  sex?: string;
+  premium?: boolean;
+  summit?: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface StravaActivity {

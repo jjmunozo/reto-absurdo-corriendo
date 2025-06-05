@@ -35,8 +35,8 @@ export const isAuthenticated = (): boolean => {
   }
   
   // En modo admin, usar la lógica original
-  const { isAuthenticated: originalIsAuthenticated } = require('./stravaAuthService');
-  return originalIsAuthenticated();
+  const stravaAuthService = await import('./stravaAuthService');
+  return stravaAuthService.isAuthenticated();
 };
 
 /**
@@ -52,8 +52,8 @@ export const getAthleteInfo = () => {
   }
   
   // En modo admin, usar la lógica original
-  const { getAthleteInfo: originalGetAthleteInfo } = require('./stravaAuthService');
-  return originalGetAthleteInfo();
+  const stravaAuthService = await import('./stravaAuthService');
+  return stravaAuthService.getAthleteInfo();
 };
 
 /**
@@ -69,8 +69,8 @@ export const getAccessToken = async (): Promise<string> => {
   }
   
   // En modo admin, usar la lógica original
-  const { getAccessToken: originalGetAccessToken } = require('./stravaAuthService');
-  return await originalGetAccessToken();
+  const stravaAuthService = await import('./stravaAuthService');
+  return await stravaAuthService.getAccessToken();
 };
 
 // Re-export función específica para forzar conexión perpetua
