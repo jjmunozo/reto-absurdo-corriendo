@@ -45,7 +45,12 @@ serve(async (req) => {
       connection?.access_token ?? Deno.env.get("JUAN_STRAVA_ACCESS_TOKEN");
     let refreshToken =
       connection?.refresh_token ?? Deno.env.get("JUAN_STRAVA_REFRESH_TOKEN");
-    let expiresAt = Number(connection?.expires_at ?? 0); // unix-seconds
+    
+    // Convertir timestamp a unix seconds para comparación
+    let expiresAt = 0;
+    if (connection?.expires_at) {
+      expiresAt = Math.floor(new Date(connection.expires_at).getTime() / 1000);
+    }
 
     console.log('🔑 Estado de tokens:', {
       hasConnection: !!connection,
@@ -83,7 +88,9 @@ serve(async (req) => {
       const t = await r.json();
       accessToken  = t.access_token;
       refreshToken = t.refresh_token;
-      expiresAt    = t.expires_at;        // unix-seconds
+      
+      // Convertir unix timestamp a formato ISO para la base de datos
+      const expiresAtDate = new Date(t.expires_at * 1000).toISOString();
 
       console.log('✅ Token refrescado exitosamente, guardando en DB...')
 
@@ -92,7 +99,7 @@ serve(async (req) => {
         athlete_id: JUAN_ATHLETE_ID,
         access_token: accessToken,
         refresh_token: refreshToken,
-        expires_at: expiresAt,
+        expires_at: expiresAtDate,
       });
     } else {
       console.log('⏰ Token aún válido, no necesita refresh')
