@@ -16,7 +16,7 @@ interface StravaActivity {
 // Credenciales de Juan - Hardcodeadas temporalmente para testing
 const STRAVA_CONFIG = {
   CLIENT_ID: '160774',
-  CLIENT_SECRET: 'your_client_secret_here', // Este necesita ser actualizado con el valor real
+  CLIENT_SECRET: '5836512c42bdd300ac801e4b2d81bdff5228d281', // Este necesita ser actualizado con el valor real
   ACCESS_TOKEN: 'your_access_token_here',   // Este necesita ser actualizado con el valor real
   REFRESH_TOKEN: 'your_refresh_token_here'  // Este necesita ser actualizado con el valor real
 };
