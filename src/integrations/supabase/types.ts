@@ -9,7 +9,117 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      strava_activities: {
+        Row: {
+          activity_data: Json | null
+          created_at: string
+          distance: number
+          id: number
+          location_city: string | null
+          location_country: string | null
+          moving_time: number
+          name: string
+          start_date_local: string
+          total_elevation_gain: number
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activity_data?: Json | null
+          created_at?: string
+          distance: number
+          id: number
+          location_city?: string | null
+          location_country?: string | null
+          moving_time: number
+          name: string
+          start_date_local: string
+          total_elevation_gain: number
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activity_data?: Json | null
+          created_at?: string
+          distance?: number
+          id?: number
+          location_city?: string | null
+          location_country?: string | null
+          moving_time?: number
+          name?: string
+          start_date_local?: string
+          total_elevation_gain?: number
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      strava_connections: {
+        Row: {
+          access_token: string
+          athlete_data: Json | null
+          created_at: string
+          expires_at: string
+          id: string
+          refresh_token: string
+          scope: string | null
+          strava_athlete_id: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token: string
+          athlete_data?: Json | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          refresh_token: string
+          scope?: string | null
+          strava_athlete_id: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token?: string
+          athlete_data?: Json | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          refresh_token?: string
+          scope?: string | null
+          strava_athlete_id?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
