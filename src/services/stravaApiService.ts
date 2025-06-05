@@ -1,3 +1,4 @@
+
 import { RunData } from '@/data/runningData';
 
 interface StravaActivity {
@@ -16,7 +17,7 @@ interface StravaActivity {
 const STRAVA_CONFIG = {
   CLIENT_ID: '160774',
   CLIENT_SECRET: '5836512c42bdd300ac801e4b2d81bdff5228d281',
-  ACCESS_TOKEN: 'a612886237e64952cc7a05b5907588a31e14286a',
+  ACCESS_TOKEN: 'a612886237e64952cc7d93be59b7a142b51ab481',
   REFRESH_TOKEN: '3a113d2432e68e8d1a1ceb5c7527eb80132373b'
 };
 
