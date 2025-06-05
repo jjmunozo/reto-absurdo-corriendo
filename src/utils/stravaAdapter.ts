@@ -1,88 +1,6 @@
 
 import { RunData, MonthlyStats } from '@/data/runningData';
-import { getRunningData, getAthleteInfo, getAthleteStats, isAuthenticated, forcePerpetualConnection } from '@/services/stravaService';
-import { loadRunningDataFromJson, isAdminMode, setLastUpdateTime } from '@/services/dataExportService';
-import { isUsingRealData } from '@/services/stravaPerpetualService';
-import { hasRealDataCaptured } from '@/services/stravaRealDataCapture';
 import { toZonedTime, format } from 'date-fns-tz';
-import { logDiagnostics } from './stravaDiagnostics';
-
-/**
- * Obtiene datos de carrera desde Strava y los convierte al formato de la aplicación
- */
-export const fetchStravaRunningData = async (): Promise<RunData[]> => {
-  console.log('🚀 fetchStravaRunningData: Iniciando...');
-  console.log('🔧 Admin Mode:', isAdminMode());
-  console.log('🔐 Authenticated:', isAuthenticated());
-  console.log('📊 Has Real Data:', hasRealDataCaptured());
-  console.log('🎯 Using Real Data:', isUsingRealData());
-  
-  try {
-    // En modo no-admin, asegurar conexión perpetua
-    if (!isAdminMode()) {
-      console.log('🔄 Modo visitante: Asegurando conexión perpetua...');
-      forcePerpetualConnection();
-    }
-    
-    // Si tenemos datos reales capturados, intentar obtener datos frescos de Strava
-    if (hasRealDataCaptured()) {
-      console.log('🏃 Tenemos datos reales - obteniendo datos frescos de Strava...');
-      
-      try {
-        // Ejecutar diagnósticos si estamos en modo admin
-        if (isAdminMode()) {
-          await logDiagnostics();
-        }
-        
-        console.log('🔄 Llamando a getRunningData...');
-        const runData = await getRunningData();
-        console.log(`🏃 Datos frescos obtenidos desde Strava: ${runData.length} actividades`);
-        
-        if (runData.length > 0) {
-          // IMPORTANTE: Actualizar fecha de última actualización cuando obtenemos datos reales
-          console.log('📅 Actualizando fecha de última actualización...');
-          setLastUpdateTime(Date.now());
-          
-          // Ordenar por fecha (más reciente primero)
-          const sortedData = runData.sort((a, b) => {
-            return new Date(b.date).getTime() - new Date(a.date).getTime();
-          });
-          
-          console.log('✅ Retornando datos frescos de Strava');
-          return sortedData;
-        }
-      } catch (error) {
-        console.error('❌ Error obteniendo datos frescos de Strava:', error);
-        // Continuar con fallback a datos en caché
-      }
-    }
-    
-    // Fallback: Intentar cargar datos del JSON (caché)
-    console.log('📁 Intentando cargar datos desde JSON...');
-    const cachedData = loadRunningDataFromJson();
-    if (cachedData && cachedData.length > 0) {
-      console.log(`📁 Datos del JSON cargados: ${cachedData.length} actividades`);
-      return cachedData;
-    } else {
-      console.log('📁 No hay datos en el JSON o está vacío');
-    }
-    
-    console.log('📁 Fallback: Retornando array vacío');
-    return [];
-  } catch (error) {
-    console.error('❌ Error obteniendo datos de Strava:', error);
-    
-    // En caso de error, intentar cargar datos del JSON como fallback
-    console.log('📁 Fallback por error: Intentando cargar datos del JSON...');
-    const cachedData = loadRunningDataFromJson();
-    if (cachedData && cachedData.length > 0) {
-      console.log(`📁 Fallback exitoso: ${cachedData.length} actividades del JSON`);
-      return cachedData;
-    }
-    
-    return [];
-  }
-};
 
 /**
  * Calcula estadísticas mensuales a partir de los datos de carrera
@@ -115,7 +33,6 @@ export const calculateMonthlyStats = (runData: RunData[]): MonthlyStats[] => {
     
     // Asegurarse de que exista el mes en el objeto (por si hay datos de años anteriores)
     if (!monthStats[monthKey]) {
-      // Si estamos en un año anterior, crear la entrada para ese mes
       const monthIndex = date.getMonth();
       monthStats[monthKey] = {
         month: monthNames[monthIndex],
@@ -224,11 +141,7 @@ export const calculateRunsPerHour = (runData: RunData[]): { hour: string, runs: 
     try {
       // Si tenemos el campo startTimeLocal (fecha-hora completa)
       if (run.startTimeLocal) {
-        // No necesitamos hacer ajustes adicionales porque convertStravaActivityToRunData
-        // ya aplicó la corrección de +6 horas y ajustó a la zona horaria de Costa Rica
         const dateObj = new Date(run.startTimeLocal);
-        
-        // Aseguramos que se interprete correctamente en la zona horaria de Costa Rica
         const crDateObj = toZonedTime(dateObj, timeZone);
         const hourOfDay = crDateObj.getHours();
         
@@ -240,7 +153,6 @@ export const calculateRunsPerHour = (runData: RunData[]): { hour: string, runs: 
           hoursData[hourOfDay].runs += 1;
         }
       } else {
-        // Compatibilidad con datos antiguos que no tienen startTimeLocal
         console.warn(`⏰ Run sin startTimeLocal: ${run.date}`);
       }
     } catch (error) {

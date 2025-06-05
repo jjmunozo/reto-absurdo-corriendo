@@ -1,6 +1,6 @@
 
 /**
- * Types for Strava API
+ * Types for Strava API - Simplified for new backend architecture
  */
 
 export interface StravaTokenResponse {
@@ -17,8 +17,8 @@ export interface StravaAthlete {
   username?: string;
   firstname: string;
   lastname: string;
-  profile: string;  // URL de la imagen de perfil
-  profile_medium?: string; // URL de la imagen de perfil mediana
+  profile: string;
+  profile_medium?: string;
   city?: string;
   state?: string;
   country?: string;
@@ -32,18 +32,18 @@ export interface StravaAthlete {
 export interface StravaActivity {
   id: number;
   name: string;
-  distance: number;            // en metros
-  moving_time: number;         // en segundos
-  elapsed_time: number;        // en segundos
-  total_elevation_gain: number; // en metros
+  distance: number;
+  moving_time: number;
+  elapsed_time: number;
+  total_elevation_gain: number;
   start_date: string;
   start_date_local: string;
-  average_speed: number;       // en metros/segundo
-  max_speed: number;           // en metros/segundo
+  average_speed: number;
+  max_speed: number;
   has_heartrate: boolean;
   average_heartrate?: number;
   max_heartrate?: number;
-  type: string;                // Run, Ride, etc.
+  type: string;
   workout_type?: number;
   location_city?: string;
   location_country?: string;
