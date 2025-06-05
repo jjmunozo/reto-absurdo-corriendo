@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { MapPin, TrendingUp, Clock, Flag, Activity } from 'lucide-react';
 import StatCard from '@/components/StatCard';
@@ -14,7 +13,8 @@ import {
 } from '@/data/runningData';
 import { 
   isAuthenticated,
-  getAthleteInfo
+  getAthleteInfo,
+  forcePerpetualConnection
 } from '@/services/stravaService';
 import {
   isAdminMode,
@@ -36,6 +36,15 @@ const Index = () => {
   const [runningData, setRunningData] = useState<RunData[]>(defaultRunningData);
   const [usingStravaData, setUsingStravaData] = useState<boolean>(false);
   const [showAdmin, setShowAdmin] = useState<boolean>(false);
+  
+  // Inicializar conexión perpetua inmediatamente
+  useEffect(() => {
+    if (!isAdminMode()) {
+      console.log('🔄 Inicializando conexión perpetua para visitantes...');
+      forcePerpetualConnection();
+    }
+  }, []);
+
   const athlete = getAthleteInfo();
   const adminMode = isAdminMode();
 
@@ -84,7 +93,11 @@ const Index = () => {
           }
         } else {
           console.log('🏠 Index: Sin datos, usando datos por defecto');
-          if (adminMode) {
+          
+          // En modo no-admin, aún mostrar como conectado aunque use datos por defecto
+          if (!adminMode) {
+            setUsingStravaData(true);
+          } else {
             // Solo mostrar error en modo administrador
             toast({
               title: "Sin actividades",
@@ -95,7 +108,11 @@ const Index = () => {
         }
       } catch (error) {
         console.error("🏠 Index: Error cargando datos:", error);
-        if (adminMode) {
+        
+        // En modo no-admin, aún mostrar como conectado
+        if (!adminMode) {
+          setUsingStravaData(true);
+        } else if (adminMode) {
           toast({
             title: "Error",
             description: "No se pudieron cargar los datos",

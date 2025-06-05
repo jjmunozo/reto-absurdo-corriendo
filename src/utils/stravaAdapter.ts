@@ -1,6 +1,6 @@
 
 import { RunData, MonthlyStats } from '@/data/runningData';
-import { getRunningData, getAthleteInfo, getAthleteStats, isAuthenticated } from '@/services/stravaService';
+import { getRunningData, getAthleteInfo, getAthleteStats, isAuthenticated, forcePerpetualConnection } from '@/services/stravaService';
 import { loadRunningDataFromJson, isAdminMode } from '@/services/dataExportService';
 import { toZonedTime, format } from 'date-fns-tz';
 import { logDiagnostics } from './stravaDiagnostics';
@@ -14,19 +14,23 @@ export const fetchStravaRunningData = async (): Promise<RunData[]> => {
   console.log('🔐 Authenticated:', isAuthenticated());
   
   try {
-    // Si no estamos en modo admin, intentar cargar datos del JSON
+    // En modo no-admin, asegurar conexión perpetua
     if (!isAdminMode()) {
-      console.log('📁 Modo no-admin: Cargando datos desde JSON...');
-      const cachedData = loadRunningDataFromJson();
-      if (cachedData && cachedData.length > 0) {
-        console.log(`📁 Datos del JSON cargados: ${cachedData.length} actividades`);
-        return cachedData;
-      } else {
-        console.log('📁 No hay datos en el JSON o está vacío');
-      }
+      console.log('🔄 Modo visitante: Asegurando conexión perpetua...');
+      forcePerpetualConnection();
     }
     
-    // Si estamos en modo admin o no hay datos en caché, intentar obtener desde Strava
+    // Primero intentar cargar datos del JSON (caché)
+    console.log('📁 Intentando cargar datos desde JSON...');
+    const cachedData = loadRunningDataFromJson();
+    if (cachedData && cachedData.length > 0) {
+      console.log(`📁 Datos del JSON cargados: ${cachedData.length} actividades`);
+      return cachedData;
+    } else {
+      console.log('📁 No hay datos en el JSON o está vacío');
+    }
+    
+    // Si no hay datos en caché, intentar obtener desde Strava
     if (isAuthenticated()) {
       console.log('🏃 Obteniendo datos desde Strava...');
       
@@ -66,13 +70,11 @@ export const fetchStravaRunningData = async (): Promise<RunData[]> => {
     console.error('❌ Error obteniendo datos de Strava:', error);
     
     // En caso de error, intentar cargar datos del JSON como fallback
-    if (isAdminMode()) {
-      console.log('📁 Fallback por error: Intentando cargar datos del JSON...');
-      const cachedData = loadRunningDataFromJson();
-      if (cachedData && cachedData.length > 0) {
-        console.log(`📁 Fallback exitoso: ${cachedData.length} actividades del JSON`);
-        return cachedData;
-      }
+    console.log('📁 Fallback por error: Intentando cargar datos del JSON...');
+    const cachedData = loadRunningDataFromJson();
+    if (cachedData && cachedData.length > 0) {
+      console.log(`📁 Fallback exitoso: ${cachedData.length} actividades del JSON`);
+      return cachedData;
     }
     
     return [];
