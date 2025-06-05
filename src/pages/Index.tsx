@@ -6,6 +6,7 @@ import RunningYearCalendar from '@/components/RunningYearCalendar';
 import RecentRuns from '@/components/RecentRuns';
 import RunsPerHourChart from '@/components/RunsPerHourChart';
 import AdminPanel from '@/components/AdminPanel';
+import GitHubContributionTracker from '@/components/GitHubContributionTracker';
 import { RunData } from '@/data/runningData';
 import { useStravaRuns } from '@/hooks/useStravaRuns';
 import { 
@@ -226,13 +227,13 @@ const Index = () => {
           </section>
         )}
 
-        {/* Calendar Section */}
+        {/* GitHub-style Contribution Tracker */}
         {!isLoading && runs.length > 0 && (
           <section className="mb-10">
-            <RunningYearCalendar
+            <GitHubContributionTracker
               runningData={runs}
-              title="Calendario Detallado de Carreras"
-              description="Vista detallada por mes con leyenda de colores mejorada"
+              title="Actividad de Entrenamiento"
+              description="Tu actividad de entrenamiento durante el año, similar al contribution tracker de GitHub"
             />
           </section>
         )}
