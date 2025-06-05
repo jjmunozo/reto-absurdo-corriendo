@@ -1,3 +1,4 @@
+
 /**
  * Service for handling Strava activities
  */
