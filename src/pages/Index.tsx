@@ -1,11 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { MapPin, TrendingUp, Clock, Flag, Activity } from 'lucide-react';
 import StatCard from '@/components/StatCard';
 import RunningChart from '@/components/RunningChart';
 import RunningYearCalendar from '@/components/RunningYearCalendar';
 import RecentRuns from '@/components/RecentRuns';
-import StravaConnectButton from '@/components/StravaConnectButton';
 import StravaTroubleshooting from '@/components/StravaTroubleshooting';
 import AdminPanel from '@/components/AdminPanel';
 import RunsPerHourChart from '@/components/RunsPerHourChart';
@@ -179,9 +177,6 @@ const Index = () => {
               </p>
             </div>
             <div className="mt-4 md:mt-0">
-              {/* Mostrar botón de conexión solo en modo admin y solo para conectar (no para desconectar) */}
-              {adminMode && <StravaConnectButton showDisconnectButton={false} />}
-              
               {/* Link al panel de administración - visible con doble clic o pasando el mouse */}
               {!adminMode && (
                 <div 

@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { initiateStravaAuth, isAuthenticated, logout, getAthleteInfo } from '@/services/stravaService';
-import { isAdminMode } from '@/services/dataExportService';
 import { LogOut, LogIn, Info } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
@@ -29,12 +28,6 @@ const StravaConnectButton: React.FC<StravaConnectButtonProps> = ({
   const authenticated = isAuthenticated();
   const athlete = getAthleteInfo();
   const [showConnectionInfo, setShowConnectionInfo] = useState(false);
-  const adminMode = isAdminMode();
-
-  // Si no estamos en modo admin, no mostrar el botón
-  if (!adminMode) {
-    return null;
-  }
 
   const handleConnect = () => {
     if (authenticated && showDisconnectButton) {
