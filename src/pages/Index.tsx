@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { MapPin, TrendingUp, Clock, Flag, Activity } from 'lucide-react';
 import StatCard from '@/components/StatCard';
@@ -163,11 +164,22 @@ const Index = () => {
             <div>
               <h1 className="text-4xl md:text-5xl font-bold mb-2">El reto más absurdo</h1>
               <p className="text-lg opacity-90">
-                Seguimiento de mis estadísticas de carrera
-                {usingStravaData && athlete && (
-                  <span className="ml-2 text-sm bg-white bg-opacity-20 px-2 py-1 rounded">
-                    Datos de {athlete.firstname} {athlete.lastname}
-                  </span>
+                {usingStravaData && athlete ? (
+                  <>
+                    Datos verificados jalados del Strava de
+                    <span className="ml-2 inline-flex items-center bg-[#FC4C02] text-white px-3 py-1 rounded-full text-sm font-medium">
+                      <svg 
+                        className="w-4 h-4 mr-2" 
+                        viewBox="0 0 24 24" 
+                        fill="currentColor"
+                      >
+                        <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.599h4.172L10.463 0l-7.008 13.828h4.172"/>
+                      </svg>
+                      {athlete.firstname} {athlete.lastname}
+                    </span>
+                  </>
+                ) : (
+                  "Seguimiento de mis estadísticas de carrera"
                 )}
                 {usingStravaData && (
                   <span className="block text-sm mt-1">
