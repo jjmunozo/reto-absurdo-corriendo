@@ -26,12 +26,12 @@ export const useStravaAuth = () => {
     }
   }, [user])
 
-  const loadStravaConnection = async () => {
+  const loadStravaConnection = async (): Promise<void> => {
     try {
       const { data, error } = await supabase
         .from('strava_connections')
         .select('id, strava_athlete_id, athlete_data, created_at')
-        .eq('user_id', user!.id)
+        .eq('athlete_id', user!.id)
         .single()
 
       if (error && error.code !== 'PGRST116') {
@@ -46,7 +46,7 @@ export const useStravaAuth = () => {
     }
   }
 
-  const initiateStravaAuth = () => {
+  const initiateStravaAuth = (): void => {
     if (!user) {
       console.error('User must be logged in to connect Strava')
       return
@@ -63,7 +63,7 @@ export const useStravaAuth = () => {
     window.location.href = authUrl
   }
 
-  const exchangeCodeForToken = async (code: string, state: string) => {
+  const exchangeCodeForToken = async (code: string, state: string): Promise<any> => {
     if (!user || !session) {
       throw new Error('User must be logged in')
     }
@@ -86,7 +86,7 @@ export const useStravaAuth = () => {
         throw error
       }
 
-      if (data.error) {
+      if (data?.error) {
         throw new Error(data.error)
       }
 
@@ -99,14 +99,14 @@ export const useStravaAuth = () => {
     }
   }
 
-  const disconnectStrava = async () => {
+  const disconnectStrava = async (): Promise<void> => {
     if (!user) return
 
     try {
       const { error } = await supabase
         .from('strava_connections')
         .delete()
-        .eq('user_id', user.id)
+        .eq('athlete_id', user.id)
 
       if (error) {
         throw error

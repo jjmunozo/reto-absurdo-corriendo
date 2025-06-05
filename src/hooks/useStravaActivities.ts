@@ -21,7 +21,7 @@ export const useStravaActivities = () => {
     }
   }, [user])
 
-  const loadActivities = async () => {
+  const loadActivities = async (): Promise<void> => {
     if (!user) return
 
     try {
@@ -30,7 +30,7 @@ export const useStravaActivities = () => {
       const { data, error } = await supabase
         .from('strava_activities')
         .select('*')
-        .eq('user_id', user.id)
+        .eq('athlete_id', user.id)
         .eq('type', 'Run')
         .order('start_date_local', { ascending: false })
 
@@ -40,7 +40,7 @@ export const useStravaActivities = () => {
       }
 
       // Convertir al formato RunData
-      const runData: RunData[] = data.map(activity => {
+      const runData: RunData[] = (data || []).map(activity => {
         const originalDate = new Date(activity.start_date_local)
         const correctedDate = new Date(originalDate.getTime() + (6 * 60 * 60 * 1000))
         
@@ -65,7 +65,7 @@ export const useStravaActivities = () => {
     }
   }
 
-  const syncActivities = async () => {
+  const syncActivities = async (): Promise<any> => {
     if (!user || !session) {
       throw new Error('User must be logged in')
     }
@@ -83,7 +83,7 @@ export const useStravaActivities = () => {
         throw error
       }
 
-      if (data.error) {
+      if (data?.error) {
         throw new Error(data.error)
       }
 
