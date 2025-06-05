@@ -17,8 +17,8 @@ interface StravaActivity {
 const STRAVA_CONFIG = {
   CLIENT_ID: '160774',
   CLIENT_SECRET: '5836512c42bdd300ac801e4b2d81bdff5228d281', // Este necesita ser actualizado con el valor real
-  ACCESS_TOKEN: 'your_access_token_here',   // Este necesita ser actualizado con el valor real
-  REFRESH_TOKEN: 'your_refresh_token_here'  // Este necesita ser actualizado con el valor real
+  ACCESS_TOKEN: 'a9dc1c04a421b97598877dc1f5d5a651fcecefae',   // Este necesita ser actualizado con el valor real
+  REFRESH_TOKEN: '101890a7d1533723487699325e80ca5848eda091'  // Este necesita ser actualizado con el valor real
 };
 
 let cache: RunData[] = [];
