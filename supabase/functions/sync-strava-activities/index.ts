@@ -6,7 +6,7 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 );
-const JUAN_ATHLETE_ID = "juan"; // ajustá si usás otro id
+const JUAN_ATHLETE_ID = "160774"; // Usar el athlete ID real
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -32,28 +32,29 @@ serve(async (req) => {
   }
 
   try {
-    console.log('🔧 Iniciando sincronización con tokens persistentes...')
+    console.log('🔧 Iniciando sincronización con tokens de base de datos...')
 
-    // ► Leemos tokens guardados (o semilla de env vars)
+    // ► Leemos tokens desde la base de datos
     const { data: connection } = await supabase
       .from("strava_connections")
       .select("access_token, refresh_token, expires_at")
       .eq("athlete_id", JUAN_ATHLETE_ID)
       .single();
 
-    let accessToken =
-      connection?.access_token ?? Deno.env.get("JUAN_STRAVA_ACCESS_TOKEN");
-    let refreshToken =
-      connection?.refresh_token ?? Deno.env.get("JUAN_STRAVA_REFRESH_TOKEN");
+    if (!connection) {
+      throw new Error('No se encontró conexión de Strava. Debes generar tokens primero en /strava-tokens')
+    }
+
+    let accessToken = connection.access_token;
+    let refreshToken = connection.refresh_token;
     
     // Convertir timestamp a unix seconds para comparación
     let expiresAt = 0;
-    if (connection?.expires_at) {
+    if (connection.expires_at) {
       expiresAt = Math.floor(new Date(connection.expires_at).getTime() / 1000);
     }
 
     console.log('🔑 Estado de tokens:', {
-      hasConnection: !!connection,
       hasAccessToken: !!accessToken,
       hasRefreshToken: !!refreshToken,
       expiresAt: expiresAt,
@@ -61,7 +62,7 @@ serve(async (req) => {
     })
 
     if (!accessToken || !refreshToken) {
-      throw new Error('No se encontraron tokens de Strava. Verifica que estén configurados en la base de datos o como secrets.')
+      throw new Error('Tokens no encontrados en la base de datos. Genera nuevos tokens en /strava-tokens')
     }
 
     const now = Math.floor(Date.now() / 1000);
@@ -94,7 +95,7 @@ serve(async (req) => {
 
       console.log('✅ Token refrescado exitosamente, guardando en DB...')
 
-      // guardar / actualizar fila
+      // Actualizar tokens en la base de datos
       await supabase.from("strava_connections").upsert({
         athlete_id: JUAN_ATHLETE_ID,
         access_token: accessToken,
@@ -134,7 +135,7 @@ serve(async (req) => {
         
         // Si es error 401, el token está inválido
         if (activitiesResponse.status === 401) {
-          throw new Error(`Token de acceso inválido. Código: ${activitiesResponse.status}. Respuesta: ${errorText}`)
+          throw new Error(`Token de acceso inválido. Genera nuevos tokens en /strava-tokens. Código: ${activitiesResponse.status}`)
         }
         
         throw new Error(`Error al obtener actividades: ${activitiesResponse.status} - ${errorText}`)
@@ -158,7 +159,7 @@ serve(async (req) => {
       .filter(activity => activity.type === 'Run')
       .map(activity => ({
         id: activity.id,
-        athlete_id: '160774',
+        athlete_id: JUAN_ATHLETE_ID,
         name: activity.name,
         distance: activity.distance,
         moving_time: activity.moving_time,

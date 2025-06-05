@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { CheckCircle2, AlertCircle, Copy, ExternalLink } from 'lucide-react';
-import { Textarea } from '@/components/ui/textarea';
+import { supabase } from '@/integrations/supabase/client';
 
 interface TokenResponse {
   access_token: string;
@@ -27,6 +27,7 @@ const StravaTokenManager: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState<{ [key: string]: boolean }>({});
+  const [isSaving, setIsSaving] = useState(false);
 
   // Configuración de Strava
   const CLIENT_ID = '160774';
@@ -44,6 +45,38 @@ const StravaTokenManager: React.FC = () => {
       setTimeout(() => setCopied({ ...copied, [key]: false }), 2000);
     } catch (err) {
       console.error('Error copying to clipboard:', err);
+    }
+  };
+
+  const saveTokensToDatabase = async (tokens: TokenResponse) => {
+    setIsSaving(true);
+    try {
+      console.log('💾 Guardando tokens en la base de datos...');
+      
+      const { error } = await supabase
+        .from('strava_connections')
+        .upsert({
+          athlete_id: tokens.athlete.id.toString(),
+          strava_athlete_id: tokens.athlete.id,
+          access_token: tokens.access_token,
+          refresh_token: tokens.refresh_token,
+          expires_at: new Date(tokens.expires_at * 1000).toISOString(),
+          scope: tokens.scope,
+          athlete_data: tokens.athlete
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      console.log('✅ Tokens guardados exitosamente');
+      return true;
+    } catch (error: any) {
+      console.error('❌ Error guardando tokens:', error);
+      setError(`Error al guardar tokens: ${error.message}`);
+      return false;
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -77,13 +110,19 @@ const StravaTokenManager: React.FC = () => {
 
       const data: TokenResponse = await response.json();
       setTokenResponse(data);
-      setStep(4);
       
       console.log('✅ Token obtenido exitosamente:', {
         scope: data.scope,
         athlete: data.athlete,
         expires_at: new Date(data.expires_at * 1000).toISOString()
       });
+
+      // Guardar automáticamente en la base de datos
+      const saved = await saveTokensToDatabase(data);
+      if (saved) {
+        setStep(4);
+      }
+      
     } catch (error: any) {
       console.error('❌ Error intercambiando código:', error);
       setError(error.message || 'Error al intercambiar código por token');
@@ -101,7 +140,7 @@ const StravaTokenManager: React.FC = () => {
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
                 <strong>Paso 1:</strong> Vamos a autorizar tu aplicación con los permisos correctos.
-                El scope actual es "read" pero necesitamos "read,activity:read_all".
+                Los tokens se guardarán automáticamente en la base de datos.
               </AlertDescription>
             </Alert>
             
@@ -129,15 +168,6 @@ const StravaTokenManager: React.FC = () => {
                   {copied.authUrl ? 'Copiado!' : 'Copiar URL'}
                 </Button>
               </div>
-              
-              <Alert>
-                <div className="text-sm">
-                  <strong>URL de autorización:</strong>
-                  <div className="bg-muted p-2 rounded mt-2 text-xs break-all">
-                    {authUrl}
-                  </div>
-                </div>
-              </Alert>
             </div>
             
             <Button onClick={() => setStep(2)} className="w-full">
@@ -185,7 +215,7 @@ const StravaTokenManager: React.FC = () => {
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                <strong>Paso 3:</strong> Intercambiar el código por tokens
+                <strong>Paso 3:</strong> Intercambiar el código por tokens y guardarlos
               </AlertDescription>
             </Alert>
             
@@ -210,10 +240,15 @@ const StravaTokenManager: React.FC = () => {
               
               <Button
                 onClick={exchangeCodeForToken}
-                disabled={isLoading || !authCode.trim()}
+                disabled={isLoading || isSaving || !authCode.trim()}
                 className="w-full"
               >
-                {isLoading ? 'Intercambiando código...' : 'Obtener Tokens'}
+                {isLoading 
+                  ? 'Intercambiando código...' 
+                  : isSaving 
+                  ? 'Guardando en base de datos...'
+                  : 'Obtener y Guardar Tokens'
+                }
               </Button>
             </div>
           </div>
@@ -225,7 +260,7 @@ const StravaTokenManager: React.FC = () => {
             <Alert>
               <CheckCircle2 className="h-4 w-4" />
               <AlertDescription>
-                <strong>¡Éxito!</strong> Tokens obtenidos correctamente con scope completo.
+                <strong>¡Éxito!</strong> Tokens obtenidos y guardados en la base de datos automáticamente.
               </AlertDescription>
             </Alert>
             
@@ -245,48 +280,24 @@ const StravaTokenManager: React.FC = () => {
                   </div>
                 </div>
                 
-                <div>
-                  <Label>Access Token (para JUAN_STRAVA_ACCESS_TOKEN):</Label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Input value={tokenResponse.access_token} readOnly />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => copyToClipboard(tokenResponse.access_token, 'accessToken')}
-                    >
-                      {copied.accessToken ? 'Copiado!' : 'Copiar'}
-                    </Button>
-                  </div>
-                </div>
-                
-                <div>
-                  <Label>Refresh Token (para JUAN_STRAVA_REFRESH_TOKEN):</Label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Input value={tokenResponse.refresh_token} readOnly />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => copyToClipboard(tokenResponse.refresh_token, 'refreshToken')}
-                    >
-                      {copied.refreshToken ? 'Copiado!' : 'Copiar'}
-                    </Button>
-                  </div>
-                </div>
-                
                 <Alert>
-                  <AlertCircle className="h-4 w-4" />
+                  <CheckCircle2 className="h-4 w-4" />
                   <AlertDescription>
-                    <strong>Paso 4:</strong> Ahora debes actualizar estos tokens en los secrets de Supabase:
-                    <br />• JUAN_STRAVA_ACCESS_TOKEN = {tokenResponse.access_token.substring(0, 20)}...
-                    <br />• JUAN_STRAVA_REFRESH_TOKEN = {tokenResponse.refresh_token.substring(0, 20)}...
+                    <strong>¡Listo!</strong> Los tokens se han guardado automáticamente en la base de datos.
+                    Ya puedes usar la sincronización de Strava desde la página principal.
                   </AlertDescription>
                 </Alert>
               </div>
             )}
             
-            <Button onClick={() => setStep(1)} variant="outline" className="w-full">
-              Reiniciar proceso
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={() => setStep(1)} variant="outline" className="flex-1">
+                Generar nuevos tokens
+              </Button>
+              <Button onClick={() => window.location.href = '/'} className="flex-1">
+                Ir a página principal
+              </Button>
+            </div>
           </div>
         );
 
@@ -302,7 +313,7 @@ const StravaTokenManager: React.FC = () => {
           🔑 Generador de Tokens Strava
         </CardTitle>
         <CardDescription>
-          Obtén tokens con scope "read,activity:read_all" para sincronizar actividades
+          Obtén tokens con scope "read,activity:read_all" y guárdalos automáticamente en la base de datos
         </CardDescription>
       </CardHeader>
       <CardContent>
