@@ -15,7 +15,10 @@ serve(async (req) => {
 
     if (error) {
       console.error('Error in auto-sync:', error)
-      return new Response(JSON.stringify({ error: error.message }), {
+      return new Response(JSON.stringify({ 
+        error: error.message,
+        timestamp: new Date().toISOString()
+      }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' }
       })
@@ -34,7 +37,8 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in auto-sync cron:', error)
     return new Response(JSON.stringify({ 
-      error: error.message || 'Internal server error' 
+      error: error.message || 'Internal server error',
+      timestamp: new Date().toISOString()
     }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }

@@ -23,10 +23,13 @@ export const useJuanStravaData = () => {
       setIsLoading(true)
       setError(null)
       
+      console.log('Loading activities from database...')
+      
       const { data, error: fetchError } = await supabase
         .from('strava_activities')
         .select('*')
         .eq('type', 'Run')
+        .eq('athlete_id', '160774')
         .order('start_date_local', { ascending: false })
 
       if (fetchError) {
@@ -35,8 +38,10 @@ export const useJuanStravaData = () => {
         return
       }
 
+      console.log(`Loaded ${data?.length || 0} activities from database`)
+
       // Convertir al formato RunData
-      const runData: RunData[] = data.map(activity => {
+      const runData: RunData[] = (data || []).map(activity => {
         const originalDate = new Date(activity.start_date_local)
         const correctedDate = new Date(originalDate.getTime() + (6 * 60 * 60 * 1000))
         
@@ -54,6 +59,7 @@ export const useJuanStravaData = () => {
 
       setActivities(runData)
       setLastSync(new Date())
+      console.log(`Activities converted to RunData format: ${runData.length} activities`)
     } catch (error) {
       console.error('Error loading activities:', error)
       setError('Error al cargar las actividades')

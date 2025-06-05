@@ -36,6 +36,7 @@ export type Database = {
       strava_activities: {
         Row: {
           activity_data: Json | null
+          athlete_id: string
           created_at: string
           distance: number
           id: number
@@ -47,10 +48,10 @@ export type Database = {
           total_elevation_gain: number
           type: string
           updated_at: string
-          user_id: string
         }
         Insert: {
           activity_data?: Json | null
+          athlete_id?: string
           created_at?: string
           distance: number
           id: number
@@ -62,10 +63,10 @@ export type Database = {
           total_elevation_gain: number
           type: string
           updated_at?: string
-          user_id: string
         }
         Update: {
           activity_data?: Json | null
+          athlete_id?: string
           created_at?: string
           distance?: number
           id?: number
@@ -77,7 +78,6 @@ export type Database = {
           total_elevation_gain?: number
           type?: string
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -85,6 +85,7 @@ export type Database = {
         Row: {
           access_token: string
           athlete_data: Json | null
+          athlete_id: string
           created_at: string
           expires_at: string
           id: string
@@ -92,11 +93,11 @@ export type Database = {
           scope: string | null
           strava_athlete_id: number
           updated_at: string
-          user_id: string
         }
         Insert: {
           access_token: string
           athlete_data?: Json | null
+          athlete_id?: string
           created_at?: string
           expires_at: string
           id?: string
@@ -104,11 +105,11 @@ export type Database = {
           scope?: string | null
           strava_athlete_id: number
           updated_at?: string
-          user_id: string
         }
         Update: {
           access_token?: string
           athlete_data?: Json | null
+          athlete_id?: string
           created_at?: string
           expires_at?: string
           id?: string
@@ -116,7 +117,6 @@ export type Database = {
           scope?: string | null
           strava_athlete_id?: number
           updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }

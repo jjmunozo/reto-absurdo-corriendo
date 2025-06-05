@@ -45,31 +45,31 @@ serve(async (req) => {
     let accessToken = juanAccessToken
     let refreshToken = juanRefreshToken
 
-    const refreshResponse = await fetch('https://www.strava.com/oauth/token', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        client_id: stravaClientId,
-        client_secret: stravaClientSecret,
-        refresh_token: refreshToken,
-        grant_type: 'refresh_token',
-      }),
-    })
+    try {
+      const refreshResponse = await fetch('https://www.strava.com/oauth/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          client_id: stravaClientId,
+          client_secret: stravaClientSecret,
+          refresh_token: refreshToken,
+          grant_type: 'refresh_token',
+        }),
+      })
 
-    if (refreshResponse.ok) {
-      const refreshData = await refreshResponse.json()
-      accessToken = refreshData.access_token
-      refreshToken = refreshData.refresh_token
-      console.log('Token refreshed successfully')
-      
-      // Actualizar tokens en variables de entorno para próximas ejecuciones
-      // Nota: En producción real necesitarías una forma de persistir estos tokens
-    } else {
-      const errorText = await refreshResponse.text()
-      console.error('Token refresh failed:', errorText)
-      throw new Error(`Failed to refresh token: ${refreshResponse.status} - ${errorText}`)
+      if (refreshResponse.ok) {
+        const refreshData = await refreshResponse.json()
+        accessToken = refreshData.access_token
+        refreshToken = refreshData.refresh_token
+        console.log('Token refreshed successfully')
+      } else {
+        const errorText = await refreshResponse.text()
+        console.warn('Token refresh failed, using existing token:', errorText)
+      }
+    } catch (refreshError) {
+      console.warn('Token refresh error, using existing token:', refreshError)
     }
 
     // Obtener actividades de Strava
@@ -111,7 +111,7 @@ serve(async (req) => {
       .filter(activity => activity.type === 'Run')
       .map(activity => ({
         id: activity.id,
-        user_id: juanAthleteId, // Usar el athlete ID de Juan como user_id
+        athlete_id: juanAthleteId, // Usar el athlete ID de Juan como texto
         name: activity.name,
         distance: activity.distance,
         moving_time: activity.moving_time,
@@ -139,7 +139,7 @@ serve(async (req) => {
 
     // Guardar/actualizar información de conexión de Juan con los nuevos tokens
     const connectionData = {
-      user_id: juanAthleteId,
+      athlete_id: juanAthleteId,
       strava_athlete_id: parseInt(juanAthleteId),
       access_token: accessToken,
       refresh_token: refreshToken,
@@ -150,7 +150,7 @@ serve(async (req) => {
 
     const { error: connectionError } = await supabase
       .from('strava_connections')
-      .upsert(connectionData, { onConflict: 'user_id' })
+      .upsert(connectionData, { onConflict: 'athlete_id' })
 
     if (connectionError) {
       console.error('Error updating connection:', connectionError)
