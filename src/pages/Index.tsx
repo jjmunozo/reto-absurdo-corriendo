@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { MapPin, TrendingUp, Clock, Flag, Activity } from 'lucide-react';
 import StatCard from '@/components/StatCard';
@@ -16,6 +15,7 @@ import {
   calculateRunsPerHour
 } from '@/utils/stravaAdapter';
 import { toast } from '@/hooks/use-toast';
+import StravaConfigDiagnostic from '@/components/StravaConfigDiagnostic';
 
 const Index = () => {
   const [showAdmin, setShowAdmin] = useState<boolean>(false);
@@ -64,22 +64,27 @@ const Index = () => {
               </a>
             </p>
           </div>
-          <div className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-xl font-semibold mb-4">Sistema Nuevo Activo</h2>
-            <p className="text-gray-600 mb-4">
-              El sistema ahora usa una API backend para obtener datos de Strava automáticamente.
-            </p>
-            <div className="space-y-2">
-              <p><strong>Estado:</strong> {isLoading ? 'Cargando...' : isError ? 'Error' : 'Conectado'}</p>
-              <p><strong>Actividades:</strong> {runs.length}</p>
-              <p><strong>Última actualización:</strong> {new Date().toLocaleString()}</p>
+          
+          <div className="space-y-6">
+            <StravaConfigDiagnostic />
+            
+            <div className="bg-white p-6 rounded-lg shadow">
+              <h2 className="text-xl font-semibold mb-4">Estado del Sistema</h2>
+              <p className="text-gray-600 mb-4">
+                El sistema ahora usa un servicio frontend para obtener datos de Strava.
+              </p>
+              <div className="space-y-2">
+                <p><strong>Estado:</strong> {isLoading ? 'Cargando...' : isError ? 'Error' : 'Conectado'}</p>
+                <p><strong>Actividades:</strong> {runs.length}</p>
+                <p><strong>Última actualización:</strong> {new Date().toLocaleString()}</p>
+              </div>
+              <button 
+                onClick={() => refresh()}
+                className="mt-4 bg-running-primary text-white px-4 py-2 rounded hover:bg-running-dark"
+              >
+                Refrescar Datos
+              </button>
             </div>
-            <button 
-              onClick={() => refresh()}
-              className="mt-4 bg-running-primary text-white px-4 py-2 rounded hover:bg-running-dark"
-            >
-              Refrescar Datos
-            </button>
           </div>
         </div>
       </div>
