@@ -1,4 +1,3 @@
-
 import { RunData } from '@/data/runningData';
 
 interface StravaActivity {
@@ -13,12 +12,12 @@ interface StravaActivity {
   location_country?: string;
 }
 
-// Credenciales de Juan - Hardcodeadas temporalmente para testing
+// Credenciales de Juan - Necesitan ser actualizadas con tokens que tengan permisos de lectura
 const STRAVA_CONFIG = {
   CLIENT_ID: '160774',
-  CLIENT_SECRET: '5836512c42bdd300ac801e4b2d81bdff5228d281', // Este necesita ser actualizado con el valor real
-  ACCESS_TOKEN: 'a9dc1c04a421b97598877dc1f5d5a651fcecefae',   // Este necesita ser actualizado con el valor real
-  REFRESH_TOKEN: '101890a7d1533723487699325e80ca5848eda091'  // Este necesita ser actualizado con el valor real
+  CLIENT_SECRET: '5836512c42bdd300ac801e4b2d81bdff5228d281',
+  ACCESS_TOKEN: 'a9dc1c04a421b97598877dc1f5d5a651fcecefae',
+  REFRESH_TOKEN: '101890a7d1533723487699325e80ca5848eda091'
 };
 
 let cache: RunData[] = [];
@@ -77,82 +76,92 @@ const convertStravaActivityToRunData = (activity: StravaActivity): RunData => {
   };
 };
 
-// Función para obtener TODAS las actividades con paginación
+// Función mejorada para obtener TODAS las actividades con mejor manejo de errores
 const getAllActivities = async (accessToken: string): Promise<StravaActivity[]> => {
   const allActivities: StravaActivity[] = [];
   let page = 1;
-  const perPage = 200; // Máximo permitido por Strava
+  const perPage = 200;
   let hasMoreActivities = true;
   
-  console.log('🏃 Iniciando obtención de TODAS las actividades...');
+  console.log('🏃 Iniciando obtención de actividades...');
+  console.log('🔑 Token siendo usado:', accessToken.substring(0, 20) + '...');
   
-  while (hasMoreActivities) {
+  while (hasMoreActivities && page <= 10) { // Límite de seguridad
     try {
       const url = `https://www.strava.com/api/v3/athlete/activities?page=${page}&per_page=${perPage}`;
       
-      console.log(`📡 Llamando a Strava API: ${url}`);
-      console.log(`🔑 Usando token: ${accessToken.substring(0, 10)}...`);
+      console.log(`📡 Página ${page}: ${url}`);
       
       const response = await fetch(url, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
+          'Accept': 'application/json'
         },
       });
       
-      console.log(`📊 Respuesta de Strava: ${response.status} ${response.statusText}`);
+      console.log(`📊 Respuesta: ${response.status} ${response.statusText}`);
       
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(`❌ Error en Strava API: ${response.status}`, errorText);
-        throw new Error(`Error en Strava API: ${response.status}`);
+        console.error(`❌ Error ${response.status}:`, errorText);
+        
+        // Parsear el error si es JSON
+        try {
+          const errorData = JSON.parse(errorText);
+          console.error('📋 Detalles del error:', errorData);
+          
+          if (errorData.errors) {
+            for (const error of errorData.errors) {
+              if (error.code === 'missing' && error.field === 'activity:read_permission') {
+                throw new Error('Token sin permisos de lectura de actividades. Necesita reautorización con scope "read,activity:read_all"');
+              }
+            }
+          }
+        } catch (parseError) {
+          // Si no es JSON, usar el texto original
+        }
+        
+        throw new Error(`Error ${response.status}: ${errorText}`);
       }
       
       const activities: StravaActivity[] = await response.json();
-      
-      console.log(`📄 Página ${page}: ${activities.length} actividades obtenidas`);
+      console.log(`📄 Página ${page}: ${activities.length} actividades`);
       
       if (activities.length === 0) {
         hasMoreActivities = false;
       } else {
         allActivities.push(...activities);
         page++;
-        
-        // Límite de seguridad para evitar bucles infinitos (máximo 50 páginas = 10,000 actividades)
-        if (page > 50) {
-          console.log('⚠️ Límite de páginas alcanzado (50 páginas)');
-          hasMoreActivities = false;
-        }
       }
     } catch (error) {
-      console.error(`❌ Error obteniendo página ${page}:`, error);
-      hasMoreActivities = false;
+      console.error(`❌ Error en página ${page}:`, error);
+      throw error; // Re-lanzar el error para que se propague
     }
   }
   
-  console.log(`✅ Total de actividades obtenidas: ${allActivities.length}`);
+  console.log(`✅ Total actividades obtenidas: ${allActivities.length}`);
   return allActivities;
 };
 
 async function refreshStravaData(): Promise<RunData[]> {
   console.log('🔄 Iniciando refresh de datos Strava...');
-  console.log('🔧 Configuración:', {
+  console.log('🔧 Configuración actual:', {
     clientId: STRAVA_CONFIG.CLIENT_ID,
     hasAccessToken: !!STRAVA_CONFIG.ACCESS_TOKEN,
+    accessTokenStart: STRAVA_CONFIG.ACCESS_TOKEN.substring(0, 10) + '...',
     hasRefreshToken: !!STRAVA_CONFIG.REFRESH_TOKEN,
     hasClientSecret: !!STRAVA_CONFIG.CLIENT_SECRET
   });
 
-  // 1. Verificar que tenemos las credenciales básicas
   if (!STRAVA_CONFIG.ACCESS_TOKEN || STRAVA_CONFIG.ACCESS_TOKEN === 'your_access_token_here') {
-    console.error('❌ ACCESS_TOKEN no configurado');
-    throw new Error('Credenciales de Strava no configuradas - necesita actualizar ACCESS_TOKEN');
+    throw new Error('ACCESS_TOKEN no configurado correctamente');
   }
 
-  // 2. Refrescar token si pasaron 6 horas
   let currentAccessToken = STRAVA_CONFIG.ACCESS_TOKEN;
   
+  // Intentar refrescar token si es necesario
   if (Date.now() - lastUpdate > SIX_HOURS) {
-    console.log('🔑 Refrescando token de acceso...');
+    console.log('🔑 Intentando refrescar token...');
     
     try {
       const tokenResponse = await fetch('https://www.strava.com/oauth/token', {
@@ -168,32 +177,31 @@ async function refreshStravaData(): Promise<RunData[]> {
         }),
       });
 
-      if (!tokenResponse.ok) {
+      if (tokenResponse.ok) {
+        const tokenData = await tokenResponse.json();
+        currentAccessToken = tokenData.access_token;
+        console.log('✅ Token refrescado exitosamente');
+        console.log('🔑 Nuevo token:', currentAccessToken.substring(0, 20) + '...');
+      } else {
         const errorText = await tokenResponse.text();
-        console.error('❌ Error refrescando token:', errorText);
-        throw new Error(`Error refrescando token: ${tokenResponse.status}`);
+        console.warn('⚠️ No se pudo refrescar token:', errorText);
+        console.log('🔄 Continuando con token actual...');
       }
-
-      const tokenData = await tokenResponse.json();
-      currentAccessToken = tokenData.access_token;
-      
-      console.log('✅ Token refrescado exitosamente');
     } catch (error) {
-      console.error('❌ Error refrescando token:', error);
-      // Continuar con el token actual
+      console.warn('⚠️ Error refrescando token:', error);
+      console.log('🔄 Continuando con token actual...');
     }
   }
 
-  // 3. Obtener TODAS las actividades
+  // Obtener actividades
   const allActivities = await getAllActivities(currentAccessToken);
   
-  // 4. Filtrar solo las de tipo "Run" y mapear al formato de la aplicación
+  // Filtrar carreras
   const runningActivities = allActivities.filter(activity => activity.type === 'Run');
-  console.log(`🏃 Actividades de carrera filtradas: ${runningActivities.length}`);
+  console.log(`🏃 Actividades de carrera: ${runningActivities.length} de ${allActivities.length} total`);
   
+  // Convertir y ordenar
   cache = runningActivities.map(convertStravaActivityToRunData);
-  
-  // 5. Ordenar por fecha (más reciente primero)
   cache.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   
   lastUpdate = Date.now();
@@ -204,14 +212,13 @@ async function refreshStravaData(): Promise<RunData[]> {
 
 export const getStravaRuns = async (): Promise<RunData[]> => {
   try {
-    console.log('📡 getStravaRuns llamada');
+    console.log('📡 getStravaRuns ejecutándose...');
     
-    // Verificar si necesitamos refrescar los datos
     if (Date.now() - lastUpdate > SIX_HOURS || cache.length === 0) {
-      console.log('🔄 Necesario refrescar datos...');
+      console.log('🔄 Refrescando datos...');
       return await refreshStravaData();
     } else {
-      console.log('📁 Usando datos en cache');
+      console.log('📁 Usando cache:', cache.length, 'carreras');
       return cache;
     }
   } catch (error) {

@@ -3,27 +3,39 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { CheckCircle2, AlertCircle, Info } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Info, ExternalLink } from 'lucide-react';
 
 const StravaConfigDiagnostic: React.FC = () => {
   const [testResult, setTestResult] = useState<string | null>(null);
   const [testing, setTesting] = useState(false);
+  const [errorDetails, setErrorDetails] = useState<string | null>(null);
 
   const runDiagnostic = async () => {
     setTesting(true);
     setTestResult(null);
+    setErrorDetails(null);
     
     try {
-      console.log('🔧 Ejecutando diagnóstico de configuración...');
+      console.log('🔧 Ejecutando diagnóstico...');
       
-      // Importar dinámicamente para poder acceder a las credenciales
       const { getStravaRuns } = await import('@/services/stravaApiService');
-      
       const runs = await getStravaRuns();
+      
       setTestResult(`✅ Éxito: ${runs.length} carreras cargadas`);
+      
+      if (runs.length === 0) {
+        setErrorDetails('Conexión exitosa pero 0 actividades. Posibles causas: 1) No hay carreras registradas en Strava, 2) Token sin permisos de lectura, 3) Configuración incorrecta.');
+      }
     } catch (error) {
       console.error('❌ Error en diagnóstico:', error);
-      setTestResult(`❌ Error: ${error instanceof Error ? error.message : 'Error desconocido'}`);
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      setTestResult(`❌ Error: ${errorMessage}`);
+      
+      if (errorMessage.includes('activity:read_permission')) {
+        setErrorDetails('El token de acceso no tiene permisos para leer actividades. Necesitas generar un nuevo token con scope "read,activity:read_all".');
+      } else if (errorMessage.includes('401')) {
+        setErrorDetails('Token inválido o expirado. Verifica que las credenciales sean correctas.');
+      }
     } finally {
       setTesting(false);
     }
@@ -37,16 +49,16 @@ const StravaConfigDiagnostic: React.FC = () => {
           Diagnóstico de Configuración Strava
         </CardTitle>
         <CardDescription>
-          Verifica que las credenciales de Strava estén correctamente configuradas
+          Verifica la conexión y permisos de Strava
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            <strong>Importante:</strong> Las credenciales de Strava están hardcodeadas en 
-            <code className="bg-muted px-1 rounded">src/services/stravaApiService.ts</code>.
-            Necesitas actualizar los valores reales de ACCESS_TOKEN, CLIENT_SECRET y REFRESH_TOKEN.
+            <strong>Estado:</strong> Las credenciales están en 
+            <code className="bg-muted px-1 rounded ml-1">src/services/stravaApiService.ts</code>.
+            Si ves "0 carreras cargadas", probablemente el token no tiene permisos de lectura.
           </AlertDescription>
         </Alert>
         
@@ -70,14 +82,43 @@ const StravaConfigDiagnostic: React.FC = () => {
           </Alert>
         )}
 
-        <div className="space-y-2">
-          <h4 className="font-medium">Pasos para configurar:</h4>
-          <ol className="text-sm space-y-1 list-decimal list-inside">
-            <li>Abre <code className="bg-muted px-1 rounded">src/services/stravaApiService.ts</code></li>
-            <li>Reemplaza los valores de <code className="bg-muted px-1 rounded">STRAVA_CONFIG</code></li>
-            <li>Usa las credenciales reales de la cuenta de Juan</li>
-            <li>Ejecuta este diagnóstico para verificar</li>
-          </ol>
+        {errorDetails && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              <strong>Detalles:</strong> {errorDetails}
+            </AlertDescription>
+          </Alert>
+        )}
+
+        <div className="space-y-3">
+          <h4 className="font-medium">Solución al problema de permisos:</h4>
+          
+          <Alert>
+            <ExternalLink className="h-4 w-4" />
+            <AlertDescription>
+              <strong>Paso 1:</strong> Ve a{' '}
+              <a 
+                href="https://www.strava.com/settings/api" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline"
+              >
+                Strava API Settings
+              </a>
+            </AlertDescription>
+          </Alert>
+          
+          <div className="bg-muted p-3 rounded text-sm space-y-1">
+            <p><strong>Paso 2:</strong> Genera un nuevo token con estos scopes:</p>
+            <code className="block bg-background p-2 rounded border">
+              read,activity:read_all
+            </code>
+          </div>
+          
+          <div className="bg-muted p-3 rounded text-sm">
+            <p><strong>Paso 3:</strong> Reemplaza el ACCESS_TOKEN en el código con el nuevo token</p>
+          </div>
         </div>
       </CardContent>
     </Card>
