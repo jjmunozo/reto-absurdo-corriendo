@@ -1,7 +1,7 @@
 
 import { RunData, MonthlyStats } from '@/data/runningData';
 import { getRunningData, getAthleteInfo, getAthleteStats, isAuthenticated, forcePerpetualConnection } from '@/services/stravaService';
-import { loadRunningDataFromJson, isAdminMode, updateLastUpdateTime } from '@/services/dataExportService';
+import { loadRunningDataFromJson, isAdminMode, setLastUpdateTime } from '@/services/dataExportService';
 import { isUsingRealData } from '@/services/stravaPerpetualService';
 import { hasRealDataCaptured } from '@/services/stravaRealDataCapture';
 import { toZonedTime, format } from 'date-fns-tz';
@@ -41,7 +41,7 @@ export const fetchStravaRunningData = async (): Promise<RunData[]> => {
         if (runData.length > 0) {
           // IMPORTANTE: Actualizar fecha de última actualización cuando obtenemos datos reales
           console.log('📅 Actualizando fecha de última actualización...');
-          updateLastUpdateTime();
+          setLastUpdateTime(Date.now());
           
           // Ordenar por fecha (más reciente primero)
           const sortedData = runData.sort((a, b) => {
