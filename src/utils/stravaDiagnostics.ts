@@ -1,164 +1,128 @@
 
-/**
- * Funciones de diagnóstico para Strava
- */
-
-import { isAuthenticated, getAthleteInfo, getAccessToken } from '@/services/stravaService';
-import { isAdminMode } from '@/services/dataExportService';
-import { getAthleteActivities, getAllRunningActivities } from '@/services/stravaActivitiesService';
+import { RunData } from '@/data/runningData';
 
 export interface DiagnosticResult {
   step: string;
-  status: 'success' | 'error' | 'warning';
+  status: 'success' | 'warning' | 'error';
   message: string;
   data?: any;
 }
 
+/**
+ * Ejecuta diagnósticos del nuevo sistema Strava
+ */
 export const runStravaDiagnostics = async (): Promise<DiagnosticResult[]> => {
   const results: DiagnosticResult[] = [];
-  
-  // 1. Verificar modo administrador
-  const adminMode = isAdminMode();
-  results.push({
-    step: 'Admin Mode',
-    status: adminMode ? 'success' : 'warning',
-    message: adminMode ? 'Modo administrador activado' : 'Modo administrador NO activado (necesario para datos de Strava)',
-    data: { adminMode }
-  });
-  
-  // 2. Verificar autenticación
-  const authenticated = isAuthenticated();
-  results.push({
-    step: 'Authentication',
-    status: authenticated ? 'success' : 'error',
-    message: authenticated ? 'Usuario autenticado con Strava' : 'Usuario NO autenticado con Strava',
-    data: { authenticated }
-  });
-  
-  if (!authenticated) {
-    results.push({
-      step: 'Authentication Details',
-      status: 'error',
-      message: 'No se puede continuar sin autenticación',
-      data: { localStorage: localStorage.getItem('strava_tokens') ? 'Tokens encontrados' : 'No hay tokens' }
-    });
-    return results;
-  }
-  
-  // 3. Verificar información del atleta
-  const athlete = getAthleteInfo();
-  results.push({
-    step: 'Athlete Info',
-    status: athlete ? 'success' : 'warning',
-    message: athlete ? `Información del atleta: ${athlete.firstname} ${athlete.lastname}` : 'No hay información del atleta',
-    data: athlete
-  });
-  
-  // 4. Verificar token de acceso
+
+  // 1. Verificar disponibilidad del endpoint API
   try {
-    const accessToken = await getAccessToken();
-    results.push({
-      step: 'Access Token',
-      status: 'success',
-      message: 'Token de acceso obtenido correctamente',
-      data: { tokenLength: accessToken?.length || 0 }
-    });
-  } catch (error) {
-    results.push({
-      step: 'Access Token',
-      status: 'error',
-      message: `Error obteniendo token: ${error}`,
-      data: { error: error.toString() }
-    });
-    return results;
-  }
-  
-  // 5. Probar conexión con API de Strava (obtener primera página de actividades)
-  try {
-    const firstPageActivities = await getAthleteActivities(undefined, undefined, 1, 5);
-    results.push({
-      step: 'API Connection',
-      status: 'success',
-      message: `Conexión con API exitosa. ${firstPageActivities.length} actividades en primera página`,
-      data: { 
-        activitiesCount: firstPageActivities.length,
-        firstActivity: firstPageActivities[0] ? {
-          id: firstPageActivities[0].id,
-          name: firstPageActivities[0].name,
-          type: firstPageActivities[0].type,
-          date: firstPageActivities[0].start_date_local
-        } : null
-      }
-    });
-  } catch (error) {
-    results.push({
-      step: 'API Connection',
-      status: 'error',
-      message: `Error conectando con API: ${error}`,
-      data: { error: error.toString() }
-    });
-    return results;
-  }
-  
-  // 6. Obtener todas las actividades de carrera
-  try {
-    const runningActivities = await getAllRunningActivities();
-    const runActivities = runningActivities.filter(activity => activity.type === 'Run');
+    console.log('🔍 Verificando endpoint /api/strava...');
     
-    results.push({
-      step: 'Running Activities',
-      status: runActivities.length > 0 ? 'success' : 'warning',
-      message: `${runActivities.length} actividades de carrera encontradas de ${runningActivities.length} actividades totales`,
-      data: { 
-        totalActivities: runningActivities.length,
-        runActivities: runActivities.length,
-        activityTypes: [...new Set(runningActivities.map(a => a.type))]
-      }
-    });
+    const response = await fetch('/api/strava');
     
-    // 7. Analizar las fechas de las actividades
-    if (runActivities.length > 0) {
-      const dates = runActivities.map(a => a.start_date_local);
-      const years = [...new Set(dates.map(d => new Date(d).getFullYear()))];
+    if (response.ok) {
+      const data: RunData[] = await response.json();
       
       results.push({
-        step: 'Date Analysis',
+        step: 'Conexión API',
         status: 'success',
-        message: `Actividades encontradas en años: ${years.join(', ')}`,
-        data: {
-          dateRange: {
-            earliest: dates.sort()[0],
-            latest: dates.sort().reverse()[0]
-          },
-          years,
-          sampleDates: dates.slice(0, 3)
+        message: `Endpoint funcionando correctamente. ${data.length} actividades cargadas.`,
+        data: { activitiesCount: data.length, endpoint: '/api/strava' }
+      });
+      
+      // 2. Verificar estructura de datos
+      if (data.length > 0) {
+        const sampleRun = data[0];
+        const requiredFields = ['id', 'date', 'distance', 'duration', 'elevation', 'avgPace', 'location'];
+        const missingFields = requiredFields.filter(field => !(field in sampleRun));
+        
+        if (missingFields.length === 0) {
+          results.push({
+            step: 'Estructura de Datos',
+            status: 'success',
+            message: 'Todos los campos requeridos están presentes.',
+            data: { sampleRun, requiredFields }
+          });
+        } else {
+          results.push({
+            step: 'Estructura de Datos',
+            status: 'warning',
+            message: `Campos faltantes: ${missingFields.join(', ')}`,
+            data: { missingFields, sampleRun }
+          });
         }
+        
+        // 3. Verificar datos de carreras
+        const runningActivities = data.filter(activity => activity.distance > 0);
+        
+        results.push({
+          step: 'Actividades de Carrera',
+          status: runningActivities.length > 0 ? 'success' : 'warning',
+          message: `${runningActivities.length} de ${data.length} actividades son carreras válidas.`,
+          data: { 
+            totalActivities: data.length, 
+            runningActivities: runningActivities.length,
+            samples: runningActivities.slice(0, 3).map(run => ({
+              date: run.date,
+              distance: run.distance,
+              location: run.location
+            }))
+          }
+        });
+        
+        // 4. Verificar fechas y horas
+        const activitiesWithTime = data.filter(activity => activity.startTimeLocal);
+        
+        results.push({
+          step: 'Datos de Tiempo',
+          status: activitiesWithTime.length > 0 ? 'success' : 'warning',
+          message: `${activitiesWithTime.length} de ${data.length} actividades tienen datos de hora.`,
+          data: { 
+            withTimeData: activitiesWithTime.length,
+            total: data.length,
+            sampleTimes: activitiesWithTime.slice(0, 3).map(run => ({
+              date: run.date,
+              startTime: run.startTimeLocal
+            }))
+          }
+        });
+        
+      } else {
+        results.push({
+          step: 'Datos de Actividades',
+          status: 'warning',
+          message: 'No se encontraron actividades en la respuesta.',
+          data: { activitiesCount: 0 }
+        });
+      }
+      
+    } else {
+      results.push({
+        step: 'Conexión API',
+        status: 'error',
+        message: `Error HTTP ${response.status}: ${response.statusText}`,
+        data: { status: response.status, statusText: response.statusText }
       });
     }
     
   } catch (error) {
     results.push({
-      step: 'Running Activities',
+      step: 'Conexión API',
       status: 'error',
-      message: `Error obteniendo actividades: ${error}`,
-      data: { error: error.toString() }
+      message: `Error de red: ${error instanceof Error ? error.message : 'Error desconocido'}`,
+      data: { error: error instanceof Error ? error.message : error }
     });
   }
-  
-  return results;
-};
 
-export const logDiagnostics = async (): Promise<void> => {
-  console.log('🔍 Iniciando diagnóstico de Strava...');
-  const results = await runStravaDiagnostics();
-  
-  results.forEach(result => {
-    const emoji = result.status === 'success' ? '✅' : result.status === 'warning' ? '⚠️' : '❌';
-    console.log(`${emoji} ${result.step}: ${result.message}`);
-    if (result.data) {
-      console.log('   Data:', result.data);
+  // 5. Verificar variables de entorno (simulado)
+  results.push({
+    step: 'Configuración Backend',
+    status: 'warning',
+    message: 'No se pueden verificar las variables de entorno desde el frontend. Revisar logs del servidor.',
+    data: { 
+      note: 'Las variables STRAVA_CLIENT_ID, STRAVA_CLIENT_SECRET, STRAVA_ACCESS_TOKEN y STRAVA_REFRESH_TOKEN deben estar configuradas en el servidor.'
     }
   });
-  
-  console.log('🔍 Diagnóstico completado');
+
+  return results;
 };
