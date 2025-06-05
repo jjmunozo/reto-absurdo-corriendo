@@ -12,12 +12,12 @@ interface StravaActivity {
   location_country?: string;
 }
 
-// Credenciales de Juan - Necesitan ser actualizadas con tokens que tengan permisos de lectura
+// Credenciales de Juan - Token actualizado con permisos de lectura de actividades
 const STRAVA_CONFIG = {
   CLIENT_ID: '160774',
   CLIENT_SECRET: '5836512c42bdd300ac801e4b2d81bdff5228d281',
-  ACCESS_TOKEN: 'a9dc1c04a421b97598877dc1f5d5a651fcecefae',
-  REFRESH_TOKEN: '101890a7d1533723487699325e80ca5848eda091'
+  ACCESS_TOKEN: 'a612886237e64952cc7a05b5907588a31e14286a',
+  REFRESH_TOKEN: '3a113d2432e68e8d1a1ceb5c7527eb80132373b'
 };
 
 let cache: RunData[] = [];
