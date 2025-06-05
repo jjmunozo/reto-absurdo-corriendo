@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -130,6 +131,13 @@ const AdminPanel: React.FC = () => {
     });
     window.location.reload();
   };
+
+  const handleBackToMain = () => {
+    // Remover el hash #admin de la URL
+    window.location.hash = '';
+    // Forzar recarga para actualizar la vista
+    window.location.reload();
+  };
   
   // Si no estamos en modo admin y no es la URL de admin, mostrar el formulario de acceso
   if (!showAdminPanel) {
@@ -241,6 +249,13 @@ const AdminPanel: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
+                <Button 
+                  variant="outline"
+                  onClick={handleBackToMain}
+                >
+                  ← Volver a la página principal
+                </Button>
+                
                 <Button 
                   variant="outline"
                   onClick={() => {
