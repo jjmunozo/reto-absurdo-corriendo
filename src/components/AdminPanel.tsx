@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,6 +20,7 @@ import {
 } from '@/services/stravaService';
 import StravaConnectButton from '@/components/StravaConnectButton';
 import StravaDebugPanel from '@/components/StravaDebugPanel';
+import StravaDataCapture from '@/components/StravaDataCapture';
 
 const AdminPanel: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -174,8 +174,9 @@ const AdminPanel: React.FC = () => {
       </Card>
 
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">Resumen</TabsTrigger>
+          <TabsTrigger value="capture">Capturar Datos</TabsTrigger>
           <TabsTrigger value="debug">Diagnóstico</TabsTrigger>
           <TabsTrigger value="settings">Configuración</TabsTrigger>
         </TabsList>
@@ -223,6 +224,10 @@ const AdminPanel: React.FC = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+        
+        <TabsContent value="capture">
+          <StravaDataCapture />
         </TabsContent>
         
         <TabsContent value="debug">
