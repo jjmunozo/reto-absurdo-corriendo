@@ -48,6 +48,13 @@ export const initializePerpetualConnection = (): void => {
     const realRefreshToken = getRealRefreshToken();
     const realAthlete = getRealAthleteData();
     
+    console.log('🔍 Datos reales disponibles:', {
+      hasToken: !!realToken,
+      hasRefreshToken: !!realRefreshToken,
+      hasAthlete: !!realAthlete,
+      athleteName: realAthlete ? `${realAthlete.firstname} ${realAthlete.lastname}` : 'N/A'
+    });
+    
     if (realToken && realRefreshToken && realAthlete) {
       // Use real captured data
       const tokens = {
@@ -104,18 +111,22 @@ export const isUsingRealData = (): boolean => {
  * Obtiene un token de acceso válido para la conexión perpetua
  */
 export const getPerpetualAccessToken = async (): Promise<string> => {
-  // Si tenemos datos reales, usar esos tokens directamente
+  console.log('🔑 getPerpetualAccessToken: Iniciando...');
+  
+  // Si tenemos datos reales, usar esos tokens directamente (PRIORIDAD MÁXIMA)
   if (hasRealDataCaptured()) {
     const realToken = getRealAccessToken();
     if (realToken) {
-      console.log('🔑 Usando token real capturado');
+      console.log('🔑 Usando token real capturado:', realToken.substring(0, 10) + '...');
       return realToken;
     }
   }
   
+  console.log('⚠️ No hay token real disponible, usando fallback');
   const tokensStr = localStorage.getItem(TOKEN_STORAGE_KEY);
   
   if (!tokensStr) {
+    console.log('🔄 No hay tokens en localStorage, inicializando conexión perpetua...');
     initializePerpetualConnection();
     const newTokensStr = localStorage.getItem(TOKEN_STORAGE_KEY);
     if (newTokensStr) {
@@ -133,7 +144,9 @@ export const getPerpetualAccessToken = async (): Promise<string> => {
  * Obtiene información del atleta para la conexión perpetua
  */
 export const getPerpetualAthleteInfo = (): StravaAthlete => {
-  // Si tenemos datos reales, usar esos datos directamente
+  console.log('👤 getPerpetualAthleteInfo: Iniciando...');
+  
+  // Si tenemos datos reales, usar esos datos directamente (PRIORIDAD MÁXIMA)
   if (hasRealDataCaptured()) {
     const realAthlete = getRealAthleteData();
     if (realAthlete) {
@@ -142,9 +155,11 @@ export const getPerpetualAthleteInfo = (): StravaAthlete => {
     }
   }
   
+  console.log('⚠️ No hay datos reales del atleta, usando fallback');
   const athleteData = localStorage.getItem(ATHLETE_STORAGE_KEY);
   
   if (!athleteData) {
+    console.log('🔄 No hay datos del atleta en localStorage, inicializando conexión perpetua...');
     initializePerpetualConnection();
     const newAthleteData = localStorage.getItem(ATHLETE_STORAGE_KEY);
     if (newAthleteData) {

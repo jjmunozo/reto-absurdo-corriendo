@@ -1,11 +1,10 @@
-
 /**
  * Service for handling Strava activities
  */
 
 import { RunData } from '@/data/runningData';
 import { StravaActivity } from '@/types/stravaTypes';
-import { getAccessToken } from './stravaAuthService';
+import { getAccessToken } from './stravaService'; // CAMBIO: usar el del servicio principal, no el de auth
 import { convertStravaActivityToRunData } from './stravaUtils';
 
 /**
@@ -18,7 +17,9 @@ export const getAthleteActivities = async (
   per_page: number = 100
 ): Promise<StravaActivity[]> => {
   try {
+    console.log('🔑 Obteniendo token de acceso para actividades...');
     const accessToken = await getAccessToken();
+    console.log('🔑 Token obtenido:', accessToken.substring(0, 10) + '...');
     
     let url = `https://www.strava.com/api/v3/athlete/activities?page=${page}&per_page=${per_page}`;
     
@@ -30,20 +31,27 @@ export const getAthleteActivities = async (
       url += `&after=${after}`;
     }
     
+    console.log('🌐 Haciendo petición a Strava API:', url);
+    
     const response = await fetch(url, {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
       },
     });
 
+    console.log('🌐 Respuesta de Strava API:', response.status, response.statusText);
+
     if (!response.ok) {
-      throw new Error(`Error obteniendo actividades: ${response.status}`);
+      const errorText = await response.text();
+      console.error('❌ Error en respuesta de Strava:', response.status, errorText);
+      throw new Error(`Error obteniendo actividades: ${response.status} - ${errorText}`);
     }
 
     const activities: StravaActivity[] = await response.json();
+    console.log('✅ Actividades obtenidas:', activities.length);
     return activities;
   } catch (error) {
-    console.error('Error obteniendo actividades del atleta:', error);
+    console.error('❌ Error obteniendo actividades del atleta:', error);
     throw error;
   }
 };

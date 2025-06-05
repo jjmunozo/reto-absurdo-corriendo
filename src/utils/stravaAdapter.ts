@@ -1,6 +1,7 @@
+
 import { RunData, MonthlyStats } from '@/data/runningData';
 import { getRunningData, getAthleteInfo, getAthleteStats, isAuthenticated, forcePerpetualConnection } from '@/services/stravaService';
-import { loadRunningDataFromJson, isAdminMode } from '@/services/dataExportService';
+import { loadRunningDataFromJson, isAdminMode, updateLastUpdateTime } from '@/services/dataExportService';
 import { isUsingRealData } from '@/services/stravaPerpetualService';
 import { hasRealDataCaptured } from '@/services/stravaRealDataCapture';
 import { toZonedTime, format } from 'date-fns-tz';
@@ -24,7 +25,7 @@ export const fetchStravaRunningData = async (): Promise<RunData[]> => {
     }
     
     // Si tenemos datos reales capturados, intentar obtener datos frescos de Strava
-    if (hasRealDataCaptured() && isAuthenticated()) {
+    if (hasRealDataCaptured()) {
       console.log('🏃 Tenemos datos reales - obteniendo datos frescos de Strava...');
       
       try {
@@ -33,10 +34,15 @@ export const fetchStravaRunningData = async (): Promise<RunData[]> => {
           await logDiagnostics();
         }
         
+        console.log('🔄 Llamando a getRunningData...');
         const runData = await getRunningData();
         console.log(`🏃 Datos frescos obtenidos desde Strava: ${runData.length} actividades`);
         
         if (runData.length > 0) {
+          // IMPORTANTE: Actualizar fecha de última actualización cuando obtenemos datos reales
+          console.log('📅 Actualizando fecha de última actualización...');
+          updateLastUpdateTime();
+          
           // Ordenar por fecha (más reciente primero)
           const sortedData = runData.sort((a, b) => {
             return new Date(b.date).getTime() - new Date(a.date).getTime();
