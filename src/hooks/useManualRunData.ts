@@ -2,18 +2,9 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
+import { RunData } from '@/data/runningData';
 
 type ManualRun = Database['public']['Tables']['manual_runs']['Row'];
-
-export interface RunData {
-  id: string;
-  name: string;
-  start_date_local: string;
-  distance: number; // en metros
-  moving_time: number; // en segundos
-  total_elevation_gain: number;
-  has_pr?: boolean;
-}
 
 export const useManualRunData = () => {
   const [activities, setActivities] = useState<RunData[]>([]);
@@ -35,15 +26,16 @@ export const useManualRunData = () => {
         throw fetchError;
       }
 
-      // Convertir datos manuales al formato RunData
+      // Convertir datos manuales al formato RunData original
       const convertedData: RunData[] = (data || []).map((run: ManualRun) => ({
-        id: run.id,
-        name: run.title,
-        start_date_local: run.start_time,
-        distance: run.distance_km * 1000, // convertir km a metros
-        moving_time: run.duration_minutes * 60, // convertir minutos a segundos
-        total_elevation_gain: run.total_elevation,
-        has_pr: run.has_pr
+        id: parseInt(run.id.replace(/-/g, '').substring(0, 10), 16), // Convertir UUID a número
+        date: run.start_time.split('T')[0], // Extraer solo la fecha
+        distance: run.distance_km, // Ya está en km
+        duration: run.duration_minutes, // Ya está en minutos
+        elevation: run.total_elevation, // Ya está en metros
+        avgPace: run.avg_pace, // Ya está en min/km
+        location: run.title, // Usar el título como ubicación
+        startTimeLocal: run.start_time // Mantener el timestamp completo
       }));
 
       setActivities(convertedData);
