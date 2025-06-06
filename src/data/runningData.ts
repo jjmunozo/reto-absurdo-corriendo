@@ -7,6 +7,9 @@ export interface RunData {
   avgPace: number; // in minutes per kilometer
   location: string;
   startTimeLocal: string; // full ISO datetime string
+  hasPR?: boolean;
+  prType?: string | null;
+  prDescription?: string | null;
 }
 
 export interface MonthlyStats {
