@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
@@ -24,7 +24,9 @@ const AddRun = () => {
     distance: '',
     pace: '',
     elevation: '',
-    hasPR: false
+    hasPR: false,
+    prType: '',
+    prDescription: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
@@ -106,7 +108,9 @@ const AddRun = () => {
           distance_km: distance,
           avg_pace: avgPace,
           total_elevation: parseInt(formData.elevation || '0'),
-          has_pr: formData.hasPR
+          has_pr: formData.hasPR,
+          pr_type: formData.hasPR ? formData.prType : null,
+          pr_description: formData.hasPR ? formData.prDescription : null
         });
 
       if (error) {
@@ -128,7 +132,9 @@ const AddRun = () => {
         distance: '',
         pace: '',
         elevation: '',
-        hasPR: false
+        hasPR: false,
+        prType: '',
+        prDescription: ''
       });
 
     } catch (err: any) {
@@ -320,13 +326,41 @@ const AddRun = () => {
                 />
               </div>
 
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="hasPR"
-                  checked={formData.hasPR}
-                  onCheckedChange={(checked) => handleInputChange('hasPR', checked as boolean)}
-                />
-                <Label htmlFor="hasPR">¿Tuviste algún PR (récord personal)?</Label>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="hasPR"
+                    checked={formData.hasPR}
+                    onCheckedChange={(checked) => handleInputChange('hasPR', checked as boolean)}
+                  />
+                  <Label htmlFor="hasPR">¿Tuviste algún PR (récord personal)?</Label>
+                </div>
+
+                {formData.hasPR && (
+                  <div className="space-y-4 pl-6 border-l-2 border-yellow-200 bg-yellow-50 p-4 rounded-r-lg">
+                    <div>
+                      <Label htmlFor="prType">Tipo de PR</Label>
+                      <Input
+                        id="prType"
+                        value={formData.prType}
+                        onChange={(e) => handleInputChange('prType', e.target.value)}
+                        placeholder="Ej: Mejor tiempo en 5K, Mayor distancia recorrida, etc."
+                        required={formData.hasPR}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="prDescription">Descripción</Label>
+                      <Textarea
+                        id="prDescription"
+                        value={formData.prDescription}
+                        onChange={(e) => handleInputChange('prDescription', e.target.value)}
+                        placeholder="Describe los detalles de tu récord personal..."
+                        rows={3}
+                        required={formData.hasPR}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               <Button type="submit" className="w-full" disabled={isSubmitting}>

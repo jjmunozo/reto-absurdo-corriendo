@@ -6,8 +6,15 @@ import { RunData } from '@/data/runningData';
 
 type ManualRun = Database['public']['Tables']['manual_runs']['Row'];
 
+// Extend RunData type to include PR fields
+interface ExtendedRunData extends RunData {
+  hasPR?: boolean;
+  prType?: string | null;
+  prDescription?: string | null;
+}
+
 export const useManualRunData = () => {
-  const [activities, setActivities] = useState<RunData[]>([]);
+  const [activities, setActivities] = useState<ExtendedRunData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastSync, setLastSync] = useState<Date | null>(null);
@@ -26,8 +33,8 @@ export const useManualRunData = () => {
         throw fetchError;
       }
 
-      // Convertir datos manuales al formato RunData original
-      const convertedData: RunData[] = (data || []).map((run: ManualRun) => ({
+      // Convertir datos manuales al formato RunData original con campos extendidos
+      const convertedData: ExtendedRunData[] = (data || []).map((run: ManualRun) => ({
         id: parseInt(run.id.replace(/-/g, '').substring(0, 10), 16), // Convertir UUID a número
         date: run.start_time.split('T')[0], // Extraer solo la fecha
         distance: run.distance_km, // Ya está en km
@@ -35,7 +42,10 @@ export const useManualRunData = () => {
         elevation: run.total_elevation, // Ya está en metros
         avgPace: run.avg_pace, // Ya está en min/km
         location: run.title, // Usar el título como ubicación
-        startTimeLocal: run.start_time // Mantener el timestamp completo
+        startTimeLocal: run.start_time, // Mantener el timestamp completo
+        hasPR: run.has_pr || false,
+        prType: run.pr_type,
+        prDescription: run.pr_description
       }));
 
       setActivities(convertedData);

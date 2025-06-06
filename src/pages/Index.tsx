@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { MapPin, TrendingUp, Clock, Flag, Activity } from 'lucide-react';
 import { useManualRunData } from '@/hooks/useManualRunData';
@@ -8,6 +7,7 @@ import RunningChart from '@/components/RunningChart';
 import RecentRuns from '@/components/RecentRuns';
 import RunsPerHourChart from '@/components/RunsPerHourChart';
 import GitHubContributionTracker from '@/components/GitHubContributionTracker';
+import PersonalRecords from '@/components/PersonalRecords';
 import { 
   calculateTotalStats,
   calculateMonthlyStats,
@@ -135,6 +135,17 @@ const Index = () => {
                 icon={<Flag size={24} />}
               />
             </div>
+          </section>
+        )}
+
+        {/* Personal Records Section */}
+        {!isLoading && activities.length > 0 && (
+          <section className="mb-10">
+            <PersonalRecords 
+              runs={activities} 
+              title="Récords Personales" 
+              description="Tus mejores logros y récords personales"
+            />
           </section>
         )}
 
