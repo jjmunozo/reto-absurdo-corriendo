@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MapPin, TrendingUp, Clock, Flag, Activity, Plus } from 'lucide-react';
+import { MapPin, TrendingUp, Clock, Flag, Activity } from 'lucide-react';
 import { useManualRunData } from '@/hooks/useManualRunData';
 import { Button } from '@/components/ui/button';
 import StatCard from '@/components/StatCard';
@@ -15,10 +15,8 @@ import {
   calculateRunsPerHour
 } from '@/utils/stravaAdapter';
 import { toast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
 
 const Index = () => {
-  const navigate = useNavigate();
   const { 
     activities, 
     isLoading, 
@@ -79,16 +77,6 @@ const Index = () => {
                   </span>
                 )}
               </p>
-            </div>
-            <div className="mt-4 md:mt-0 flex gap-2">
-              <Button 
-                variant="secondary" 
-                size="sm"
-                onClick={() => navigate('/add-run')}
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Agregar Carrera
-              </Button>
             </div>
           </div>
         </div>
@@ -207,11 +195,7 @@ const Index = () => {
         {!isLoading && activities.length === 0 && (
           <div className="text-center py-12">
             <h3 className="text-xl font-semibold text-gray-900 mb-2">No hay carreras registradas</h3>
-            <p className="text-gray-600 mb-4">Haz clic en "Agregar Carrera" para registrar tu primera carrera.</p>
-            <Button onClick={() => navigate('/add-run')}>
-              <Plus className="w-4 h-4 mr-2" />
-              Agregar Primera Carrera
-            </Button>
+            <p className="text-gray-600 mb-4">No se han encontrado carreras en el sistema.</p>
           </div>
         )}
       </main>
