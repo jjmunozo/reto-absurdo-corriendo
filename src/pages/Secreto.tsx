@@ -1,7 +1,7 @@
 
 import React from 'react';
-import { MapPin, TrendingUp, Clock, Flag, Activity, Plus } from 'lucide-react';
-import { useManualRunData } from '@/hooks/useManualRunData';
+import { MapPin, TrendingUp, Clock, Flag, Activity, RefreshCw } from 'lucide-react';
+import { useJuanStravaData } from '@/hooks/useJuanStravaData';
 import { Button } from '@/components/ui/button';
 import StatCard from '@/components/StatCard';
 import RunningChart from '@/components/RunningChart';
@@ -15,29 +15,28 @@ import {
   calculateRunsPerHour
 } from '@/utils/stravaAdapter';
 import { toast } from '@/hooks/use-toast';
-import { useNavigate } from 'react-router-dom';
 
-const Index = () => {
-  const navigate = useNavigate();
+const Secreto = () => {
   const { 
     activities, 
     isLoading, 
+    isSyncing, 
     lastSync,
     error,
     syncActivities 
-  } = useManualRunData();
+  } = useJuanStravaData();
 
-  const handleRefresh = async () => {
+  const handleSync = async () => {
     try {
       await syncActivities();
       toast({
-        title: "Datos actualizados",
-        description: "Las carreras han sido recargadas",
+        title: "Sincronización completada",
+        description: "Los datos han sido actualizados",
       });
     } catch (error: any) {
       toast({
-        title: "Error al actualizar",
-        description: error.message || "No se pudieron cargar las carreras",
+        title: "Error en sincronización",
+        description: error.message || "No se pudieron sincronizar las actividades",
         variant: "destructive",
       });
     }
@@ -70,9 +69,9 @@ const Index = () => {
         <div className="container mx-auto">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-2">El reto más absurdo</h1>
+              <h1 className="text-4xl md:text-5xl font-bold mb-2">El reto más absurdo - Strava</h1>
               <p className="text-lg opacity-90">
-                Datos de entrenamiento de Juan
+                Datos de entrenamiento de Juan (Versión con integración Strava)
                 {lastSync && (
                   <span className="block text-sm mt-1">
                     Última actualización: {lastSync.toLocaleString('es-ES')}
@@ -84,10 +83,11 @@ const Index = () => {
               <Button 
                 variant="secondary" 
                 size="sm"
-                onClick={() => navigate('/add-run')}
+                onClick={handleSync}
+                disabled={isSyncing}
               >
-                <Plus className="w-4 h-4 mr-2" />
-                Agregar Carrera
+                <RefreshCw className={`w-4 h-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
+                {isSyncing ? 'Sincronizando...' : 'Actualizar datos'}
               </Button>
             </div>
           </div>
@@ -207,10 +207,10 @@ const Index = () => {
         {!isLoading && activities.length === 0 && (
           <div className="text-center py-12">
             <h3 className="text-xl font-semibold text-gray-900 mb-2">No hay carreras registradas</h3>
-            <p className="text-gray-600 mb-4">Haz clic en "Agregar Carrera" para registrar tu primera carrera.</p>
-            <Button onClick={() => navigate('/add-run')}>
-              <Plus className="w-4 h-4 mr-2" />
-              Agregar Primera Carrera
+            <p className="text-gray-600 mb-4">Haz clic en "Actualizar datos" para cargar las actividades más recientes.</p>
+            <Button onClick={handleSync} disabled={isSyncing}>
+              <RefreshCw className={`w-4 h-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
+              {isSyncing ? 'Sincronizando...' : 'Actualizar datos'}
             </Button>
           </div>
         )}
@@ -219,11 +219,11 @@ const Index = () => {
       {/* Footer */}
       <footer className="bg-gray-100 py-6 px-4">
         <div className="container mx-auto text-center text-gray-600">
-          <p className="text-sm">&copy; 2024 El reto más absurdo | Datos registrados manualmente</p>
+          <p className="text-sm">&copy; 2024 El reto más absurdo | Datos actualizados automáticamente desde Strava</p>
         </div>
       </footer>
     </div>
   );
 };
 
-export default Index;
+export default Secreto;

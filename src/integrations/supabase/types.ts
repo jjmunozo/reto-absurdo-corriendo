@@ -9,6 +9,45 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      manual_runs: {
+        Row: {
+          avg_pace: number
+          created_at: string
+          distance_km: number
+          duration_minutes: number
+          has_pr: boolean
+          id: string
+          start_time: string
+          title: string
+          total_elevation: number
+          updated_at: string
+        }
+        Insert: {
+          avg_pace: number
+          created_at?: string
+          distance_km: number
+          duration_minutes: number
+          has_pr?: boolean
+          id?: string
+          start_time: string
+          title: string
+          total_elevation?: number
+          updated_at?: string
+        }
+        Update: {
+          avg_pace?: number
+          created_at?: string
+          distance_km?: number
+          duration_minutes?: number
+          has_pr?: boolean
+          id?: string
+          start_time?: string
+          title?: string
+          total_elevation?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
