@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -138,14 +139,15 @@ const AddRun = () => {
     setIsSubmitting(true);
 
     try {
-      // Calcular el tiempo total en minutos como entero
-      const totalSeconds = parseInt(data.hours || '0') * 3600 + parseInt(data.minutes || '0') * 60 + parseInt(data.seconds || '0');
-      const totalMinutes = Math.round(totalSeconds / 60); // Convertir a minutos y redondear
+      // Usar los valores directamente sin conversiones
+      const durationHours = parseInt(data.hours || '0');
+      const durationMinutes = parseInt(data.minutes || '0');
+      const durationSeconds = parseInt(data.seconds || '0');
       const distance = parseFloat(data.distance);
       
       // Convertir pace de formato min:ss a decimal
-      const [paceMinutes, paceSeconds] = data.pace.split(':').map(Number);
-      const avgPace = paceMinutes + (paceSeconds / 60);
+      const [paceMinutes, paceSecondsTime] = data.pace.split(':').map(Number);
+      const avgPace = paceMinutes + (paceSecondsTime / 60);
       
       // Combinar fecha y hora
       const startDateTime = new Date(`${data.date}T${data.time}`);
@@ -153,7 +155,9 @@ const AddRun = () => {
       console.log('Datos a insertar:', {
         title: data.title,
         start_time: startDateTime.toISOString(),
-        duration_minutes: totalMinutes,
+        duration_hours: durationHours,
+        duration_minutes: durationMinutes,
+        duration_seconds: durationSeconds,
         distance_km: distance,
         avg_pace: avgPace,
         total_elevation: parseInt(data.elevation || '0'),
@@ -167,7 +171,9 @@ const AddRun = () => {
         .insert({
           title: data.title,
           start_time: startDateTime.toISOString(),
-          duration_minutes: totalMinutes,
+          duration_hours: durationHours,
+          duration_minutes: durationMinutes,
+          duration_seconds: durationSeconds,
           distance_km: distance,
           avg_pace: avgPace,
           total_elevation: parseInt(data.elevation || '0'),

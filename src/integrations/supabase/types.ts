@@ -14,7 +14,9 @@ export type Database = {
           avg_pace: number
           created_at: string
           distance_km: number
+          duration_hours: number
           duration_minutes: number
+          duration_seconds: number
           has_pr: boolean
           id: string
           pr_description: string | null
@@ -28,7 +30,9 @@ export type Database = {
           avg_pace: number
           created_at?: string
           distance_km: number
-          duration_minutes: number
+          duration_hours?: number
+          duration_minutes?: number
+          duration_seconds?: number
           has_pr?: boolean
           id?: string
           pr_description?: string | null
@@ -42,7 +46,9 @@ export type Database = {
           avg_pace?: number
           created_at?: string
           distance_km?: number
+          duration_hours?: number
           duration_minutes?: number
+          duration_seconds?: number
           has_pr?: boolean
           id?: string
           pr_description?: string | null

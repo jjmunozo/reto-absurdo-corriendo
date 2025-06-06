@@ -27,19 +27,24 @@ export const useManualRunData = () => {
       }
 
       // Convertir datos manuales al formato RunData original con campos extendidos
-      const convertedData: RunData[] = (data || []).map((run: ManualRun) => ({
-        id: parseInt(run.id.replace(/-/g, '').substring(0, 10), 16), // Convertir UUID a número
-        date: run.start_time.split('T')[0], // Extraer solo la fecha
-        distance: run.distance_km, // Ya está en km
-        duration: run.duration_minutes, // Ya está en minutos
-        elevation: run.total_elevation, // Ya está en metros
-        avgPace: run.avg_pace, // Ya está en min/km
-        location: run.title, // Usar el título como ubicación
-        startTimeLocal: run.start_time, // Mantener el timestamp completo
-        hasPR: run.has_pr || false,
-        prType: run.pr_type,
-        prDescription: run.pr_description
-      }));
+      const convertedData: RunData[] = (data || []).map((run: ManualRun) => {
+        // Convertir las horas, minutos y segundos a minutos totales para mantener compatibilidad
+        const totalMinutes = (run.duration_hours || 0) * 60 + (run.duration_minutes || 0) + (run.duration_seconds || 0) / 60;
+        
+        return {
+          id: parseInt(run.id.replace(/-/g, '').substring(0, 10), 16), // Convertir UUID a número
+          date: run.start_time.split('T')[0], // Extraer solo la fecha
+          distance: run.distance_km, // Ya está en km
+          duration: Math.round(totalMinutes), // Convertir a entero para compatibilidad
+          elevation: run.total_elevation, // Ya está en metros
+          avgPace: run.avg_pace, // Ya está en min/km
+          location: run.title, // Usar el título como ubicación
+          startTimeLocal: run.start_time, // Mantener el timestamp completo
+          hasPR: run.has_pr || false,
+          prType: run.pr_type,
+          prDescription: run.pr_description
+        };
+      });
 
       setActivities(convertedData);
       setLastSync(new Date());
