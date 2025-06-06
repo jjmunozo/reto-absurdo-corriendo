@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -40,9 +39,14 @@ const formSchema = z.object({
     return !isNaN(num) && num > 0;
   }, "La distancia debe ser un número mayor a 0"),
   pace: z.string().refine((val) => {
-    const num = parseFloat(val);
-    return !isNaN(num) && num > 0;
-  }, "El ritmo debe ser un número mayor a 0 (formato: minutos por km)"),
+    // Validar formato min:ss (ej: 5:30)
+    const paceRegex = /^\d{1,2}:\d{2}$/;
+    if (!paceRegex.test(val)) {
+      return false;
+    }
+    const [minutes, seconds] = val.split(':').map(Number);
+    return minutes >= 0 && seconds >= 0 && seconds <= 59;
+  }, "El ritmo debe tener formato min:ss (ej: 5:30)"),
   elevation: z.string().refine((val) => {
     const num = parseInt(val || '0');
     return num >= 0;
@@ -136,7 +140,10 @@ const AddRun = () => {
     try {
       const totalMinutes = parseInt(data.hours || '0') * 60 + parseInt(data.minutes || '0') + parseInt(data.seconds || '0') / 60;
       const distance = parseFloat(data.distance);
-      const avgPace = parseFloat(data.pace);
+      
+      // Convertir pace de formato min:ss a decimal
+      const [paceMinutes, paceSeconds] = data.pace.split(':').map(Number);
+      const avgPace = paceMinutes + (paceSeconds / 60);
       
       // Combinar fecha y hora
       const startDateTime = new Date(`${data.date}T${data.time}`);
@@ -389,12 +396,10 @@ const AddRun = () => {
                     name="pace"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Ritmo promedio (min/km)</FormLabel>
+                        <FormLabel>Ritmo promedio (min:ss por km)</FormLabel>
                         <FormControl>
                           <Input
-                            type="number"
-                            step="0.01"
-                            placeholder="5.30"
+                            placeholder="5:30"
                             {...field}
                           />
                         </FormControl>
