@@ -21,6 +21,7 @@ const AddRun = () => {
     time: '',
     hours: '',
     minutes: '',
+    seconds: '',
     distance: '',
     pace: '',
     elevation: '',
@@ -75,13 +76,11 @@ const AddRun = () => {
   };
 
   const calculatePace = () => {
-    const totalMinutes = parseInt(formData.hours || '0') * 60 + parseInt(formData.minutes || '0');
+    const totalMinutes = parseInt(formData.hours || '0') * 60 + parseInt(formData.minutes || '0') + parseInt(formData.seconds || '0') / 60;
     const distance = parseFloat(formData.distance || '0');
     
     if (totalMinutes > 0 && distance > 0) {
       const paceMinutes = totalMinutes / distance;
-      const paceMin = Math.floor(paceMinutes);
-      const paceSec = Math.round((paceMinutes - paceMin) * 60);
       return paceMinutes; // devolver en decimal para la base de datos
     }
     return 0;
@@ -92,7 +91,7 @@ const AddRun = () => {
     setIsSubmitting(true);
 
     try {
-      const totalMinutes = parseInt(formData.hours || '0') * 60 + parseInt(formData.minutes || '0');
+      const totalMinutes = parseInt(formData.hours || '0') * 60 + parseInt(formData.minutes || '0') + parseInt(formData.seconds || '0') / 60;
       const distance = parseFloat(formData.distance);
       const avgPace = parseFloat(formData.pace) || calculatePace();
       
@@ -129,6 +128,7 @@ const AddRun = () => {
         time: '',
         hours: '',
         minutes: '',
+        seconds: '',
         distance: '',
         pace: '',
         elevation: '',
@@ -265,7 +265,7 @@ const AddRun = () => {
 
               <div>
                 <Label>Tiempo total</Label>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                   <div>
                     <Input
                       value={formData.hours}
@@ -284,6 +284,16 @@ const AddRun = () => {
                       min="0"
                       max="59"
                       required
+                    />
+                  </div>
+                  <div>
+                    <Input
+                      value={formData.seconds}
+                      onChange={(e) => handleInputChange('seconds', e.target.value)}
+                      placeholder="Segundos"
+                      type="number"
+                      min="0"
+                      max="59"
                     />
                   </div>
                 </div>
