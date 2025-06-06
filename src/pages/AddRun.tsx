@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -5,32 +6,93 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Lock, Plus } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 
 const PASSWORD_HASH = "reto2024"; // Cambiar por tu contraseña preferida
+
+const formSchema = z.object({
+  title: z.string().min(1, "El título es obligatorio").max(100, "El título no puede exceder 100 caracteres"),
+  date: z.string().min(1, "La fecha es obligatoria"),
+  time: z.string().min(1, "La hora es obligatoria"),
+  hours: z.string().refine((val) => {
+    const num = parseInt(val || '0');
+    return num >= 0 && num <= 23;
+  }, "Las horas deben estar entre 0 y 23"),
+  minutes: z.string().refine((val) => {
+    const num = parseInt(val || '0');
+    return num >= 0 && num <= 59;
+  }, "Los minutos deben estar entre 0 y 59").refine((val) => {
+    return val !== '' && parseInt(val) >= 0;
+  }, "Los minutos son obligatorios"),
+  seconds: z.string().refine((val) => {
+    const num = parseInt(val || '0');
+    return num >= 0 && num <= 59;
+  }, "Los segundos deben estar entre 0 y 59"),
+  distance: z.string().refine((val) => {
+    const num = parseFloat(val);
+    return !isNaN(num) && num > 0;
+  }, "La distancia debe ser un número mayor a 0"),
+  pace: z.string().refine((val) => {
+    const num = parseFloat(val);
+    return !isNaN(num) && num > 0;
+  }, "El ritmo debe ser un número mayor a 0 (formato: minutos por km)"),
+  elevation: z.string().refine((val) => {
+    const num = parseInt(val || '0');
+    return num >= 0;
+  }, "La elevación debe ser un número positivo"),
+  hasPR: z.boolean(),
+  prType: z.string().optional(),
+  prDescription: z.string().optional(),
+}).refine((data) => {
+  if (data.hasPR) {
+    return data.prType && data.prType.trim() !== '';
+  }
+  return true;
+}, {
+  message: "El tipo de PR es obligatorio cuando marcas que tuviste un PR",
+  path: ["prType"]
+}).refine((data) => {
+  if (data.hasPR) {
+    return data.prDescription && data.prDescription.trim() !== '';
+  }
+  return true;
+}, {
+  message: "La descripción del PR es obligatoria cuando marcas que tuviste un PR",
+  path: ["prDescription"]
+});
+
+type FormData = z.infer<typeof formSchema>;
 
 const AddRun = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
-  const [formData, setFormData] = useState({
-    title: '',
-    date: '',
-    time: '',
-    hours: '',
-    minutes: '',
-    seconds: '',
-    distance: '',
-    pace: '',
-    elevation: '',
-    hasPR: false,
-    prType: '',
-    prDescription: ''
-  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
+
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: '',
+      date: '',
+      time: '',
+      hours: '',
+      minutes: '',
+      seconds: '',
+      distance: '',
+      pace: '',
+      elevation: '',
+      hasPR: false,
+      prType: '',
+      prDescription: ''
+    }
+  });
 
   useEffect(() => {
     // Verificar si ya está autenticado en esta sesión
@@ -68,48 +130,29 @@ const AddRun = () => {
     });
   };
 
-  const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const calculatePace = () => {
-    const totalMinutes = parseInt(formData.hours || '0') * 60 + parseInt(formData.minutes || '0') + parseInt(formData.seconds || '0') / 60;
-    const distance = parseFloat(formData.distance || '0');
-    
-    if (totalMinutes > 0 && distance > 0) {
-      const paceMinutes = totalMinutes / distance;
-      return paceMinutes; // devolver en decimal para la base de datos
-    }
-    return 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
 
     try {
-      const totalMinutes = parseInt(formData.hours || '0') * 60 + parseInt(formData.minutes || '0') + parseInt(formData.seconds || '0') / 60;
-      const distance = parseFloat(formData.distance);
-      const avgPace = parseFloat(formData.pace) || calculatePace();
+      const totalMinutes = parseInt(data.hours || '0') * 60 + parseInt(data.minutes || '0') + parseInt(data.seconds || '0') / 60;
+      const distance = parseFloat(data.distance);
+      const avgPace = parseFloat(data.pace);
       
       // Combinar fecha y hora
-      const startDateTime = new Date(`${formData.date}T${formData.time}`);
+      const startDateTime = new Date(`${data.date}T${data.time}`);
 
       const { error } = await supabase
         .from('manual_runs')
         .insert({
-          title: formData.title,
+          title: data.title,
           start_time: startDateTime.toISOString(),
           duration_minutes: totalMinutes,
           distance_km: distance,
           avg_pace: avgPace,
-          total_elevation: parseInt(formData.elevation || '0'),
-          has_pr: formData.hasPR,
-          pr_type: formData.hasPR ? formData.prType : null,
-          pr_description: formData.hasPR ? formData.prDescription : null
+          total_elevation: parseInt(data.elevation || '0'),
+          has_pr: data.hasPR,
+          pr_type: data.hasPR ? data.prType : null,
+          pr_description: data.hasPR ? data.prDescription : null
         });
 
       if (error) {
@@ -122,20 +165,7 @@ const AddRun = () => {
       });
 
       // Limpiar formulario
-      setFormData({
-        title: '',
-        date: '',
-        time: '',
-        hours: '',
-        minutes: '',
-        seconds: '',
-        distance: '',
-        pace: '',
-        elevation: '',
-        hasPR: false,
-        prType: '',
-        prDescription: ''
-      });
+      form.reset();
 
     } catch (err: any) {
       console.error('Error saving run:', err);
@@ -228,155 +258,235 @@ const AddRun = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <Label htmlFor="title">Título de la carrera</Label>
-                <Input
-                  id="title"
-                  value={formData.title}
-                  onChange={(e) => handleInputChange('title', e.target.value)}
-                  placeholder="Ej: Carrera matutina por el parque"
-                  required
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Título de la carrera</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Ej: Carrera matutina por el parque"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="date">Fecha</Label>
-                  <Input
-                    id="date"
-                    type="date"
-                    value={formData.date}
-                    onChange={(e) => handleInputChange('date', e.target.value)}
-                    required
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="date"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Fecha</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="time"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Hora de inicio</FormLabel>
+                        <FormControl>
+                          <Input type="time" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
                 </div>
-                <div>
-                  <Label htmlFor="time">Hora de inicio</Label>
-                  <Input
-                    id="time"
-                    type="time"
-                    value={formData.time}
-                    onChange={(e) => handleInputChange('time', e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
 
-              <div>
-                <Label>Tiempo total</Label>
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <Input
-                      value={formData.hours}
-                      onChange={(e) => handleInputChange('hours', e.target.value)}
-                      placeholder="Horas"
-                      type="number"
-                      min="0"
+                <div>
+                  <Label>Tiempo total</Label>
+                  <div className="grid grid-cols-3 gap-4 mt-2">
+                    <FormField
+                      control={form.control}
+                      name="hours"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input
+                              placeholder="Horas"
+                              type="number"
+                              min="0"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="minutes"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input
+                              placeholder="Minutos"
+                              type="number"
+                              min="0"
+                              max="59"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="seconds"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input
+                              placeholder="Segundos"
+                              type="number"
+                              min="0"
+                              max="59"
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
                   </div>
-                  <div>
-                    <Input
-                      value={formData.minutes}
-                      onChange={(e) => handleInputChange('minutes', e.target.value)}
-                      placeholder="Minutos"
-                      type="number"
-                      min="0"
-                      max="59"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Input
-                      value={formData.seconds}
-                      onChange={(e) => handleInputChange('seconds', e.target.value)}
-                      placeholder="Segundos"
-                      type="number"
-                      min="0"
-                      max="59"
-                    />
-                  </div>
                 </div>
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="distance">Distancia (km)</Label>
-                  <Input
-                    id="distance"
-                    type="number"
-                    step="0.1"
-                    value={formData.distance}
-                    onChange={(e) => handleInputChange('distance', e.target.value)}
-                    placeholder="5.0"
-                    required
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="distance"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Distancia (km)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="0.1"
+                            placeholder="5.0"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="pace"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Ritmo promedio (min/km)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            placeholder="5.30"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
                 </div>
-                <div>
-                  <Label htmlFor="pace">Ritmo promedio (min/km)</Label>
-                  <Input
-                    id="pace"
-                    type="number"
-                    step="0.01"
-                    value={formData.pace}
-                    onChange={(e) => handleInputChange('pace', e.target.value)}
-                    placeholder="Se calcula automáticamente"
-                  />
-                </div>
-              </div>
 
-              <div>
-                <Label htmlFor="elevation">Elevación total (metros)</Label>
-                <Input
-                  id="elevation"
-                  type="number"
-                  value={formData.elevation}
-                  onChange={(e) => handleInputChange('elevation', e.target.value)}
-                  placeholder="0"
+                <FormField
+                  control={form.control}
+                  name="elevation"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Elevación total (metros)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="0"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="hasPR"
-                    checked={formData.hasPR}
-                    onCheckedChange={(checked) => handleInputChange('hasPR', checked as boolean)}
+                <div className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="hasPR"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>
+                            ¿Tuviste algún PR (récord personal)?
+                          </FormLabel>
+                        </div>
+                      </FormItem>
+                    )}
                   />
-                  <Label htmlFor="hasPR">¿Tuviste algún PR (récord personal)?</Label>
-                </div>
 
-                {formData.hasPR && (
-                  <div className="space-y-4 pl-6 border-l-2 border-yellow-200 bg-yellow-50 p-4 rounded-r-lg">
-                    <div>
-                      <Label htmlFor="prType">Tipo de PR</Label>
-                      <Input
-                        id="prType"
-                        value={formData.prType}
-                        onChange={(e) => handleInputChange('prType', e.target.value)}
-                        placeholder="Ej: Mejor tiempo en 5K, Mayor distancia recorrida, etc."
-                        required={formData.hasPR}
+                  {form.watch('hasPR') && (
+                    <div className="space-y-4 pl-6 border-l-2 border-yellow-200 bg-yellow-50 p-4 rounded-r-lg">
+                      <FormField
+                        control={form.control}
+                        name="prType"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Tipo de PR</FormLabel>
+                            <FormControl>
+                              <Input
+                                placeholder="Ej: Mejor tiempo en 5K, Mayor distancia recorrida, etc."
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="prDescription"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Descripción</FormLabel>
+                            <FormControl>
+                              <Textarea
+                                placeholder="Describe los detalles de tu récord personal..."
+                                rows={3}
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
                       />
                     </div>
-                    <div>
-                      <Label htmlFor="prDescription">Descripción</Label>
-                      <Textarea
-                        id="prDescription"
-                        value={formData.prDescription}
-                        onChange={(e) => handleInputChange('prDescription', e.target.value)}
-                        placeholder="Describe los detalles de tu récord personal..."
-                        rows={3}
-                        required={formData.hasPR}
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
 
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? 'Guardando...' : 'Guardar Carrera'}
-              </Button>
-            </form>
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                  {isSubmitting ? 'Guardando...' : 'Guardar Carrera'}
+                </Button>
+              </form>
+            </Form>
           </CardContent>
         </Card>
       </main>
