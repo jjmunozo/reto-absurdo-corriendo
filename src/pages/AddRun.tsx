@@ -138,7 +138,9 @@ const AddRun = () => {
     setIsSubmitting(true);
 
     try {
-      const totalMinutes = parseInt(data.hours || '0') * 60 + parseInt(data.minutes || '0') + parseInt(data.seconds || '0') / 60;
+      // Calcular el tiempo total en minutos como entero
+      const totalSeconds = parseInt(data.hours || '0') * 3600 + parseInt(data.minutes || '0') * 60 + parseInt(data.seconds || '0');
+      const totalMinutes = Math.round(totalSeconds / 60); // Convertir a minutos y redondear
       const distance = parseFloat(data.distance);
       
       // Convertir pace de formato min:ss a decimal
@@ -147,6 +149,18 @@ const AddRun = () => {
       
       // Combinar fecha y hora
       const startDateTime = new Date(`${data.date}T${data.time}`);
+
+      console.log('Datos a insertar:', {
+        title: data.title,
+        start_time: startDateTime.toISOString(),
+        duration_minutes: totalMinutes,
+        distance_km: distance,
+        avg_pace: avgPace,
+        total_elevation: parseInt(data.elevation || '0'),
+        has_pr: data.hasPR,
+        pr_type: data.hasPR ? data.prType : null,
+        pr_description: data.hasPR ? data.prDescription : null
+      });
 
       const { error } = await supabase
         .from('manual_runs')
