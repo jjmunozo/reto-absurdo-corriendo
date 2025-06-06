@@ -17,6 +17,8 @@ export type Database = {
           duration_minutes: number
           has_pr: boolean
           id: string
+          pr_description: string | null
+          pr_type: string | null
           start_time: string
           title: string
           total_elevation: number
@@ -29,6 +31,8 @@ export type Database = {
           duration_minutes: number
           has_pr?: boolean
           id?: string
+          pr_description?: string | null
+          pr_type?: string | null
           start_time: string
           title: string
           total_elevation?: number
@@ -41,6 +45,8 @@ export type Database = {
           duration_minutes?: number
           has_pr?: boolean
           id?: string
+          pr_description?: string | null
+          pr_type?: string | null
           start_time?: string
           title?: string
           total_elevation?: number
