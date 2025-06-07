@@ -50,32 +50,34 @@ const PersonalRecords: React.FC<PersonalRecordsProps> = ({
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
           {displayedRuns.map((run) => (
-            <div key={run.id} className="aspect-square border border-yellow-200 rounded-lg p-2 bg-yellow-50 flex flex-col">
-              <div className="flex items-center gap-1 mb-1">
-                <Trophy className="h-3 w-3 text-yellow-600 flex-shrink-0" />
-                <h4 className="font-semibold text-yellow-800 text-xs leading-tight">
-                  {run.prType || 'Récord Personal'}
-                </h4>
+            <div key={run.id} className="aspect-square border border-yellow-200 rounded-lg p-3 bg-yellow-50 flex flex-col justify-between">
+              <div>
+                <div className="flex items-start gap-2 mb-2">
+                  <Trophy className="h-4 w-4 text-yellow-600 flex-shrink-0 mt-0.5" />
+                  <h4 className="font-semibold text-yellow-800 text-sm leading-tight">
+                    {run.prType || 'Récord Personal'}
+                  </h4>
+                </div>
+                
+                <p className="text-xs text-gray-700 mb-3 leading-relaxed">
+                  {run.prDescription}
+                </p>
               </div>
               
-              <p className="text-xs text-gray-700 mb-2 line-clamp-2 flex-1">
-                {run.prDescription}
-              </p>
-              
-              <div className="text-xs text-gray-600 space-y-0.5">
-                <div className="flex items-center gap-1">
+              <div className="text-xs text-gray-600 space-y-1">
+                <div className="flex items-center gap-2">
                   <span>📅</span>
                   <span>{formatDate(run.date)}</span>
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-2">
                   <span>📍</span>
                   <span className="truncate">{run.location}</span>
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-2">
                   <span>📏</span>
                   <span>{run.distance.toFixed(1)}km</span>
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-2">
                   <span>⏱️</span>
                   <span>{Math.floor(run.duration / 60)}h {run.duration % 60}m</span>
                 </div>
