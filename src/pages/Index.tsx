@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { MapPin, TrendingUp, Clock, Flag, Activity } from 'lucide-react';
 import { useManualRunData } from '@/hooks/useManualRunData';
@@ -140,7 +141,7 @@ const Index = () => {
                 icon={<Activity size={24} />}
               />
               <StatCard 
-                title="Ritmo Promedio" 
+                title="Pace Promedio" 
                 value={formatPace(totalStats.avgPace)}
                 subtitle="min/km" 
                 icon={<Clock size={24} />}
@@ -203,8 +204,8 @@ const Index = () => {
           <section className="mb-10">
             <WeeklyPaceChart 
               data={weeklyPaceData}
-              title="Evolución del Ritmo Semanal"
-              description="Cambios en el ritmo promedio por semana"
+              title="Evolución del Pace Semanal"
+              description="Cambios en el pace promedio por semana"
             />
           </section>
         )}

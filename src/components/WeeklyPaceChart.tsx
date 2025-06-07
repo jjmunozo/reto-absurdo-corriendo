@@ -20,11 +20,11 @@ const WeeklyPaceChart: React.FC<WeeklyPaceChartProps> = ({
   title,
   description
 }) => {
-  // Función para formatear el ritmo en el tooltip
+  // Función para formatear el pace en el tooltip
   const formatPaceTooltip = (value: number) => {
     const minutes = Math.floor(value);
     const seconds = Math.round((value - minutes) * 60);
-    return [`${minutes}'${seconds.toString().padStart(2, '0')}" /km`, 'Ritmo Promedio'];
+    return [`${minutes}'${seconds.toString().padStart(2, '0')}" /km`, 'Pace Promedio'];
   };
 
   // Función para formatear el eje Y
