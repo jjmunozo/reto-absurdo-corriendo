@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { MapPin, TrendingUp, Clock, Flag, Activity } from 'lucide-react';
 import { useManualRunData } from '@/hooks/useManualRunData';
@@ -9,11 +8,13 @@ import RecentRuns from '@/components/RecentRuns';
 import RunsPerHourChart from '@/components/RunsPerHourChart';
 import GitHubContributionTracker from '@/components/GitHubContributionTracker';
 import PersonalRecords from '@/components/PersonalRecords';
+import WeeklyPaceChart from '@/components/WeeklyPaceChart';
 import { 
   calculateTotalStats,
   calculateMonthlyStats,
   prepareChartData,
-  calculateRunsPerHour
+  calculateRunsPerHour,
+  calculateWeeklyPaceStats
 } from '@/utils/stravaAdapter';
 import { toast } from '@/hooks/use-toast';
 
@@ -48,6 +49,7 @@ const Index = () => {
   const chartData = prepareChartData(monthlyStats);
   const recentRuns = activities.slice(0, 5);
   const runsPerHourData = calculateRunsPerHour(activities);
+  const weeklyPaceData = calculateWeeklyPaceStats(activities);
 
   // Formatear funciones
   const formatPace = (pace: number) => {
@@ -192,6 +194,17 @@ const Index = () => {
               runningData={activities}
               title="Actividad de Entrenamiento"
               description="Actividad de entrenamiento durante el año, similar al contribution tracker de GitHub"
+            />
+          </section>
+        )}
+
+        {/* Weekly Pace Evolution Chart */}
+        {!isLoading && activities.length > 0 && weeklyPaceData.length > 0 && (
+          <section className="mb-10">
+            <WeeklyPaceChart 
+              data={weeklyPaceData}
+              title="Evolución del Ritmo Semanal"
+              description="Cambios en el ritmo promedio por semana"
             />
           </section>
         )}
