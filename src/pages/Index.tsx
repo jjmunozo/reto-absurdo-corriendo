@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { useManualRunData } from '@/hooks/useManualRunData';
 import { toast } from '@/hooks/use-toast';
@@ -83,7 +84,25 @@ const Index = () => {
               </p>
               
               <p className="text-sm text-gray-600 italic">
-                Mi programación la hace Mario Perez y mi nutrición Natalia Villalobos — ¡gracias a ambos!
+                Mi programación la hace{' '}
+                <a 
+                  href="https://www.instagram.com/marioperezcoaching/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-orange-600 hover:text-orange-700 underline"
+                >
+                  Mario Perez
+                </a>
+                {' '}y mi nutrición{' '}
+                <a 
+                  href="https://www.instagram.com/midietanoesdieta/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-orange-600 hover:text-orange-700 underline"
+                >
+                  Natalia Villalobos
+                </a>
+                {' '}— ¡gracias a ambos!
               </p>
             </div>
           </CollapsibleContent>
@@ -203,3 +222,4 @@ const Index = () => {
 };
 
 export default Index;
+
