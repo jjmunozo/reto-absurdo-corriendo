@@ -63,12 +63,20 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
+				logo: {
+					cream: '#fff9e1',
+					'gray-purple': '#6a729d',
+					coral: '#ff5a5a',
+					red: '#ed1c24',
+					orange: '#f15a24',
+					yellow: '#fbb03b'
+				},
 				running: {
-					primary: '#3B82F6', // azul para distancias estándar
-					secondary: '#10B981', // verde para distancias de maratón
-					accent: '#60A5FA',
-					light: '#93C5FD',
-					dark: '#1E40AF'
+					primary: '#ff5a5a', // coral del logo
+					secondary: '#ed1c24', // rojo del logo
+					accent: '#f15a24', // naranja del logo
+					light: '#fbb03b', // amarillo del logo
+					dark: '#6a729d' // gris/morado del logo
 				}
 			},
 			borderRadius: {

@@ -11,11 +11,18 @@ const HeroSection: React.FC<HeroSectionProps> = ({ lastSync }) => {
   };
 
   return (
-    <header className="bg-gradient-to-r from-running-primary to-running-dark text-white py-12 px-4 md:px-8">
+    <header className="bg-gradient-to-r from-logo-coral to-logo-red text-white py-12 px-4 md:px-8">
       <div className="container mx-auto">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">El reto más absurdo</h1>
+            <div className="flex items-center gap-4 mb-4">
+              <img 
+                src="/lovable-uploads/logo.png" 
+                alt="Logo El reto más absurdo" 
+                className="w-16 h-16 md:w-20 md:h-20 object-contain"
+              />
+              <h1 className="text-4xl md:text-5xl font-bold">El reto más absurdo</h1>
+            </div>
             <div className="flex flex-col gap-3">
               <p className="text-lg opacity-90">
                 Datos de carreras conectadas a Strava de
@@ -24,7 +31,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ lastSync }) => {
               {/* Strava Connection Box */}
               <button 
                 onClick={handleStravaProfileClick}
-                className="inline-flex items-center gap-3 bg-orange-500 text-white px-4 py-2 rounded-lg w-fit hover:bg-orange-600 transition-colors cursor-pointer"
+                className="inline-flex items-center gap-3 bg-logo-orange text-white px-4 py-2 rounded-lg w-fit hover:bg-logo-yellow hover:text-logo-gray-purple transition-colors cursor-pointer"
               >
                 <div className="bg-white p-1 rounded">
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
