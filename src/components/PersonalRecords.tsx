@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Trophy, ChevronDown, ChevronUp } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Trophy, ChevronDown, ChevronUp, MapPin, Clock, Calendar, Route } from 'lucide-react';
 import { RunData } from '@/data/runningData';
 
 interface PersonalRecordsProps {
@@ -34,6 +35,13 @@ const PersonalRecords: React.FC<PersonalRecordsProps> = ({
     });
   };
 
+  // Formatear tiempo
+  const formatTime = (duration: number) => {
+    const hours = Math.floor(duration / 60);
+    const minutes = duration % 60;
+    return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
+  };
+
   if (prsRuns.length === 0) {
     return null;
   }
@@ -48,46 +56,79 @@ const PersonalRecords: React.FC<PersonalRecordsProps> = ({
         {description && <CardDescription>{description}</CardDescription>}
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-          {displayedRuns.map((run) => (
-            <div key={run.id} className="aspect-square border border-yellow-200 rounded-lg p-3 bg-yellow-50 flex flex-col justify-between">
-              <div>
-                <div className="flex items-start gap-2 mb-2">
-                  <Trophy className="h-4 w-4 text-yellow-600 flex-shrink-0 mt-0.5" />
-                  <h4 className="font-semibold text-yellow-800 text-sm leading-tight">
-                    {run.prType || 'Récord Personal'}
-                  </h4>
-                </div>
-                
-                <p className="text-xs text-gray-700 mb-3 leading-relaxed">
-                  {run.prDescription}
-                </p>
-              </div>
-              
-              <div className="text-xs text-gray-600 space-y-1">
-                <div className="flex items-center gap-2">
-                  <span>📅</span>
-                  <span>{formatDate(run.date)}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span>📍</span>
-                  <span className="truncate">{run.location}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span>📏</span>
-                  <span>{run.distance.toFixed(1)}km</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span>⏱️</span>
-                  <span>{Math.floor(run.duration / 60)}h {run.duration % 60}m</span>
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[200px]">
+                  <div className="flex items-center gap-2">
+                    <Trophy className="h-4 w-4" />
+                    Tipo de Récord
+                  </div>
+                </TableHead>
+                <TableHead>Descripción</TableHead>
+                <TableHead className="w-[120px]">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4" />
+                    Fecha
+                  </div>
+                </TableHead>
+                <TableHead className="w-[150px]">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4" />
+                    Ubicación
+                  </div>
+                </TableHead>
+                <TableHead className="w-[100px]">
+                  <div className="flex items-center gap-2">
+                    <Route className="h-4 w-4" />
+                    Distancia
+                  </div>
+                </TableHead>
+                <TableHead className="w-[100px]">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4" />
+                    Tiempo
+                  </div>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {displayedRuns.map((run) => (
+                <TableRow key={run.id} className="hover:bg-yellow-50">
+                  <TableCell className="font-medium">
+                    <div className="flex items-center gap-2">
+                      <Trophy className="h-4 w-4 text-yellow-600" />
+                      <span className="text-yellow-800">{run.prType || 'Récord Personal'}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="max-w-[300px]">
+                    <p className="text-sm text-gray-700 line-clamp-2">
+                      {run.prDescription}
+                    </p>
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    {formatDate(run.date)}
+                  </TableCell>
+                  <TableCell className="text-sm">
+                    <span className="truncate block max-w-[130px]" title={run.location}>
+                      {run.location}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-sm font-medium">
+                    {run.distance.toFixed(1)}km
+                  </TableCell>
+                  <TableCell className="text-sm font-medium">
+                    {formatTime(run.duration)}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
         
         {hasMore && (
-          <div className="flex justify-center">
+          <div className="flex justify-center mt-4">
             <Button
               variant="outline"
               onClick={() => setShowAll(!showAll)}
