@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -58,34 +57,34 @@ const PersonalRecords: React.FC<PersonalRecordsProps> = ({
       <CardContent>
         <div className="rounded-md border">
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-gray-100">
               <TableRow>
-                <TableHead className="w-[200px]">
+                <TableHead className="w-[200px] text-black">
                   <div className="flex items-center gap-2">
                     <Trophy className="h-4 w-4" />
                     Tipo de Récord
                   </div>
                 </TableHead>
-                <TableHead>Descripción</TableHead>
-                <TableHead className="w-[120px]">
+                <TableHead className="text-black">Descripción</TableHead>
+                <TableHead className="w-[120px] text-black">
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4" />
                     Fecha
                   </div>
                 </TableHead>
-                <TableHead className="w-[150px]">
+                <TableHead className="w-[150px] text-black">
                   <div className="flex items-center gap-2">
                     <MapPin className="h-4 w-4" />
                     Ubicación
                   </div>
                 </TableHead>
-                <TableHead className="w-[100px]">
+                <TableHead className="w-[100px] text-black">
                   <div className="flex items-center gap-2">
                     <Route className="h-4 w-4" />
                     Distancia
                   </div>
                 </TableHead>
-                <TableHead className="w-[100px]">
+                <TableHead className="w-[100px] text-black">
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4" />
                     Tiempo
@@ -99,7 +98,7 @@ const PersonalRecords: React.FC<PersonalRecordsProps> = ({
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
                       <Trophy className="h-4 w-4 text-yellow-600" />
-                      <span className="text-yellow-800">{run.prType || 'Récord Personal'}</span>
+                      <span className="text-brand-coral">{run.prType || 'Récord Personal'}</span>
                     </div>
                   </TableCell>
                   <TableCell className="max-w-[300px]">
