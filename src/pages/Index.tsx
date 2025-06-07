@@ -1,23 +1,21 @@
 
 import React from 'react';
-import { MapPin, TrendingUp, Clock, Flag, Activity } from 'lucide-react';
 import { useManualRunData } from '@/hooks/useManualRunData';
-import { Button } from '@/components/ui/button';
-import StatCard from '@/components/StatCard';
-import RunningChart from '@/components/RunningChart';
+import { toast } from '@/hooks/use-toast';
+import HeroSection from '@/components/HeroSection';
+import StatsSummary from '@/components/StatsSummary';
 import RecentRuns from '@/components/RecentRuns';
 import RunsPerHourChart from '@/components/RunsPerHourChart';
-import GitHubContributionTracker from '@/components/GitHubContributionTracker';
 import PersonalRecords from '@/components/PersonalRecords';
+import GitHubContributionTracker from '@/components/GitHubContributionTracker';
 import WeeklyPaceChart from '@/components/WeeklyPaceChart';
+import RunningChart from '@/components/RunningChart';
 import { 
-  calculateTotalStats,
   calculateMonthlyStats,
   prepareChartData,
   calculateRunsPerHour,
   calculateWeeklyPaceStats
 } from '@/utils/stravaAdapter';
-import { toast } from '@/hooks/use-toast';
 
 const Index = () => {
   const { 
@@ -45,59 +43,15 @@ const Index = () => {
   };
 
   // Calcular estadísticas
-  const totalStats = calculateTotalStats(activities);
   const monthlyStats = calculateMonthlyStats(activities);
   const chartData = prepareChartData(monthlyStats);
   const recentRuns = activities.slice(0, 5);
   const runsPerHourData = calculateRunsPerHour(activities);
   const weeklyPaceData = calculateWeeklyPaceStats(activities);
 
-  // Formatear funciones
-  const formatPace = (pace: number) => {
-    const minutes = Math.floor(pace);
-    const seconds = Math.round((pace - minutes) * 60);
-    return `${minutes}'${seconds.toString().padStart(2, '0')}"`;
-  };
-
-  const formatTime = (minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <header className="bg-gradient-to-r from-running-primary to-running-dark text-white py-12 px-4 md:px-8">
-        <div className="container mx-auto">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            <div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">El reto más absurdo</h1>
-              <div className="flex flex-col gap-3">
-                <p className="text-lg opacity-90">
-                  Datos de carreras conectadas a Strava de
-                </p>
-                
-                {/* Strava Connection Box */}
-                <div className="inline-flex items-center gap-3 bg-orange-500 text-white px-4 py-2 rounded-lg w-fit">
-                  <div className="bg-white p-1 rounded">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.599h4.172L10.463 0l-7 13.828h4.172" fill="#FC4C02"/>
-                    </svg>
-                  </div>
-                  <span className="font-semibold">Juan J. Muñoz O.</span>
-                </div>
-                
-                {lastSync && (
-                  <span className="text-sm opacity-80">
-                    Última actualización: {lastSync.toLocaleString('es-ES')}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <HeroSection lastSync={lastSync} />
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
@@ -115,45 +69,7 @@ const Index = () => {
           </div>
         )}
 
-        {/* Stats Summary Section */}
-        {!isLoading && (
-          <section className="mb-10 animate-fade-in">
-            <h2 className="text-2xl font-bold mb-6">Resumen Total</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-              <StatCard 
-                title="Distancia Total" 
-                value={`${totalStats.totalDistance.toFixed(1)}km`} 
-                icon={<MapPin size={24} />}
-              />
-              <StatCard 
-                title="Carrera Más Larga" 
-                value={`${totalStats.longestRun.toFixed(1)}km`}
-                icon={<TrendingUp size={24} />}
-              />
-              <StatCard 
-                title="Tiempo Total" 
-                value={formatTime(totalStats.totalTime)} 
-                icon={<Clock size={24} />}
-              />
-              <StatCard 
-                title="Total Carreras" 
-                value={totalStats.totalRuns} 
-                icon={<Activity size={24} />}
-              />
-              <StatCard 
-                title="Pace Promedio" 
-                value={formatPace(totalStats.avgPace)}
-                subtitle="min/km" 
-                icon={<Clock size={24} />}
-              />
-              <StatCard 
-                title="Elevación Total" 
-                value={`${totalStats.totalElevation}m`} 
-                icon={<Flag size={24} />}
-              />
-            </div>
-          </section>
-        )}
+        <StatsSummary activities={activities} isLoading={isLoading} />
 
         {/* Recent Runs Table */}
         {!isLoading && activities.length > 0 && (
