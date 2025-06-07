@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useManualRunData } from '@/hooks/useManualRunData';
 import { toast } from '@/hooks/use-toast';
@@ -158,7 +157,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="bg-gray-100 py-6 px-4">
         <div className="container mx-auto text-center text-gray-600">
-          <p className="text-sm">&copy; 2024 El reto más absurdo | Datos registrados manualmente</p>
+          <p className="text-sm">&copy; 2025 El reto más absurdo | Datos verificados por Strava</p>
         </div>
       </footer>
     </div>
