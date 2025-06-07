@@ -1,3 +1,5 @@
+
+
 import React from 'react';
 import { useManualRunData } from '@/hooks/useManualRunData';
 import { toast } from '@/hooks/use-toast';
@@ -51,22 +53,22 @@ const Index = () => {
   const weeklyPaceData = calculateWeeklyPaceStats(activities);
 
   return (
-    <div className="min-h-screen bg-logo-cream">
+    <div className="min-h-screen bg-gray-50">
       <HeroSection lastSync={lastSync} />
 
       {/* Challenge Description Dropdown */}
       <section className="container mx-auto px-4 py-6">
         <Collapsible>
-          <CollapsibleTrigger className="w-full bg-logo-orange hover:bg-logo-yellow text-white hover:text-logo-gray-purple rounded-lg p-4 transition-colors group">
+          <CollapsibleTrigger className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-lg p-4 transition-colors group">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold text-left">¿Cuál es el reto más absurdo?</h2>
               <ChevronDown className="h-5 w-5 transition-transform duration-200 group-data-[state=open]:rotate-180" />
             </div>
           </CollapsibleTrigger>
-          <CollapsibleContent className="bg-logo-cream border-x-2 border-b-2 border-logo-orange rounded-b-lg p-6">
-            <div className="space-y-4 text-logo-gray-purple leading-relaxed">
+          <CollapsibleContent className="bg-orange-50 border-x-2 border-b-2 border-orange-200 rounded-b-lg p-6">
+            <div className="space-y-4 text-gray-800 leading-relaxed">
               <p>
-                ¡Hola, soy Juan! Me puse un reto épico este año porque creo en el valor de hacer <strong className="text-logo-red">Cosas Difíciles</strong>.
+                ¡Hola, soy Juan! Me puse un reto épico este año porque creo en el valor de hacer <strong className="text-orange-700">Cosas Difíciles</strong>.
               </p>
               
               <p>
@@ -74,20 +76,20 @@ const Index = () => {
               </p>
               
               <p>
-                Decidí ponerme un reto que me diera miedo — un <strong className="text-logo-red">misogi</strong>: correr 100km en un tiempo de 24hrs.
+                Decidí ponerme un reto que me diera miedo — un <strong className="text-orange-700">misogi</strong>: correr 100km en un tiempo de 24hrs.
               </p>
               
               <p>
                 Este es el resumen de mi entrenamiento que comencé el 7 de enero.
               </p>
               
-              <p className="text-sm text-logo-gray-purple italic">
+              <p className="text-sm text-gray-600 italic">
                 Mi programación la hace{' '}
                 <a 
                   href="https://www.instagram.com/marioperezcoaching/" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-logo-coral hover:text-logo-red underline"
+                  className="text-orange-600 hover:text-orange-700 underline"
                 >
                   Mario Perez
                 </a>
@@ -96,7 +98,7 @@ const Index = () => {
                   href="https://www.instagram.com/midietanoesdieta/" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-logo-coral hover:text-logo-red underline"
+                  className="text-orange-600 hover:text-orange-700 underline"
                 >
                   Natalia Villalobos
                 </a>
@@ -111,15 +113,15 @@ const Index = () => {
       <main className="container mx-auto px-4 py-8">
         {/* Error State */}
         {error && (
-          <div className="bg-logo-coral/10 border border-logo-coral rounded-lg p-4 mb-6">
-            <p className="text-logo-red">{error}</p>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <p className="text-red-800">{error}</p>
           </div>
         )}
 
         {/* Loading State */}
         {isLoading && (
           <div className="flex justify-center my-8">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-logo-coral"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-running-primary"></div>
           </div>
         )}
 
@@ -203,15 +205,15 @@ const Index = () => {
         {/* Empty State */}
         {!isLoading && activities.length === 0 && (
           <div className="text-center py-12">
-            <h3 className="text-xl font-semibold text-logo-gray-purple mb-2">No hay carreras registradas</h3>
-            <p className="text-logo-gray-purple/70 mb-4">No se han encontrado carreras en el sistema.</p>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No hay carreras registradas</h3>
+            <p className="text-gray-600 mb-4">No se han encontrado carreras en el sistema.</p>
           </div>
         )}
       </main>
 
       {/* Footer */}
-      <footer className="bg-logo-gray-purple/10 py-6 px-4">
-        <div className="container mx-auto text-center text-logo-gray-purple">
+      <footer className="bg-gray-100 py-6 px-4">
+        <div className="container mx-auto text-center text-gray-600">
           <p className="text-sm">&copy; 2025 El reto más absurdo | Datos verificados por Strava</p>
         </div>
       </footer>
@@ -220,3 +222,4 @@ const Index = () => {
 };
 
 export default Index;
+
