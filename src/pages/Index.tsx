@@ -152,17 +152,6 @@ const Index = () => {
           </section>
         )}
 
-        {/* Personal Records Section */}
-        {!isLoading && activities.length > 0 && (
-          <section className="mb-10">
-            <PersonalRecords 
-              runs={activities} 
-              title="Récords Personales" 
-              description="Tus mejores logros y récords personales"
-            />
-          </section>
-        )}
-
         {/* Recent Runs Table */}
         {!isLoading && activities.length > 0 && (
           <section className="mb-10">
@@ -173,7 +162,7 @@ const Index = () => {
             />
           </section>
         )}
-        
+
         {/* Carreras por hora del día */}
         {!isLoading && activities.length > 0 && (
           <section className="mb-10">
@@ -181,6 +170,17 @@ const Index = () => {
               data={runsPerHourData}
               title="Distribución de Carreras por Hora"
               description="Cantidad de carreras iniciadas en cada hora del día"
+            />
+          </section>
+        )}
+
+        {/* Personal Records Section */}
+        {!isLoading && activities.length > 0 && (
+          <section className="mb-10">
+            <PersonalRecords 
+              runs={activities} 
+              title="Récords Personales" 
+              description="Tus mejores logros y récords personales"
             />
           </section>
         )}
