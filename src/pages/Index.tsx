@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import { useManualRunData } from '@/hooks/useManualRunData';
 import { toast } from '@/hooks/use-toast';
@@ -53,22 +51,22 @@ const Index = () => {
   const weeklyPaceData = calculateWeeklyPaceStats(activities);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-brand-cream">
       <HeroSection lastSync={lastSync} />
 
       {/* Challenge Description Dropdown */}
       <section className="container mx-auto px-4 py-6">
         <Collapsible>
-          <CollapsibleTrigger className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-lg p-4 transition-colors group">
+          <CollapsibleTrigger className="w-full bg-brand-coral hover:bg-brand-red text-white rounded-lg p-4 transition-colors group">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold text-left">¿Cuál es el reto más absurdo?</h2>
               <ChevronDown className="h-5 w-5 transition-transform duration-200 group-data-[state=open]:rotate-180" />
             </div>
           </CollapsibleTrigger>
-          <CollapsibleContent className="bg-orange-50 border-x-2 border-b-2 border-orange-200 rounded-b-lg p-6">
+          <CollapsibleContent className="bg-white border-x-2 border-b-2 border-brand-coral/20 rounded-b-lg p-6">
             <div className="space-y-4 text-gray-800 leading-relaxed">
               <p>
-                ¡Hola, soy Juan! Me puse un reto épico este año porque creo en el valor de hacer <strong className="text-orange-700">Cosas Difíciles</strong>.
+                ¡Hola, soy Juan! Me puse un reto épico este año porque creo en el valor de hacer <strong className="text-brand-coral">Cosas Difíciles</strong>.
               </p>
               
               <p>
@@ -76,7 +74,7 @@ const Index = () => {
               </p>
               
               <p>
-                Decidí ponerme un reto que me diera miedo — un <strong className="text-orange-700">misogi</strong>: correr 100km en un tiempo de 24hrs.
+                Decidí ponerme un reto que me diera miedo — un <strong className="text-brand-coral">misogi</strong>: correr 100km en un tiempo de 24hrs.
               </p>
               
               <p>
@@ -89,7 +87,7 @@ const Index = () => {
                   href="https://www.instagram.com/marioperezcoaching/" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-orange-600 hover:text-orange-700 underline"
+                  className="text-brand-coral hover:text-brand-red underline"
                 >
                   Mario Perez
                 </a>
@@ -98,7 +96,7 @@ const Index = () => {
                   href="https://www.instagram.com/midietanoesdieta/" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-orange-600 hover:text-orange-700 underline"
+                  className="text-brand-coral hover:text-brand-red underline"
                 >
                   Natalia Villalobos
                 </a>
@@ -121,7 +119,7 @@ const Index = () => {
         {/* Loading State */}
         {isLoading && (
           <div className="flex justify-center my-8">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-running-primary"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-coral"></div>
           </div>
         )}
 
@@ -212,8 +210,8 @@ const Index = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-100 py-6 px-4">
-        <div className="container mx-auto text-center text-gray-600">
+      <footer className="bg-white py-6 px-4">
+        <div className="container mx-auto text-center text-brand-gray-purple">
           <p className="text-sm">&copy; 2025 El reto más absurdo | Datos verificados por Strava</p>
         </div>
       </footer>
@@ -222,4 +220,3 @@ const Index = () => {
 };
 
 export default Index;
-

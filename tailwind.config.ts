@@ -64,11 +64,19 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				running: {
-					primary: '#3B82F6', // azul para distancias estándar
+					primary: '#ff5a5a', // coral para distancias estándar
 					secondary: '#10B981', // verde para distancias de maratón
 					accent: '#60A5FA',
 					light: '#93C5FD',
 					dark: '#1E40AF'
+				},
+				brand: {
+					cream: '#fff9e1',
+					'gray-purple': '#6a729d',
+					coral: '#ff5a5a',
+					red: '#ed1c24',
+					orange: '#f15a24',
+					yellow: '#fbb03b'
 				}
 			},
 			borderRadius: {
