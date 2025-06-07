@@ -1,6 +1,9 @@
+
 import React from 'react';
 import { useManualRunData } from '@/hooks/useManualRunData';
 import { toast } from '@/hooks/use-toast';
+import { ChevronDown } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import HeroSection from '@/components/HeroSection';
 import StatsSummary from '@/components/StatsSummary';
 import RecentRuns from '@/components/RecentRuns';
@@ -51,6 +54,41 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <HeroSection lastSync={lastSync} />
+
+      {/* Challenge Description Dropdown */}
+      <section className="container mx-auto px-4 py-6">
+        <Collapsible>
+          <CollapsibleTrigger className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-lg p-4 transition-colors group">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold text-left">¿Cuál es el reto más absurdo?</h2>
+              <ChevronDown className="h-5 w-5 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+            </div>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="bg-orange-50 border-x-2 border-b-2 border-orange-200 rounded-b-lg p-6">
+            <div className="space-y-4 text-gray-800 leading-relaxed">
+              <p>
+                ¡Hola, soy Juan! Me puse un reto épico este año porque creo en el valor de hacer <strong className="text-orange-700">Cosas Difíciles</strong>.
+              </p>
+              
+              <p>
+                Yo "odiaba" correr entonces no corría pero hay algo que odio más que correr: odiar hacer cosas y que me obstaculicen.
+              </p>
+              
+              <p>
+                Decidí ponerme un reto que me diera miedo — un <strong className="text-orange-700">misogi</strong>: correr 100km en un tiempo de 24hrs.
+              </p>
+              
+              <p>
+                Este es el resumen de mi entrenamiento que comencé el 7 de enero.
+              </p>
+              
+              <p className="text-sm text-gray-600 italic">
+                Mi programación la hace Mario Perez y mi nutrición Natalia Villalobos — ¡gracias a ambos!
+              </p>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+      </section>
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
