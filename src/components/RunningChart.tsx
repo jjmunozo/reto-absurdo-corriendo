@@ -60,7 +60,7 @@ const RunningChart: React.FC<RunningChartProps> = ({
               <Tooltip formatter={formatTooltip} />
               <Bar 
                 dataKey={dataKey} 
-                fill={dataKey === 'distance' ? '#3B82F6' : dataKey === 'runs' ? '#10B981' : '#60A5FA'} 
+                fill="#ff5a5a" 
                 radius={[4, 4, 0, 0]} 
               />
             </BarChart>

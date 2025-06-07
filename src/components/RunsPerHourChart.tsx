@@ -38,7 +38,7 @@ const RunsPerHourChart: React.FC<RunsPerHourChartProps> = ({ data, title, descri
     <Card className="w-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <ChartBarIcon className="h-5 w-5 text-running-primary" />
+          <ChartBarIcon className="h-5 w-5 text-brand-coral" />
           {title}
         </CardTitle>
         {description && <CardDescription>{description}</CardDescription>}
@@ -71,7 +71,7 @@ const RunsPerHourChart: React.FC<RunsPerHourChartProps> = ({ data, title, descri
               <Tooltip formatter={formatTooltip} />
               <Bar 
                 dataKey="runs" 
-                fill="#60A5FA" 
+                fill="#ff5a5a" 
                 radius={[4, 4, 0, 0]} 
               />
             </BarChart>

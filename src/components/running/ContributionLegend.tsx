@@ -2,7 +2,7 @@
 import React from 'react';
 
 /**
- * Legend component showing the intensity scale (GitHub style)
+ * Legend component showing the intensity scale (coral style)
  */
 const ContributionLegend: React.FC = () => {
   const levels = [
@@ -16,10 +16,10 @@ const ContributionLegend: React.FC = () => {
   const getColorClass = (level: number): string => {
     switch (level) {
       case 0: return 'bg-gray-100 dark:bg-gray-800';
-      case 1: return 'bg-green-200 dark:bg-green-900';
-      case 2: return 'bg-green-300 dark:bg-green-700';
-      case 3: return 'bg-green-400 dark:bg-green-600';
-      case 4: return 'bg-green-600 dark:bg-green-500';
+      case 1: return 'bg-red-100'; // Lightest coral tone
+      case 2: return 'bg-red-200'; // Light coral tone
+      case 3: return 'bg-red-300'; // Medium coral tone
+      case 4: return 'bg-brand-coral'; // Full coral color
       default: return 'bg-gray-100 dark:bg-gray-800';
     }
   };

@@ -38,7 +38,7 @@ const WeeklyPaceChart: React.FC<WeeklyPaceChartProps> = ({
     <Card className="w-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Clock className="h-5 w-5 text-blue-500" />
+          <Clock className="h-5 w-5 text-brand-coral" />
           {title}
         </CardTitle>
         {description && <CardDescription>{description}</CardDescription>}
@@ -65,10 +65,10 @@ const WeeklyPaceChart: React.FC<WeeklyPaceChartProps> = ({
               <Line 
                 type="monotone" 
                 dataKey="avgPace" 
-                stroke="#3B82F6" 
+                stroke="#ff5a5a" 
                 strokeWidth={2}
-                dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
-                activeDot={{ r: 6, fill: '#1D4ED8' }}
+                dot={{ fill: '#ff5a5a', strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6, fill: '#ed1c24' }}
               />
             </LineChart>
           </ResponsiveContainer>
