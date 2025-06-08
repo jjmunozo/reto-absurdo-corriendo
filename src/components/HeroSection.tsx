@@ -1,13 +1,27 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 
 interface HeroSectionProps {
   lastSync?: Date | null;
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({ lastSync }) => {
+  const [logoError, setLogoError] = useState(false);
+  const [logoLoaded, setLogoLoaded] = useState(false);
+
   const handleStravaProfileClick = () => {
     window.open('https://strava.app.link/O4InfygyZTb', '_blank');
+  };
+
+  const handleLogoLoad = () => {
+    console.log('Logo cargado correctamente');
+    setLogoLoaded(true);
+    setLogoError(false);
+  };
+
+  const handleLogoError = () => {
+    console.error('Error al cargar el logo');
+    setLogoError(true);
   };
 
   return (
@@ -17,11 +31,20 @@ const HeroSection: React.FC<HeroSectionProps> = ({ lastSync }) => {
           <div>
             {/* Logo and Title Section */}
             <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
-              <img 
-                src="/lovable-uploads/872d257a-11e7-4136-9e02-d2043dbf9402.png" 
-                alt="Logo El reto más absurdo" 
-                className="w-16 h-16 md:w-20 md:h-20 object-contain mx-auto md:mx-0"
-              />
+              {!logoError ? (
+                <img 
+                  src="https://cdn.prod.website-files.com/61a2c8c4fb992469753cd087/6844d50b856574ebce414f85_logo_reto_transp.png" 
+                  alt="Logo El reto más absurdo" 
+                  className="w-16 h-16 md:w-20 md:h-20 object-contain mx-auto md:mx-0"
+                  onLoad={handleLogoLoad}
+                  onError={handleLogoError}
+                  loading="eager"
+                />
+              ) : (
+                <div className="w-16 h-16 md:w-20 md:h-20 bg-brand-gray-purple/20 rounded-lg flex items-center justify-center mx-auto md:mx-0">
+                  <span className="text-xs text-brand-gray-purple font-bold">LOGO</span>
+                </div>
+              )}
               <h1 className="text-4xl md:text-5xl font-bold text-brand-gray-purple text-center md:text-left">
                 El reto más absurdo
               </h1>
