@@ -27,28 +27,12 @@ const HeroSection: React.FC<HeroSectionProps> = ({ lastSync }) => {
   return (
     <header className="bg-brand-cream text-gray-800 py-12 px-4 md:px-8">
       <div className="container mx-auto">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-          <div>
-            {/* Logo and Title Section */}
-            <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
-              {!logoError ? (
-                <img 
-                  src="https://cdn.prod.website-files.com/61a2c8c4fb992469753cd087/6844d50b856574ebce414f85_logo_reto_transp.png" 
-                  alt="Logo El reto más absurdo" 
-                  className="w-16 h-16 md:w-20 md:h-20 object-contain mx-auto md:mx-0"
-                  onLoad={handleLogoLoad}
-                  onError={handleLogoError}
-                  loading="eager"
-                />
-              ) : (
-                <div className="w-16 h-16 md:w-20 md:h-20 bg-brand-gray-purple/20 rounded-lg flex items-center justify-center mx-auto md:mx-0">
-                  <span className="text-xs text-brand-gray-purple font-bold">LOGO</span>
-                </div>
-              )}
-              <h1 className="text-4xl md:text-5xl font-bold text-brand-gray-purple text-center md:text-left">
-                El reto más absurdo
-              </h1>
-            </div>
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+          {/* Left side - Title and content */}
+          <div className="flex-1">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-brand-gray-purple mb-6">
+              El reto más absurdo
+            </h1>
             
             <div className="flex flex-col gap-3">
               <p className="text-lg text-brand-gray-purple">
@@ -74,6 +58,24 @@ const HeroSection: React.FC<HeroSectionProps> = ({ lastSync }) => {
                 </span>
               )}
             </div>
+          </div>
+
+          {/* Right side - Logo */}
+          <div className="flex-shrink-0 flex justify-center lg:justify-end">
+            {!logoError ? (
+              <img 
+                src="https://cdn.prod.website-files.com/61a2c8c4fb992469753cd087/6844d50b856574ebce414f85_logo_reto_transp.png" 
+                alt="Logo El reto más absurdo" 
+                className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 object-contain"
+                onLoad={handleLogoLoad}
+                onError={handleLogoError}
+                loading="eager"
+              />
+            ) : (
+              <div className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 bg-brand-gray-purple/20 rounded-lg flex items-center justify-center">
+                <span className="text-sm text-brand-gray-purple font-bold">LOGO</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
