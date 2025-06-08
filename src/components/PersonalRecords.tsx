@@ -53,7 +53,7 @@ const PersonalRecords: React.FC<PersonalRecordsProps> = ({
           <img 
             src="https://cdn.prod.website-files.com/61a2c8c4fb992469753cd087/6844d632972b1e36f8fe4229_logo_reto_rojo_transp.png" 
             alt="Logo" 
-            className="h-5 w-5 object-contain"
+            className="h-12 w-12 object-contain"
           />
           {title}
         </CardTitle>
@@ -69,7 +69,7 @@ const PersonalRecords: React.FC<PersonalRecordsProps> = ({
                     <img 
                       src="https://cdn.prod.website-files.com/61a2c8c4fb992469753cd087/6844d632972b1e36f8fe4229_logo_reto_rojo_transp.png" 
                       alt="Logo" 
-                      className="h-4 w-4 object-contain"
+                      className="h-10 w-10 object-contain"
                     />
                     Tipo de Récord
                   </div>
@@ -109,7 +109,7 @@ const PersonalRecords: React.FC<PersonalRecordsProps> = ({
                       <img 
                         src="https://cdn.prod.website-files.com/61a2c8c4fb992469753cd087/6844d632972b1e36f8fe4229_logo_reto_rojo_transp.png" 
                         alt="Logo" 
-                        className="h-4 w-4 object-contain"
+                        className="h-10 w-10 object-contain"
                       />
                       <span className="text-brand-coral">{run.prType || 'Récord Personal'}</span>
                     </div>
