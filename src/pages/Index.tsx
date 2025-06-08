@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useManualRunData } from '@/hooks/useManualRunData';
 import { toast } from '@/hooks/use-toast';
@@ -11,6 +12,7 @@ import PersonalRecords from '@/components/PersonalRecords';
 import GitHubContributionTracker from '@/components/GitHubContributionTracker';
 import WeeklyPaceChart from '@/components/WeeklyPaceChart';
 import RunningChart from '@/components/RunningChart';
+import SectionNavigation from '@/components/SectionNavigation';
 import { 
   calculateMonthlyStats,
   prepareChartData,
