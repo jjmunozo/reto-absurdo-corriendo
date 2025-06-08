@@ -56,7 +56,14 @@ const RecentRuns: React.FC<RecentRunsProps> = ({
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <img 
+            src="https://cdn.prod.website-files.com/61a2c8c4fb992469753cd087/6844d632972b1e36f8fe4229_logo_reto_rojo_transp.png" 
+            alt="Logo" 
+            className="h-12 w-12 object-contain"
+          />
+          {title}
+        </CardTitle>
         {description && <CardDescription>{description}</CardDescription>}
       </CardHeader>
       <CardContent>
@@ -92,4 +99,3 @@ const RecentRuns: React.FC<RecentRunsProps> = ({
 };
 
 export default RecentRuns;
-
