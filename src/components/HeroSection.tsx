@@ -27,7 +27,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ lastSync }) => {
   return (
     <header className="bg-brand-cream text-gray-800 py-12 px-4 md:px-8">
       <div className="container mx-auto">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2 md:gap-8">
           {/* Left side - Title and content */}
           <div className="flex-1">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
