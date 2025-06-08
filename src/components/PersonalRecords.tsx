@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Trophy, ChevronDown, ChevronUp, MapPin, Clock, Calendar, Route } from 'lucide-react';
+import { ChevronDown, ChevronUp, MapPin, Clock, Calendar, Route } from 'lucide-react';
 import { RunData } from '@/data/runningData';
 
 interface PersonalRecordsProps {
@@ -49,7 +50,11 @@ const PersonalRecords: React.FC<PersonalRecordsProps> = ({
     <Card className="w-full">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Trophy className="h-5 w-5 text-yellow-500" />
+          <img 
+            src="https://cdn.prod.website-files.com/61a2c8c4fb992469753cd087/6844d632972b1e36f8fe4229_logo_reto_rojo_transp.png" 
+            alt="Logo" 
+            className="h-5 w-5 object-contain"
+          />
           {title}
         </CardTitle>
         {description && <CardDescription>{description}</CardDescription>}
@@ -61,7 +66,11 @@ const PersonalRecords: React.FC<PersonalRecordsProps> = ({
               <TableRow>
                 <TableHead className="w-[200px] text-black">
                   <div className="flex items-center gap-2">
-                    <Trophy className="h-4 w-4" />
+                    <img 
+                      src="https://cdn.prod.website-files.com/61a2c8c4fb992469753cd087/6844d632972b1e36f8fe4229_logo_reto_rojo_transp.png" 
+                      alt="Logo" 
+                      className="h-4 w-4 object-contain"
+                    />
                     Tipo de Récord
                   </div>
                 </TableHead>
@@ -97,7 +106,11 @@ const PersonalRecords: React.FC<PersonalRecordsProps> = ({
                 <TableRow key={run.id} className="hover:bg-yellow-50">
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
-                      <Trophy className="h-4 w-4 text-yellow-600" />
+                      <img 
+                        src="https://cdn.prod.website-files.com/61a2c8c4fb992469753cd087/6844d632972b1e36f8fe4229_logo_reto_rojo_transp.png" 
+                        alt="Logo" 
+                        className="h-4 w-4 object-contain"
+                      />
                       <span className="text-brand-coral">{run.prType || 'Récord Personal'}</span>
                     </div>
                   </TableCell>
