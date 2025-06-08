@@ -30,13 +30,13 @@ const HeroSection: React.FC<HeroSectionProps> = ({ lastSync }) => {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
           {/* Left side - Title and content */}
           <div className="flex-1">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-brand-gray-purple mb-6">
-              El reto más absurdo
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-black mb-6">
+              El reto más absurdo que me he puesto en mi vida
             </h1>
             
             <div className="flex flex-col gap-3">
-              <p className="text-lg text-brand-gray-purple">
-                Datos de carreras conectadas a Strava de
+              <p className="text-lg text-black">
+                Datos de entrenamiento conectados al Strava de
               </p>
               
               {/* Strava Connection Box */}
