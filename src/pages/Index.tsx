@@ -50,6 +50,16 @@ const Index = () => {
   const runsPerHourData = calculateRunsPerHour(activities);
   const weeklyPaceData = calculateWeeklyPaceStats(activities);
 
+  const navigationSections = [
+    { id: 'stats-summary', label: 'Estadísticas' },
+    { id: 'recent-runs', label: 'Carreras Recientes' },
+    { id: 'runs-per-hour', label: 'Distribución por Hora' },
+    { id: 'personal-records', label: 'Récords Personales' },
+    { id: 'activity-tracker', label: 'Actividad de Entrenamiento' },
+    { id: 'weekly-pace', label: 'Evolución del Pace' },
+    { id: 'charts', label: 'Gráficos Mensuales' }
+  ];
+
   return (
     <div className="min-h-screen bg-brand-cream">
       <HeroSection lastSync={lastSync} />
@@ -107,6 +117,9 @@ const Index = () => {
         </Collapsible>
       </section>
 
+      {/* Section Navigation */}
+      <SectionNavigation sections={navigationSections} />
+
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         {/* Error State */}
@@ -123,11 +136,13 @@ const Index = () => {
           </div>
         )}
 
-        <StatsSummary activities={activities} isLoading={isLoading} />
+        <div id="stats-summary">
+          <StatsSummary activities={activities} isLoading={isLoading} />
+        </div>
 
         {/* Recent Runs Table */}
         {!isLoading && activities.length > 0 && (
-          <section className="mb-10">
+          <section id="recent-runs" className="mb-10">
             <RecentRuns 
               runs={recentRuns} 
               title="Carreras Recientes" 
@@ -138,7 +153,7 @@ const Index = () => {
 
         {/* Carreras por hora del día */}
         {!isLoading && activities.length > 0 && (
-          <section className="mb-10">
+          <section id="runs-per-hour" className="mb-10">
             <RunsPerHourChart 
               data={runsPerHourData}
               title="Distribución de Carreras por Hora"
@@ -149,7 +164,7 @@ const Index = () => {
 
         {/* Personal Records Section */}
         {!isLoading && activities.length > 0 && (
-          <section className="mb-10">
+          <section id="personal-records" className="mb-10">
             <PersonalRecords 
               runs={activities} 
               title="Récords Personales" 
@@ -160,7 +175,7 @@ const Index = () => {
 
         {/* GitHub-style Contribution Tracker */}
         {!isLoading && activities.length > 0 && (
-          <section className="mb-10">
+          <section id="activity-tracker" className="mb-10">
             <GitHubContributionTracker
               runningData={activities}
               title="Actividad de Entrenamiento"
@@ -171,7 +186,7 @@ const Index = () => {
 
         {/* Weekly Pace Evolution Chart */}
         {!isLoading && activities.length > 0 && weeklyPaceData.length > 0 && (
-          <section className="mb-10">
+          <section id="weekly-pace" className="mb-10">
             <WeeklyPaceChart 
               data={weeklyPaceData}
               title="Evolución del Pace Semanal"
@@ -182,7 +197,7 @@ const Index = () => {
 
         {/* Charts Section */}
         {!isLoading && activities.length > 0 && (
-          <section className="mb-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <section id="charts" className="mb-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
             <RunningChart 
               data={chartData} 
               title="Distancia Mensual" 
