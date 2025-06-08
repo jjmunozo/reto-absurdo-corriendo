@@ -66,13 +66,13 @@ const HeroSection: React.FC<HeroSectionProps> = ({ lastSync }) => {
               <img 
                 src="https://cdn.prod.website-files.com/61a2c8c4fb992469753cd087/6844d50b856574ebce414f85_logo_reto_transp.png" 
                 alt="Logo El reto más absurdo" 
-                className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 object-contain"
+                className="w-64 h-64 md:w-40 md:h-40 lg:w-48 lg:h-48 object-contain"
                 onLoad={handleLogoLoad}
                 onError={handleLogoError}
                 loading="eager"
               />
             ) : (
-              <div className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 bg-brand-gray-purple/20 rounded-lg flex items-center justify-center">
+              <div className="w-64 h-64 md:w-40 md:h-40 lg:w-48 lg:h-48 bg-brand-gray-purple/20 rounded-lg flex items-center justify-center">
                 <span className="text-sm text-brand-gray-purple font-bold">LOGO</span>
               </div>
             )}
