@@ -15,7 +15,18 @@ const HeroSection: React.FC<HeroSectionProps> = ({ lastSync }) => {
       <div className="container mx-auto">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-brand-gray-purple">El reto más absurdo</h1>
+            {/* Logo and Title Section */}
+            <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
+              <img 
+                src="/lovable-uploads/872d257a-11e7-4136-9e02-d2043dbf9402.png" 
+                alt="Logo El reto más absurdo" 
+                className="w-16 h-16 md:w-20 md:h-20 object-contain mx-auto md:mx-0"
+              />
+              <h1 className="text-4xl md:text-5xl font-bold text-brand-gray-purple text-center md:text-left">
+                El reto más absurdo
+              </h1>
+            </div>
+            
             <div className="flex flex-col gap-3">
               <p className="text-lg text-brand-gray-purple">
                 Datos de carreras conectadas a Strava de
