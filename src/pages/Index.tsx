@@ -67,7 +67,7 @@ const Index = () => {
       <HeroSection lastSync={lastSync} />
 
       {/* Challenge Description Dropdown */}
-      <section className="container mx-auto px-4 py-6">
+      <section className="container mx-auto px-4 py-3">
         <Collapsible>
           <CollapsibleTrigger className="w-full bg-brand-coral hover:bg-brand-red text-white rounded-lg p-4 transition-colors group">
             <div className="flex items-center justify-between">
