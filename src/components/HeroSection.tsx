@@ -30,12 +30,12 @@ const HeroSection: React.FC<HeroSectionProps> = ({ lastSync }) => {
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
           {/* Left side - Title and content */}
           <div className="flex-1">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-black mb-6">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
               El reto más absurdo que me he puesto en mi vida
             </h1>
             
             <div className="flex flex-col gap-3">
-              <p className="text-lg text-black">
+              <p className="text-lg text-foreground">
                 Datos de entrenamiento conectados al Strava de
               </p>
               
@@ -53,7 +53,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ lastSync }) => {
               </button>
               
               {lastSync && (
-                <span className="text-sm text-brand-gray-purple/80">
+                <span className="text-sm text-foreground/80">
                   Última actualización: {lastSync.toLocaleString('es-ES')}
                 </span>
               )}
