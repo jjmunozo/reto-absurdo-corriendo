@@ -4,8 +4,8 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const supabase = createClient(
   Deno.env.get("SUPABASE_URL")!,
-  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-);
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")! // Using service role key to bypass RLS
+)
 const JUAN_ATHLETE_ID = "160774"; // Usar el athlete ID real
 
 const corsHeaders = {
@@ -34,7 +34,7 @@ serve(async (req) => {
   try {
     console.log('🔧 Iniciando sincronización con tokens de base de datos...')
 
-    // ► Leemos tokens desde la base de datos
+    // ► Leemos tokens desde la base de datos (usando service role key para bypasear RLS)
     const { data: connection } = await supabase
       .from("strava_connections")
       .select("access_token, refresh_token, expires_at")
@@ -95,7 +95,7 @@ serve(async (req) => {
 
       console.log('✅ Token refrescado exitosamente, guardando en DB...')
 
-      // Actualizar tokens en la base de datos
+      // Actualizar tokens en la base de datos (usando service role key para bypasear RLS)
       await supabase.from("strava_connections").upsert({
         athlete_id: JUAN_ATHLETE_ID,
         access_token: accessToken,
@@ -173,7 +173,7 @@ serve(async (req) => {
 
     console.log(`🏃 Carreras filtradas: ${runningActivities.length}`)
 
-    // Guardar actividades en la base de datos
+    // Guardar actividades en la base de datos (usando service role key para bypasear RLS)
     if (runningActivities.length > 0) {
       console.log('💾 Guardando actividades en la base de datos...')
       
