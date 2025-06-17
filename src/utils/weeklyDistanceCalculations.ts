@@ -1,11 +1,14 @@
 
 import { RunData } from '@/data/runningData';
+import { toZonedTime } from 'date-fns-tz';
 
 export interface WeeklyDistanceData {
   week: string;
   distance: number;
   runs: number;
 }
+
+const COSTA_RICA_TIMEZONE = 'America/Costa_Rica';
 
 export const calculateWeeklyDistanceStats = (runData: RunData[]): WeeklyDistanceData[] => {
   console.log('📊 calculateWeeklyDistanceStats: Procesando', runData.length, 'carreras');
@@ -31,12 +34,29 @@ export const calculateWeeklyDistanceStats = (runData: RunData[]): WeeklyDistance
   
   // Calcular estadísticas para cada carrera
   validRuns.forEach(run => {
-    const date = new Date(run.date);
+    // Para fechas que vienen como string YYYY-MM-DD, las tratamos como locales
+    // Para fechas que vienen como timestamp, las convertimos a zona horaria local
+    let date: Date;
+    
+    if (run.date.includes('T')) {
+      // Es un timestamp completo, convertir a zona horaria de Costa Rica
+      const utcDate = new Date(run.date);
+      date = toZonedTime(utcDate, COSTA_RICA_TIMEZONE);
+    } else {
+      // Es solo una fecha, la tratamos como ya está en zona horaria local
+      date = new Date(run.date + 'T00:00:00');
+    }
     
     if (isNaN(date.getTime())) {
       console.warn('⚠️ Fecha inválida en carrera:', run);
       return;
     }
+    
+    console.log('📅 Procesando fecha:', {
+      originalDate: run.date,
+      processedDate: date.toISOString(),
+      isTimestamp: run.date.includes('T')
+    });
     
     // Calcular el inicio de la semana (lunes)
     const dayOfWeek = date.getDay();

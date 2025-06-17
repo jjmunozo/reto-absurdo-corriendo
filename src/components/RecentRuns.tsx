@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { RunData } from '@/data/runningData';
+import { toZonedTime, format } from 'date-fns-tz';
 
 interface RecentRunsProps {
   runs: RunData[];
@@ -10,17 +11,31 @@ interface RecentRunsProps {
   description?: string;
 }
 
+const COSTA_RICA_TIMEZONE = 'America/Costa_Rica';
+
 const RecentRuns: React.FC<RecentRunsProps> = ({
   runs,
   title,
   description
 }) => {
-  // Formatear fecha
+  // Formatear fecha usando la zona horaria de Costa Rica
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('es-ES', { 
-      day: 'numeric', 
-      month: 'short' 
-    });
+    // Para datos manuales, la fecha ya viene en formato local
+    // Para datos de Strava, necesitamos convertir si es necesario
+    const date = new Date(dateString);
+    
+    // Si la fecha parece ser solo una fecha (sin tiempo), la tratamos como local
+    if (dateString.includes('T')) {
+      // Es un timestamp completo, convertir a zona horaria de Costa Rica
+      const costaRicaDate = toZonedTime(date, COSTA_RICA_TIMEZONE);
+      return format(costaRicaDate, 'dd MMM', { timeZone: COSTA_RICA_TIMEZONE, locale: require('date-fns/locale/es') });
+    } else {
+      // Es solo una fecha, la tratamos como ya está en zona horaria local
+      return date.toLocaleDateString('es-ES', { 
+        day: 'numeric', 
+        month: 'short' 
+      });
+    }
   };
 
   // Formatear hora usando la zona horaria correcta de Costa Rica
@@ -28,15 +43,13 @@ const RecentRuns: React.FC<RecentRunsProps> = ({
     if (!dateTimeString) return "-";
     
     // Crear un objeto Date a partir del string ISO
-    const date = new Date(dateTimeString);
+    const utcDate = new Date(dateTimeString);
     
-    // Formatear usando opciones específicas para Costa Rica (es-CR)
-    // Note: La configuración regional es-CR incluirá ajustes específicos para Costa Rica
-    return date.toLocaleTimeString('es-CR', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true // Formato de 12 horas con AM/PM, común en Costa Rica
-    });
+    // Convertir a zona horaria de Costa Rica
+    const costaRicaDate = toZonedTime(utcDate, COSTA_RICA_TIMEZONE);
+    
+    // Formatear usando opciones específicas para Costa Rica
+    return format(costaRicaDate, 'hh:mm a', { timeZone: COSTA_RICA_TIMEZONE });
   };
 
   // Formatear ritmo
