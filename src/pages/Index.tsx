@@ -11,13 +11,12 @@ import RunsPerHourChart from '@/components/RunsPerHourChart';
 import PersonalRecords from '@/components/PersonalRecords';
 import GitHubContributionTracker from '@/components/GitHubContributionTracker';
 import WeeklyPaceChart from '@/components/WeeklyPaceChart';
-import RunningChart from '@/components/RunningChart';
+import WeeklyDistanceChart from '@/components/WeeklyDistanceChart';
 import SectionNavigation from '@/components/SectionNavigation';
 import { 
-  calculateMonthlyStats,
-  prepareChartData,
   calculateRunsPerHour,
-  calculateWeeklyPaceStats
+  calculateWeeklyPaceStats,
+  calculateWeeklyDistanceStats
 } from '@/utils/stravaAdapter';
 
 const Index = () => {
@@ -46,11 +45,10 @@ const Index = () => {
   };
 
   // Calcular estadísticas
-  const monthlyStats = calculateMonthlyStats(activities);
-  const chartData = prepareChartData(monthlyStats);
   const recentRuns = activities.slice(0, 5);
   const runsPerHourData = calculateRunsPerHour(activities);
   const weeklyPaceData = calculateWeeklyPaceStats(activities);
+  const weeklyDistanceData = calculateWeeklyDistanceStats(activities);
 
   const navigationSections = [
     { id: 'stats-summary', label: 'Estadísticas' },
@@ -59,7 +57,7 @@ const Index = () => {
     { id: 'personal-records', label: 'Récords Personales' },
     { id: 'activity-tracker', label: 'Actividad de Entrenamiento' },
     { id: 'weekly-pace', label: 'Evolución del Pace' },
-    { id: 'charts', label: 'Gráficos Mensuales' }
+    { id: 'weekly-distance', label: 'Distancia Semanal' }
   ];
 
   return (
@@ -197,22 +195,13 @@ const Index = () => {
           </section>
         )}
 
-        {/* Charts Section */}
-        {!isLoading && activities.length > 0 && (
-          <section id="charts" className="mb-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <RunningChart 
-              data={chartData} 
-              title="Distancia Mensual" 
-              description="Kilómetros recorridos por mes"
-              dataKey="distance"
-              yAxisLabel="Distancia (km)"
-            />
-            <RunningChart 
-              data={chartData} 
-              title="Número de Carreras" 
-              description="Carreras completadas por mes"
-              dataKey="runs"
-              yAxisLabel="Carreras"
+        {/* Weekly Distance Chart - Full Width */}
+        {!isLoading && activities.length > 0 && weeklyDistanceData.length > 0 && (
+          <section id="weekly-distance" className="mb-10">
+            <WeeklyDistanceChart 
+              data={weeklyDistanceData}
+              title="Distancia Semanal"
+              description="Kilómetros recorridos por semana durante el entrenamiento"
             />
           </section>
         )}
