@@ -1,14 +1,11 @@
 
 import { RunData } from '@/data/runningData';
-import { toZonedTime } from 'date-fns-tz';
 
 export interface WeeklyDistanceData {
   week: string;
   distance: number;
   runs: number;
 }
-
-const COSTA_RICA_TIMEZONE = 'America/Costa_Rica';
 
 export const calculateWeeklyDistanceStats = (runData: RunData[]): WeeklyDistanceData[] => {
   console.log('📊 calculateWeeklyDistanceStats: Procesando', runData.length, 'carreras');
@@ -34,16 +31,15 @@ export const calculateWeeklyDistanceStats = (runData: RunData[]): WeeklyDistance
   
   // Calcular estadísticas para cada carrera
   validRuns.forEach(run => {
-    // Para fechas que vienen como string YYYY-MM-DD, las tratamos como locales
-    // Para fechas que vienen como timestamp, las convertimos a zona horaria local
+    // Para fechas que vienen como string YYYY-MM-DD (datos manuales), las tratamos como fechas locales
+    // Para fechas que vienen como timestamp (datos de Strava), las usamos tal como vienen
     let date: Date;
     
     if (run.date.includes('T')) {
-      // Es un timestamp completo, convertir a zona horaria de Costa Rica
-      const utcDate = new Date(run.date);
-      date = toZonedTime(utcDate, COSTA_RICA_TIMEZONE);
+      // Es un timestamp completo, usarlo tal como viene (ya procesado correctamente por cada fuente)
+      date = new Date(run.date);
     } else {
-      // Es solo una fecha, la tratamos como ya está en zona horaria local
+      // Es solo una fecha YYYY-MM-DD, tratarla como fecha local sin conversiones
       date = new Date(run.date + 'T00:00:00');
     }
     
@@ -52,13 +48,13 @@ export const calculateWeeklyDistanceStats = (runData: RunData[]): WeeklyDistance
       return;
     }
     
-    console.log('📅 Procesando fecha:', {
+    console.log('📅 Procesando fecha para weekly stats:', {
       originalDate: run.date,
       processedDate: date.toISOString(),
       isTimestamp: run.date.includes('T')
     });
     
-    // Calcular el inicio de la semana (lunes)
+    // Calcular el inicio de la semana (lunes) usando la fecha local
     const dayOfWeek = date.getDay();
     const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Si es domingo (0), retroceder 6 días
     const mondayDate = new Date(date);

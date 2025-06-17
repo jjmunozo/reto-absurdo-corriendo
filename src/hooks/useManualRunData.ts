@@ -3,11 +3,8 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 import { RunData } from '@/data/runningData';
-import { toZonedTime, format } from 'date-fns-tz';
 
 type ManualRun = Database['public']['Tables']['manual_runs']['Row'];
-
-const COSTA_RICA_TIMEZONE = 'America/Costa_Rica';
 
 export const useManualRunData = () => {
   const [activities, setActivities] = useState<RunData[]>([]);
@@ -34,23 +31,24 @@ export const useManualRunData = () => {
         // Convertir las horas, minutos y segundos a minutos totales para mantener compatibilidad
         const totalMinutes = (run.duration_hours || 0) * 60 + (run.duration_minutes || 0) + (run.duration_seconds || 0) / 60;
         
-        // Convertir la fecha UTC a la zona horaria de Costa Rica
-        const utcDate = new Date(run.start_time);
-        const costaRicaDate = toZonedTime(utcDate, COSTA_RICA_TIMEZONE);
+        // Para datos manuales, usar la fecha tal como se ingresó sin conversiones de zona horaria
+        const startDateTime = new Date(run.start_time);
         
-        // Extraer solo la fecha en formato YYYY-MM-DD en la zona horaria local
-        const localDateString = format(costaRicaDate, 'yyyy-MM-dd', { timeZone: COSTA_RICA_TIMEZONE });
+        // Extraer solo la fecha en formato YYYY-MM-DD usando la fecha local sin conversiones
+        const year = startDateTime.getFullYear();
+        const month = String(startDateTime.getMonth() + 1).padStart(2, '0');
+        const day = String(startDateTime.getDate()).padStart(2, '0');
+        const localDateString = `${year}-${month}-${day}`;
         
-        console.log('🕐 Conversión de fecha:', {
-          utcTimestamp: run.start_time,
-          utcDate: utcDate.toISOString(),
-          costaRicaDate: costaRicaDate.toISOString(),
-          extractedDate: localDateString
+        console.log('📅 Procesando fecha manual (sin conversión):', {
+          originalTimestamp: run.start_time,
+          extractedDate: localDateString,
+          originalDateTime: startDateTime.toISOString()
         });
         
         return {
           id: parseInt(run.id.replace(/-/g, '').substring(0, 10), 16), // Convertir UUID a número
-          date: localDateString, // Usar la fecha en zona horaria local
+          date: localDateString, // Usar la fecha local sin conversiones
           distance: run.distance_km, // Ya está en km
           duration: Math.round(totalMinutes), // Convertir a entero para compatibilidad
           elevation: run.total_elevation, // Ya está en metros

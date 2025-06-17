@@ -18,38 +18,37 @@ const RecentRuns: React.FC<RecentRunsProps> = ({
   title,
   description
 }) => {
-  // Formatear fecha usando la zona horaria de Costa Rica
+  // Formatear fecha - para datos manuales no convertir zona horaria
   const formatDate = (dateString: string) => {
-    // Para datos manuales, la fecha ya viene en formato local
-    // Para datos de Strava, necesitamos convertir si es necesario
     const date = new Date(dateString);
     
-    // Si la fecha parece ser solo una fecha (sin tiempo), la tratamos como local
-    if (dateString.includes('T')) {
-      // Es un timestamp completo, convertir a zona horaria de Costa Rica
-      const costaRicaDate = toZonedTime(date, COSTA_RICA_TIMEZONE);
-      return format(costaRicaDate, 'dd MMM', { timeZone: COSTA_RICA_TIMEZONE, locale: require('date-fns/locale/es') });
-    } else {
-      // Es solo una fecha, la tratamos como ya está en zona horaria local
+    // Si la fecha parece ser solo una fecha (YYYY-MM-DD), la tratamos como local sin conversiones
+    if (!dateString.includes('T') || dateString.endsWith('T00:00:00')) {
+      // Es una fecha local, no convertir zona horaria
       return date.toLocaleDateString('es-ES', { 
         day: 'numeric', 
         month: 'short' 
       });
+    } else {
+      // Es un timestamp completo de Strava, convertir a zona horaria de Costa Rica
+      const costaRicaDate = toZonedTime(date, COSTA_RICA_TIMEZONE);
+      return format(costaRicaDate, 'dd MMM', { timeZone: COSTA_RICA_TIMEZONE, locale: require('date-fns/locale/es') });
     }
   };
 
-  // Formatear hora usando la zona horaria correcta de Costa Rica
+  // Formatear hora - para datos manuales usar la hora local sin conversiones
   const formatTime = (dateTimeString: string) => {
     if (!dateTimeString) return "-";
     
-    // Crear un objeto Date a partir del string ISO
-    const utcDate = new Date(dateTimeString);
+    const date = new Date(dateTimeString);
     
-    // Convertir a zona horaria de Costa Rica
-    const costaRicaDate = toZonedTime(utcDate, COSTA_RICA_TIMEZONE);
-    
-    // Formatear usando opciones específicas para Costa Rica
-    return format(costaRicaDate, 'hh:mm a', { timeZone: COSTA_RICA_TIMEZONE });
+    // Para datos manuales (que se guardan con la hora local), no convertir zona horaria
+    // Para datos de Strava (que vienen con startTimeLocal), ya están en hora local
+    return date.toLocaleTimeString('es-ES', { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      hour12: true 
+    });
   };
 
   // Formatear ritmo
