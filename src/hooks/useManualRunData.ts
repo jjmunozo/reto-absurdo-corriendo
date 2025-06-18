@@ -12,10 +12,87 @@ export const useManualRunData = () => {
   const [error, setError] = useState<string | null>(null);
   const [lastSync, setLastSync] = useState<Date | null>(null);
 
+  // Función para corregir fechas incorrectas existentes
+  const fixExistingRunDates = async () => {
+    try {
+      console.log('🔧 Iniciando corrección de fechas existentes...');
+      
+      // Obtener todas las carreras
+      const { data: runs, error: fetchError } = await supabase
+        .from('manual_runs')
+        .select('*');
+
+      if (fetchError) {
+        console.error('Error fetching runs for date fix:', fetchError);
+        return;
+      }
+
+      if (!runs || runs.length === 0) {
+        console.log('No hay carreras para corregir');
+        return;
+      }
+
+      // Procesar cada carrera
+      for (const run of runs) {
+        const originalDate = new Date(run.start_time);
+        
+        // Si la fecha parece ser UTC (termina en Z o +00:00), la corregimos
+        const dateString = run.start_time;
+        if (dateString.includes('Z') || dateString.includes('+00:00')) {
+          console.log('🔧 CORRIGIENDO FECHA:', {
+            id: run.id,
+            fechaOriginal: dateString,
+            fechaParseada: originalDate.toISOString()
+          });
+          
+          // Crear la nueva fecha agregando un día para compensar la diferencia de zona horaria
+          const correctedDate = new Date(originalDate);
+          correctedDate.setDate(correctedDate.getDate() + 1);
+          
+          // Convertir a string en formato local (sin zona horaria)
+          const year = correctedDate.getFullYear();
+          const month = String(correctedDate.getMonth() + 1).padStart(2, '0');
+          const day = String(correctedDate.getDate()).padStart(2, '0');
+          const hours = String(correctedDate.getHours()).padStart(2, '0');
+          const minutes = String(correctedDate.getMinutes()).padStart(2, '0');
+          const seconds = String(correctedDate.getSeconds()).padStart(2, '0');
+          
+          const newDateString = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+          
+          console.log('📅 FECHA CORREGIDA:', {
+            fechaAnterior: dateString,
+            fechaNueva: newDateString
+          });
+          
+          // Actualizar en la base de datos
+          const { error: updateError } = await supabase
+            .from('manual_runs')
+            .update({ start_time: newDateString })
+            .eq('id', run.id);
+            
+          if (updateError) {
+            console.error('Error updating run date:', updateError);
+          } else {
+            console.log('✅ Fecha actualizada correctamente para:', run.title);
+          }
+        } else {
+          console.log('🟢 Fecha ya está en formato correcto:', run.title, dateString);
+        }
+      }
+      
+      console.log('✅ Corrección de fechas completada');
+    } catch (error) {
+      console.error('Error en corrección de fechas:', error);
+    }
+  };
+
   const loadActivities = async () => {
     try {
       setIsLoading(true);
       setError(null);
+
+      // Primero ejecutar la corrección de fechas
+      await fixExistingRunDates();
 
       const { data, error: fetchError } = await supabase
         .from('manual_runs')
@@ -37,11 +114,10 @@ export const useManualRunData = () => {
           title: run.title
         });
         
-        // CORRECCIÓN: Para datos manuales, usar la fecha como está guardada sin conversiones
-        // El timestamp se guardó como string local, así que lo interpretamos como fecha local
+        // Para datos manuales, usar la fecha como está guardada (ahora corregida)
         const startDateTime = new Date(run.start_time);
         
-        // Extraer la fecha usando métodos locales (no UTC) para mantener la fecha original
+        // Extraer la fecha usando métodos locales
         const year = startDateTime.getFullYear();
         const month = String(startDateTime.getMonth() + 1).padStart(2, '0');
         const day = String(startDateTime.getDate()).padStart(2, '0');
