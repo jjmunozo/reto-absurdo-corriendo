@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -149,28 +148,21 @@ const AddRun = () => {
       const [paceMinutes, paceSecondsTime] = data.pace.split(':').map(Number);
       const avgPace = paceMinutes + (paceSecondsTime / 60);
       
-      // Combinar fecha y hora
-      const startDateTime = new Date(`${data.date}T${data.time}`);
-
-      console.log('Datos a insertar:', {
-        title: data.title,
-        start_time: startDateTime.toISOString(),
-        duration_hours: durationHours,
-        duration_minutes: durationMinutes,
-        duration_seconds: durationSeconds,
-        distance_km: distance,
-        avg_pace: avgPace,
-        total_elevation: parseInt(data.elevation || '0'),
-        has_pr: data.hasPR,
-        pr_type: data.hasPR ? data.prType : null,
-        pr_description: data.hasPR ? data.prDescription : null
+      // CORRECCIÓN: Crear fecha local sin conversión UTC
+      // Combinar fecha y hora como string y crear Date sin forzar UTC
+      const localDateTimeString = `${data.date}T${data.time}:00`;
+      
+      console.log('🔧 GUARDANDO CARRERA - Datos originales:', {
+        fecha: data.date,
+        hora: data.time,
+        fechaHoraLocal: localDateTimeString
       });
 
       const { error } = await supabase
         .from('manual_runs')
         .insert({
           title: data.title,
-          start_time: startDateTime.toISOString(),
+          start_time: localDateTimeString, // Guardar como string local, no como ISO UTC
           duration_hours: durationHours,
           duration_minutes: durationMinutes,
           duration_seconds: durationSeconds,
@@ -185,6 +177,8 @@ const AddRun = () => {
       if (error) {
         throw error;
       }
+
+      console.log('✅ CARRERA GUARDADA EXITOSAMENTE');
 
       toast({
         title: "Carrera agregada",

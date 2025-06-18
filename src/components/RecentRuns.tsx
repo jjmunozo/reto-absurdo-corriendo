@@ -18,13 +18,19 @@ const RecentRuns: React.FC<RecentRunsProps> = ({
   title,
   description
 }) => {
-  // Formatear fecha - para datos manuales no convertir zona horaria
+  // Formatear fecha - CORRECCIÓN: detectar si es dato manual o de Strava
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     
-    // Si la fecha parece ser solo una fecha (YYYY-MM-DD), la tratamos como local sin conversiones
+    console.log('🔧 FORMATEANDO FECHA:', {
+      original: dateString,
+      esTimestamp: dateString.includes('T'),
+      fechaParseada: date.toISOString()
+    });
+    
+    // Si la fecha parece ser solo una fecha (YYYY-MM-DD) o es un dato manual, tratarla como local
     if (!dateString.includes('T') || dateString.endsWith('T00:00:00')) {
-      // Es una fecha local, no convertir zona horaria
+      // Es una fecha local (datos manuales), no convertir zona horaria
       return date.toLocaleDateString('es-ES', { 
         day: 'numeric', 
         month: 'short' 
@@ -36,14 +42,19 @@ const RecentRuns: React.FC<RecentRunsProps> = ({
     }
   };
 
-  // Formatear hora - para datos manuales usar la hora local sin conversiones
+  // Formatear hora - CORRECCIÓN: para datos manuales usar la hora tal como se guardó
   const formatTime = (dateTimeString: string) => {
     if (!dateTimeString) return "-";
     
     const date = new Date(dateTimeString);
     
-    // Para datos manuales (que se guardan con la hora local), no convertir zona horaria
-    // Para datos de Strava (que vienen con startTimeLocal), ya están en hora local
+    console.log('🔧 FORMATEANDO HORA:', {
+      original: dateTimeString,
+      fechaParseada: date.toISOString(),
+      horaLocal: date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: true })
+    });
+    
+    // Para datos manuales y de Strava, usar la hora local sin conversiones adicionales
     return date.toLocaleTimeString('es-ES', { 
       hour: '2-digit', 
       minute: '2-digit',

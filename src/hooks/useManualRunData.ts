@@ -31,24 +31,33 @@ export const useManualRunData = () => {
         // Convertir las horas, minutos y segundos a minutos totales para mantener compatibilidad
         const totalMinutes = (run.duration_hours || 0) * 60 + (run.duration_minutes || 0) + (run.duration_seconds || 0) / 60;
         
-        // Para datos manuales, usar la fecha tal como se ingresó sin conversiones de zona horaria
+        console.log('🔧 LEYENDO CARRERA - Datos de la base:', {
+          id: run.id,
+          originalTimestamp: run.start_time,
+          title: run.title
+        });
+        
+        // CORRECCIÓN: Para datos manuales, usar la fecha como está guardada sin conversiones
+        // El timestamp se guardó como string local, así que lo interpretamos como fecha local
         const startDateTime = new Date(run.start_time);
         
-        // Extraer solo la fecha en formato YYYY-MM-DD usando la fecha local sin conversiones
+        // Extraer la fecha usando métodos locales (no UTC) para mantener la fecha original
         const year = startDateTime.getFullYear();
         const month = String(startDateTime.getMonth() + 1).padStart(2, '0');
         const day = String(startDateTime.getDate()).padStart(2, '0');
         const localDateString = `${year}-${month}-${day}`;
         
-        console.log('📅 Procesando fecha manual (sin conversión):', {
+        console.log('📅 FECHA PROCESADA:', {
           originalTimestamp: run.start_time,
-          extractedDate: localDateString,
-          originalDateTime: startDateTime.toISOString()
+          fechaExtraida: localDateString,
+          año: year,
+          mes: month,
+          día: day
         });
         
         return {
           id: parseInt(run.id.replace(/-/g, '').substring(0, 10), 16), // Convertir UUID a número
-          date: localDateString, // Usar la fecha local sin conversiones
+          date: localDateString, // La fecha local extraída correctamente
           distance: run.distance_km, // Ya está en km
           duration: Math.round(totalMinutes), // Convertir a entero para compatibilidad
           elevation: run.total_elevation, // Ya está en metros
@@ -60,6 +69,13 @@ export const useManualRunData = () => {
           prDescription: run.pr_description
         };
       });
+
+      console.log('✅ CARRERAS CONVERTIDAS:', convertedData.length, 'carreras procesadas');
+      console.log('📊 Primeras 3 carreras:', convertedData.slice(0, 3).map(r => ({
+        fecha: r.date,
+        titulo: r.location,
+        horaCompleta: r.startTimeLocal
+      })));
 
       setActivities(convertedData);
       setLastSync(new Date());

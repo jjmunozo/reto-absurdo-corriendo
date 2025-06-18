@@ -31,8 +31,12 @@ export const calculateWeeklyDistanceStats = (runData: RunData[]): WeeklyDistance
   
   // Calcular estadísticas para cada carrera
   validRuns.forEach(run => {
-    // Para fechas que vienen como string YYYY-MM-DD (datos manuales), las tratamos como fechas locales
-    // Para fechas que vienen como timestamp (datos de Strava), las usamos tal como vienen
+    console.log('🔧 PROCESANDO FECHA PARA ESTADÍSTICAS:', {
+      originalDate: run.date,
+      esTimestamp: run.date.includes('T')
+    });
+    
+    // CORRECCIÓN: Para fechas de datos manuales, usar siempre como fecha local
     let date: Date;
     
     if (run.date.includes('T')) {
@@ -40,7 +44,9 @@ export const calculateWeeklyDistanceStats = (runData: RunData[]): WeeklyDistance
       date = new Date(run.date);
     } else {
       // Es solo una fecha YYYY-MM-DD, tratarla como fecha local sin conversiones
-      date = new Date(run.date + 'T00:00:00');
+      // Usar formato que evite problemas de zona horaria
+      const [year, month, day] = run.date.split('-').map(Number);
+      date = new Date(year, month - 1, day); // Crear fecha local directamente
     }
     
     if (isNaN(date.getTime())) {
@@ -48,13 +54,13 @@ export const calculateWeeklyDistanceStats = (runData: RunData[]): WeeklyDistance
       return;
     }
     
-    console.log('📅 Procesando fecha para weekly stats:', {
+    console.log('📅 FECHA PROCESADA PARA WEEKLY STATS:', {
       originalDate: run.date,
-      processedDate: date.toISOString(),
-      isTimestamp: run.date.includes('T')
+      fechaProcesada: date.toISOString(),
+      fechaLocal: date.toLocaleDateString()
     });
     
-    // Calcular el inicio de la semana (lunes) usando la fecha local
+    // Calcular el inicio de la semana (lunes) usan do la fecha local
     const dayOfWeek = date.getDay();
     const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Si es domingo (0), retroceder 6 días
     const mondayDate = new Date(date);
@@ -77,10 +83,11 @@ export const calculateWeeklyDistanceStats = (runData: RunData[]): WeeklyDistance
     weekStats[weekKey].totalDistance += run.distance;
     weekStats[weekKey].runsCount += 1;
     
-    console.log('📊 Procesando carrera:', {
+    console.log('📊 Carrera agregada a estadísticas:', {
       originalDate: run.date,
       mondayDate: weekKey,
-      distance: run.distance
+      distance: run.distance,
+      totalDistance: weekStats[weekKey].totalDistance
     });
   });
   
