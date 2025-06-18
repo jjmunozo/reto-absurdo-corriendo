@@ -12,10 +12,10 @@ export const useManualRunData = () => {
   const [error, setError] = useState<string | null>(null);
   const [lastSync, setLastSync] = useState<Date | null>(null);
 
-  // Función para corregir fechas incorrectas existentes
-  const fixExistingRunDates = async () => {
+  // Función para corregir las horas incorrectas causadas por la corrección anterior
+  const fixIncorrectHours = async () => {
     try {
-      console.log('🔧 Iniciando corrección de fechas existentes...');
+      console.log('🔧 Iniciando corrección de horas incorrectas...');
       
       // Obtener todas las carreras
       const { data: runs, error: fetchError } = await supabase
@@ -23,33 +23,54 @@ export const useManualRunData = () => {
         .select('*');
 
       if (fetchError) {
-        console.error('Error fetching runs for date fix:', fetchError);
+        console.error('Error fetching runs for hour fix:', fetchError);
         return;
       }
 
       if (!runs || runs.length === 0) {
-        console.log('No hay carreras para corregir');
+        console.log('No hay carreras para corregir horas');
         return;
       }
 
-      // Procesar cada carrera
+      // Procesar cada carrera para corregir las horas
       for (const run of runs) {
-        const originalDate = new Date(run.start_time);
+        const currentDate = new Date(run.start_time);
+        const currentHour = currentDate.getHours();
         
-        // Si la fecha parece ser UTC (termina en Z o +00:00), la corregimos
-        const dateString = run.start_time;
-        if (dateString.includes('Z') || dateString.includes('+00:00')) {
-          console.log('🔧 CORRIGIENDO FECHA:', {
-            id: run.id,
-            fechaOriginal: dateString,
-            fechaParseada: originalDate.toISOString()
+        console.log('🔧 VERIFICANDO HORA:', {
+          id: run.id,
+          title: run.title,
+          fechaActual: run.start_time,
+          horaActual: currentHour
+        });
+        
+        // Detectar si las horas están incorrectas y necesitan corrección
+        // Si la hora está entre 18-23 (6 PM - 11 PM), probablemente era una carrera matutina (6 AM - 11 AM)
+        // Si la hora está entre 0-5 (12 AM - 5 AM), probablemente era una carrera matutina (6 AM - 11 AM)
+        let needsCorrection = false;
+        let hoursToSubtract = 0;
+        
+        if (currentHour >= 18 && currentHour <= 23) {
+          // Carreras que ahora muestran 18-23 (6-11 PM) probablemente eran 6-11 AM
+          needsCorrection = true;
+          hoursToSubtract = 18; // Para convertir 18-23 a 0-5, luego ajustar a 6-11
+        } else if (currentHour >= 0 && currentHour <= 5) {
+          // Carreras que ahora muestran 0-5 (12-5 AM) probablemente eran 6-11 AM  
+          needsCorrection = true;
+          hoursToSubtract = -6; // Agregar 6 horas para convertir 0-5 a 6-11
+        }
+        
+        if (needsCorrection) {
+          console.log('🔧 CORRIGIENDO HORA:', {
+            title: run.title,
+            horaAnterior: currentHour,
+            ajuste: hoursToSubtract
           });
           
-          // Crear la nueva fecha agregando un día para compensar la diferencia de zona horaria
-          const correctedDate = new Date(originalDate);
-          correctedDate.setDate(correctedDate.getDate() + 1);
+          const correctedDate = new Date(currentDate);
+          correctedDate.setHours(correctedDate.getHours() - hoursToSubtract);
           
-          // Convertir a string en formato local (sin zona horaria)
+          // Convertir a string en formato local manteniendo la fecha correcta
           const year = correctedDate.getFullYear();
           const month = String(correctedDate.getMonth() + 1).padStart(2, '0');
           const day = String(correctedDate.getDate()).padStart(2, '0');
@@ -57,32 +78,34 @@ export const useManualRunData = () => {
           const minutes = String(correctedDate.getMinutes()).padStart(2, '0');
           const seconds = String(correctedDate.getSeconds()).padStart(2, '0');
           
-          const newDateString = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+          const newDateTimeString = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
           
-          console.log('📅 FECHA CORREGIDA:', {
-            fechaAnterior: dateString,
-            fechaNueva: newDateString
+          console.log('🕐 HORA CORREGIDA:', {
+            fechaAnterior: run.start_time,
+            fechaNueva: newDateTimeString,
+            horaAnterior: currentHour,
+            horaNueva: correctedDate.getHours()
           });
           
           // Actualizar en la base de datos
           const { error: updateError } = await supabase
             .from('manual_runs')
-            .update({ start_time: newDateString })
+            .update({ start_time: newDateTimeString })
             .eq('id', run.id);
             
           if (updateError) {
-            console.error('Error updating run date:', updateError);
+            console.error('Error updating run hour:', updateError);
           } else {
-            console.log('✅ Fecha actualizada correctamente para:', run.title);
+            console.log('✅ Hora actualizada correctamente para:', run.title);
           }
         } else {
-          console.log('🟢 Fecha ya está en formato correcto:', run.title, dateString);
+          console.log('🟢 Hora ya está correcta:', run.title, 'Hora:', currentHour);
         }
       }
       
-      console.log('✅ Corrección de fechas completada');
+      console.log('✅ Corrección de horas completada');
     } catch (error) {
-      console.error('Error en corrección de fechas:', error);
+      console.error('Error en corrección de horas:', error);
     }
   };
 
@@ -91,8 +114,8 @@ export const useManualRunData = () => {
       setIsLoading(true);
       setError(null);
 
-      // Primero ejecutar la corrección de fechas
-      await fixExistingRunDates();
+      // Ejecutar la corrección de horas incorrectas
+      await fixIncorrectHours();
 
       const { data, error: fetchError } = await supabase
         .from('manual_runs')
