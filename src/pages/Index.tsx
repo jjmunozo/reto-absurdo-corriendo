@@ -2,10 +2,8 @@
 import React from 'react';
 import { useManualRunData } from '@/hooks/useManualRunData';
 import { toast } from '@/hooks/use-toast';
-import { ChevronDown, Upload, Plus } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Button } from '@/components/ui/button';
 import HeroSection from '@/components/HeroSection';
 import StatsSummary from '@/components/StatsSummary';
 import RecentRuns from '@/components/RecentRuns';
@@ -119,24 +117,6 @@ const Index = () => {
         </Collapsible>
       </section>
 
-      {/* Action Buttons */}
-      <section className="container mx-auto px-4 py-4">
-        <div className="flex flex-wrap gap-3 justify-center">
-          <Link to="/add-run">
-            <Button className="bg-brand-coral hover:bg-brand-red text-white">
-              <Plus className="h-4 w-4 mr-2" />
-              Agregar Carrera
-            </Button>
-          </Link>
-          <Link to="/import-runs">
-            <Button variant="outline" className="border-brand-coral text-brand-coral hover:bg-brand-coral hover:text-white">
-              <Upload className="h-4 w-4 mr-2" />
-              Importar Datos Históricos
-            </Button>
-          </Link>
-        </div>
-      </section>
-
       {/* Section Navigation */}
       <SectionNavigation sections={navigationSections} />
 
@@ -231,20 +211,9 @@ const Index = () => {
           <div className="text-center py-12">
             <h3 className="text-xl font-semibold text-gray-900 mb-2">No hay carreras registradas</h3>
             <p className="text-gray-600 mb-4">No se han encontrado carreras en el sistema.</p>
-            <div className="flex gap-3 justify-center">
-              <Link to="/add-run">
-                <Button className="bg-brand-coral hover:bg-brand-red text-white">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Agregar Primera Carrera
-                </Button>
-              </Link>
-              <Link to="/import-runs">
-                <Button variant="outline" className="border-brand-coral text-brand-coral hover:bg-brand-coral hover:text-white">
-                  <Upload className="h-4 w-4 mr-2" />
-                  Importar Datos Históricos
-                </Button>
-              </Link>
-            </div>
+            <p className="text-sm text-gray-500">
+              Accede a <code className="bg-gray-100 px-2 py-1 rounded">/add-run</code> para agregar una carrera o <code className="bg-gray-100 px-2 py-1 rounded">/import-runs</code> para importar datos históricos.
+            </p>
           </div>
         )}
       </main>
