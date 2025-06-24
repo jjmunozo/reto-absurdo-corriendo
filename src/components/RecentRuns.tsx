@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -15,33 +14,38 @@ const RecentRuns: React.FC<RecentRunsProps> = ({
   title,
   description
 }) => {
-  // Formatear fecha sin conversiones de zona horaria
+  // Formatear fecha respetando la zona horaria original
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('es-ES', { 
       day: 'numeric', 
-      month: 'short' 
+      month: 'short',
+      timeZone: 'America/Costa_Rica' // Especificar zona horaria de Costa Rica
     });
   };
 
-  // Formatear hora tal como está guardada en los datos
+  // Formatear hora respetando la zona horaria original del CSV
   const formatTime = (dateTimeString: string) => {
     if (!dateTimeString) return "-";
     
+    console.log('🔧 FORMATEANDO HORA CORREGIDA:', {
+      original: dateTimeString
+    });
+    
+    // Crear fecha respetando la zona horaria original
     const date = new Date(dateTimeString);
     
-    console.log('🔧 FORMATEANDO HORA:', {
-      original: dateTimeString,
-      fechaParseada: date.toISOString(),
-      horaLocal: date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: true })
-    });
-    
-    // Usar la hora local sin conversiones adicionales
-    return date.toLocaleTimeString('es-ES', { 
+    // Usar toLocaleTimeString con zona horaria específica de Costa Rica
+    const horaFormateada = date.toLocaleTimeString('es-ES', { 
       hour: '2-digit', 
       minute: '2-digit',
-      hour12: true 
+      hour12: true,
+      timeZone: 'America/Costa_Rica' // Forzar zona horaria de Costa Rica
     });
+    
+    console.log('✅ Hora formateada final:', horaFormateada);
+    
+    return horaFormateada;
   };
 
   // Formatear ritmo

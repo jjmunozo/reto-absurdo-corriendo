@@ -52,9 +52,9 @@ const ImportRuns = () => {
     }
   };
 
-  const validateAndConvertDateTime = (dateTimeStr: string): string => {
+  const validateAndFormatDateTime = (dateTimeStr: string): string => {
     try {
-      console.log('🕐 Validando fecha/hora:', dateTimeStr);
+      console.log('🕐 Procesando fecha/hora original:', dateTimeStr);
       
       // Verificar que la fecha sea válida
       const testDate = new Date(dateTimeStr);
@@ -62,9 +62,24 @@ const ImportRuns = () => {
         throw new Error(`Formato de fecha inválido: ${dateTimeStr}`);
       }
       
-      // Si la fecha ya está en formato correcto (YYYY-MM-DD), devolverla tal como está
-      console.log('✅ Fecha válida:', dateTimeStr);
-      return dateTimeStr;
+      // Formatear la fecha/hora manteniendo la zona horaria local (Costa Rica: UTC-6)
+      // Si la fecha no tiene zona horaria, asumimos que es hora local de Costa Rica
+      let formattedDateTime: string;
+      
+      if (dateTimeStr.includes('T') && !dateTimeStr.includes('+') && !dateTimeStr.includes('Z')) {
+        // Si es formato ISO pero sin zona horaria, agregar -06:00 (Costa Rica)
+        formattedDateTime = `${dateTimeStr}-06:00`;
+      } else if (dateTimeStr.includes(' ') && !dateTimeStr.includes('+') && !dateTimeStr.includes('-', 10)) {
+        // Si es formato "YYYY-MM-DD HH:MM:SS" sin zona horaria, convertir a ISO con zona horaria
+        const isoFormat = dateTimeStr.replace(' ', 'T');
+        formattedDateTime = `${isoFormat}-06:00`;
+      } else {
+        // Si ya tiene zona horaria o es otro formato, usarlo tal como está
+        formattedDateTime = dateTimeStr;
+      }
+      
+      console.log('✅ Fecha formateada con zona horaria:', formattedDateTime);
+      return formattedDateTime;
       
     } catch (error) {
       throw new Error(`Error validando fecha "${dateTimeStr}": ${error instanceof Error ? error.message : 'Error desconocido'}`);
@@ -150,10 +165,10 @@ const ImportRuns = () => {
       
       const [fechaHora, titulo, descripcion, distancia, tiempo, elevacion] = columns;
       
-      // Validar la fecha/hora (sin conversión, ya está en formato correcto)
+      // Validar y formatear la fecha/hora con zona horaria correcta
       let fechaHoraValidada: string;
       try {
-        fechaHoraValidada = validateAndConvertDateTime(fechaHora);
+        fechaHoraValidada = validateAndFormatDateTime(fechaHora);
       } catch (error) {
         throw new Error(`Línea ${i + 1}: ${error instanceof Error ? error.message : 'Error en fecha/hora'}`);
       }
@@ -271,6 +286,8 @@ const ImportRuns = () => {
         total_elevation: run.totalElevation,
         has_pr: false
       }));
+      
+      console.log('🕐 Ejemplo de datos a insertar:', insertData.slice(0, 2));
       
       const { error: insertError } = await supabase
         .from('manual_runs')
