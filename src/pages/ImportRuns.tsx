@@ -54,49 +54,18 @@ const ImportRuns = () => {
 
   const validateAndConvertDateTime = (dateTimeStr: string): string => {
     try {
-      // Si ya está en formato ISO válido, devolverlo
-      const isoDate = new Date(dateTimeStr);
-      if (!isNaN(isoDate.getTime()) && dateTimeStr.includes('-') && dateTimeStr.length >= 10) {
-        // Verificar si el formato parece ser DD-MM-YYYY o DD/MM/YYYY
-        const parts = dateTimeStr.split(/[-\/\s]/);
-        if (parts.length >= 3) {
-          const firstPart = parseInt(parts[0]);
-          const secondPart = parseInt(parts[1]);
-          const thirdPart = parseInt(parts[2]);
-          
-          // Si el primer número es mayor a 12, probablemente es DD-MM-YYYY
-          if (firstPart > 12 || (secondPart > 12 && firstPart <= 12)) {
-            console.log('🔄 Convirtiendo fecha DD-MM-YYYY a YYYY-MM-DD:', dateTimeStr);
-            
-            // Extraer la parte de fecha y hora por separado
-            const [datePart, timePart] = dateTimeStr.split(' ');
-            const dateSegments = datePart.split(/[-\/]/);
-            
-            if (dateSegments.length === 3) {
-              const day = dateSegments[0].padStart(2, '0');
-              const month = dateSegments[1].padStart(2, '0');
-              const year = dateSegments[2];
-              
-              const convertedDate = `${year}-${month}-${day}`;
-              const finalDateTime = timePart ? `${convertedDate} ${timePart}` : convertedDate;
-              
-              console.log('✅ Fecha convertida:', finalDateTime);
-              
-              // Validar que la fecha convertida sea válida
-              const testDate = new Date(finalDateTime);
-              if (isNaN(testDate.getTime())) {
-                throw new Error(`Fecha inválida después de conversión: ${finalDateTime}`);
-              }
-              
-              return finalDateTime;
-            }
-          }
-        }
-        
-        return dateTimeStr; // Ya está en formato correcto
+      console.log('🕐 Validando fecha/hora:', dateTimeStr);
+      
+      // Verificar que la fecha sea válida
+      const testDate = new Date(dateTimeStr);
+      if (isNaN(testDate.getTime())) {
+        throw new Error(`Formato de fecha inválido: ${dateTimeStr}`);
       }
       
-      throw new Error(`Formato de fecha no reconocido: ${dateTimeStr}`);
+      // Si la fecha ya está en formato correcto (YYYY-MM-DD), devolverla tal como está
+      console.log('✅ Fecha válida:', dateTimeStr);
+      return dateTimeStr;
+      
     } catch (error) {
       throw new Error(`Error validando fecha "${dateTimeStr}": ${error instanceof Error ? error.message : 'Error desconocido'}`);
     }
@@ -181,7 +150,7 @@ const ImportRuns = () => {
       
       const [fechaHora, titulo, descripcion, distancia, tiempo, elevacion] = columns;
       
-      // Validar y convertir la fecha/hora
+      // Validar la fecha/hora (sin conversión, ya está en formato correcto)
       let fechaHoraValidada: string;
       try {
         fechaHoraValidada = validateAndConvertDateTime(fechaHora);
@@ -192,7 +161,7 @@ const ImportRuns = () => {
       // Validar que los campos numéricos sean válidos
       const distanciaNum = parseFloat(distancia);
       const tiempoNum = parseInt(tiempo);
-      const elevacionNum = parseFloat(elevacion); // Cambiar a parseFloat para manejar decimales
+      const elevacionNum = parseFloat(elevacion);
       
       if (isNaN(distanciaNum) || isNaN(tiempoNum) || isNaN(elevacionNum)) {
         throw new Error(`Línea ${i + 1}: Error en valores numéricos. Distancia: ${distancia}, Tiempo: ${tiempo}, Elevación: ${elevacion}`);
@@ -204,7 +173,7 @@ const ImportRuns = () => {
         descripcion,
         distanciaKm: distanciaNum,
         tiempoSegundos: tiempoNum,
-        elevacion: Math.round(elevacionNum) // Redondear elevación a entero
+        elevacion: Math.round(elevacionNum)
       });
     }
     
@@ -404,7 +373,7 @@ const ImportRuns = () => {
                 <CardDescription>
                   El archivo debe tener exactamente estas 6 columnas (con encabezado). 
                   Se detectará automáticamente si usa comas (,) o punto y coma (;) como separador.
-                  Las fechas pueden estar en formato DD-MM-YYYY o YYYY-MM-DD:
+                  Las fechas deben estar en formato YYYY-MM-DD HH:MM:SS:
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -412,7 +381,7 @@ const ImportRuns = () => {
                   <code className="text-sm">
                     Fecha_y_hora,Titulo,Descripcion,Distancia_km,Tiempo_segundos,Elevacion
                     <br />
-                    17-06-2024 05:06:00,Morning Run,Carrera matutina,5.2,1860,45
+                    2024-06-17 05:06:00,Morning Run,Carrera matutina,5.2,1860,45
                     <br />
                     <br />
                     O también:
