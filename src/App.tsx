@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound";
 import StravaTokens from "./pages/StravaTokens";
 import StravaCallback from "./pages/StravaCallback";
 import AddRun from "./pages/AddRun";
+import ImportRuns from "./pages/ImportRuns";
 import Secreto from "./pages/Secreto";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/add-run" element={<AddRun />} />
+            <Route path="/import-runs" element={<ImportRuns />} />
             <Route path="/secreto" element={<Secreto />} />
             <Route path="/strava-tokens" element={<StravaTokens />} />
             <Route path="/strava/callback" element={<StravaCallback />} />
