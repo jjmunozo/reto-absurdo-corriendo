@@ -41,6 +41,7 @@ const ImportRuns = () => {
   const [isImporting, setIsImporting] = useState(false);
   const [importSuccess, setImportSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [csvPreview, setCsvPreview] = useState<string>('');
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,8 +53,64 @@ const ImportRuns = () => {
     }
   };
 
+  const detectSeparator = (text: string): string => {
+    const lines = text.split('\n').filter(line => line.trim());
+    if (lines.length < 2) return ',';
+    
+    const firstDataLine = lines[1]; // Skip header
+    
+    // Contar separadores potenciales
+    const commaCount = (firstDataLine.match(/,/g) || []).length;
+    const semicolonCount = (firstDataLine.match(/;/g) || []).length;
+    
+    console.log('🔍 Detectando separador:', { commaCount, semicolonCount, firstDataLine });
+    
+    // Si tenemos 5 punto y comas (6 campos), usar punto y coma
+    if (semicolonCount === 5) return ';';
+    // Si tenemos 5 comas (6 campos), usar coma
+    if (commaCount === 5) return ',';
+    
+    // Por defecto, usar el separador más común
+    return semicolonCount > commaCount ? ';' : ',';
+  };
+
+  const parseCsvLine = (line: string, separator: string): string[] => {
+    const result: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      
+      if (char === '"') {
+        inQuotes = !inQuotes;
+      } else if (char === separator && !inQuotes) {
+        result.push(current.trim().replace(/^"|"$/g, ''));
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    
+    // Agregar el último campo
+    result.push(current.trim().replace(/^"|"$/g, ''));
+    
+    return result;
+  };
+
   const parseCSV = (text: string): CSVRow[] => {
     const lines = text.split('\n').filter(line => line.trim());
+    const separator = detectSeparator(text);
+    
+    console.log('📄 Procesando CSV:', { 
+      totalLines: lines.length, 
+      separator,
+      preview: lines.slice(0, 3)
+    });
+    
+    // Guardar preview para mostrar al usuario
+    setCsvPreview(lines.slice(0, 3).join('\n'));
+    
     const data: CSVRow[] = [];
     
     // Skip header row (primera línea)
@@ -61,21 +118,36 @@ const ImportRuns = () => {
       const line = lines[i].trim();
       if (!line) continue;
       
-      const columns = line.split(',').map(col => col.trim().replace(/"/g, ''));
+      const columns = parseCsvLine(line, separator);
+      
+      console.log(`📊 Línea ${i + 1}:`, { 
+        raw: line, 
+        parsed: columns, 
+        count: columns.length 
+      });
       
       if (columns.length !== 6) {
-        throw new Error(`Línea ${i + 1}: Esperaba 6 columnas, encontradas ${columns.length}`);
+        throw new Error(`Línea ${i + 1}: Esperaba 6 columnas, encontradas ${columns.length}. Separador detectado: '${separator}'. Columnas: [${columns.join(', ')}]`);
       }
       
       const [fechaHora, titulo, descripcion, distancia, tiempo, elevacion] = columns;
+      
+      // Validar que los campos numéricos sean válidos
+      const distanciaNum = parseFloat(distancia);
+      const tiempoNum = parseInt(tiempo);
+      const elevacionNum = parseInt(elevacion);
+      
+      if (isNaN(distanciaNum) || isNaN(tiempoNum) || isNaN(elevacionNum)) {
+        throw new Error(`Línea ${i + 1}: Error en valores numéricos. Distancia: ${distancia}, Tiempo: ${tiempo}, Elevación: ${elevacion}`);
+      }
       
       data.push({
         fechaHora,
         titulo,
         descripcion,
-        distanciaKm: parseFloat(distancia),
-        tiempoSegundos: parseInt(tiempo),
-        elevacion: parseInt(elevacion)
+        distanciaKm: distanciaNum,
+        tiempoSegundos: tiempoNum,
+        elevacion: elevacionNum
       });
     }
     
@@ -118,6 +190,7 @@ const ImportRuns = () => {
     
     setFile(selectedFile);
     setError(null);
+    setCsvPreview('');
     setIsProcessing(true);
     
     try {
@@ -128,8 +201,9 @@ const ImportRuns = () => {
       setCsvData(parsed);
       setProcessedData(processed);
       
-      console.log('📊 Datos procesados:', processed.slice(0, 3));
+      console.log('📊 Datos procesados exitosamente:', processed.slice(0, 3));
     } catch (err: any) {
+      console.error('❌ Error procesando CSV:', err);
       setError(`Error procesando CSV: ${err.message}`);
       setCsvData([]);
       setProcessedData([]);
@@ -271,7 +345,8 @@ const ImportRuns = () => {
               <CardHeader>
                 <CardTitle>Formato del CSV</CardTitle>
                 <CardDescription>
-                  El archivo debe tener exactamente estas 6 columnas (con encabezado):
+                  El archivo debe tener exactamente estas 6 columnas (con encabezado). 
+                  Se detectará automáticamente si usa comas (,) o punto y coma (;) como separador:
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -280,6 +355,13 @@ const ImportRuns = () => {
                     Fecha_y_hora,Titulo,Descripcion,Distancia_km,Tiempo_segundos,Elevacion
                     <br />
                     2024-06-17 05:06:00,Morning Run,Carrera matutina,5.2,1860,45
+                    <br />
+                    <br />
+                    O también:
+                    <br />
+                    Fecha_y_hora;Titulo;Descripcion;Distancia_km;Tiempo_segundos;Elevacion
+                    <br />
+                    2024-06-17 05:06:00;Morning Run;Carrera matutina;5.2;1860;45
                   </code>
                 </div>
               </CardContent>
@@ -301,6 +383,13 @@ const ImportRuns = () => {
                     />
                     {isProcessing && <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-brand-coral"></div>}
                   </div>
+                  
+                  {csvPreview && (
+                    <div className="bg-blue-50 p-4 rounded-lg">
+                      <h4 className="font-medium text-blue-900 mb-2">Vista previa del archivo:</h4>
+                      <pre className="text-xs text-blue-800 whitespace-pre-wrap">{csvPreview}</pre>
+                    </div>
+                  )}
                   
                   {error && (
                     <Alert>
