@@ -384,9 +384,8 @@ const ImportRuns = () => {
                       </>
                     )}
                   </Button>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
             )}
           </div>
         )}
