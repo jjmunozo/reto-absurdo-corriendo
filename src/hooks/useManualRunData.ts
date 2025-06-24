@@ -39,24 +39,21 @@ export const useManualRunData = () => {
           startTime: run.start_time
         });
         
-        // Usar la fecha tal como está guardada en la base de datos
-        const startDateTime = new Date(run.start_time);
+        // Usar la fecha tal como está guardada - sin conversiones de zona horaria
+        const startDateTime = run.start_time;
         
-        // Extraer la fecha usando métodos locales
-        const year = startDateTime.getFullYear();
-        const month = String(startDateTime.getMonth() + 1).padStart(2, '0');
-        const day = String(startDateTime.getDate()).padStart(2, '0');
-        const localDateString = `${year}-${month}-${day}`;
+        // Extraer solo la fecha (YYYY-MM-DD) del timestamp
+        const dateOnly = startDateTime.split('T')[0];
         
         return {
           id: parseInt(run.id.replace(/-/g, '').substring(0, 10), 16), // Convertir UUID a número
-          date: localDateString, // La fecha local extraída
+          date: dateOnly, // Solo la fecha YYYY-MM-DD
           distance: run.distance_km, // Ya está en km
           duration: Math.round(totalMinutes), // Convertir a entero para compatibilidad
           elevation: run.total_elevation, // Ya está en metros
           avgPace: run.avg_pace, // Ya está en min/km
           location: run.title, // Usar el título como ubicación
-          startTimeLocal: run.start_time, // Mantener el timestamp completo para mostrar la hora
+          startTimeLocal: startDateTime, // Mantener el timestamp completo para mostrar la hora
           hasPR: run.has_pr || false,
           prType: run.pr_type,
           prDescription: run.pr_description

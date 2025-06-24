@@ -55,7 +55,7 @@ const RunsPerHourChart: React.FC<RunsPerHourChartProps> = ({ data, title, descri
                 dataKey="hour" 
                 tickFormatter={formatXAxis}
                 label={{ 
-                  value: 'Hora del día (Costa Rica UTC-6)', 
+                  value: 'Hora del día (hora local)', 
                   position: 'insideBottom',
                   offset: -5
                 }}

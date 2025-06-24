@@ -1,6 +1,5 @@
 
 import { RunData } from '@/data/runningData';
-import { toZonedTime, format } from 'date-fns-tz';
 
 export const calculateRunsPerHour = (runData: RunData[]): { hour: string, runs: number }[] => {
   console.log('⏰ calculateRunsPerHour: Procesando', runData.length, 'carreras');
@@ -11,20 +10,16 @@ export const calculateRunsPerHour = (runData: RunData[]): { hour: string, runs: 
     runs: 0
   }));
   
-  // La zona horaria de Costa Rica es UTC-6
-  const timeZone = 'America/Costa_Rica';
-  
-  // Contar carreras por hora
+  // Contar carreras por hora - usando la hora local tal como está guardada
   runData.forEach(run => {
     try {
       // Si tenemos el campo startTimeLocal (fecha-hora completa)
       if (run.startTimeLocal) {
         const dateObj = new Date(run.startTimeLocal);
-        const crDateObj = toZonedTime(dateObj, timeZone);
-        const hourOfDay = crDateObj.getHours();
+        const hourOfDay = dateObj.getHours();
         
-        // Debug para ver las fechas transformadas
-        console.log(`⏰ Run hora: ${run.date}, Start Time: ${run.startTimeLocal}, CR Time: ${format(crDateObj, 'yyyy-MM-dd HH:mm:ss', { timeZone })}, Hour: ${hourOfDay}`);
+        // Debug para ver las horas extraídas
+        console.log(`⏰ Run hora: ${run.date}, Start Time: ${run.startTimeLocal}, Hour: ${hourOfDay}`);
         
         // Incrementar contador para esa hora
         if (hourOfDay >= 0 && hourOfDay < 24) {

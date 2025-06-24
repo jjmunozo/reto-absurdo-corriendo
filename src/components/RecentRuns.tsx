@@ -3,7 +3,6 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { RunData } from '@/data/runningData';
-import { toZonedTime, format } from 'date-fns-tz';
 
 interface RecentRunsProps {
   runs: RunData[];
@@ -11,38 +10,21 @@ interface RecentRunsProps {
   description?: string;
 }
 
-const COSTA_RICA_TIMEZONE = 'America/Costa_Rica';
-
 const RecentRuns: React.FC<RecentRunsProps> = ({
   runs,
   title,
   description
 }) => {
-  // Formatear fecha - CORRECCIÓN: detectar si es dato manual o de Strava
+  // Formatear fecha sin conversiones de zona horaria
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    
-    console.log('🔧 FORMATEANDO FECHA:', {
-      original: dateString,
-      esTimestamp: dateString.includes('T'),
-      fechaParseada: date.toISOString()
+    return date.toLocaleDateString('es-ES', { 
+      day: 'numeric', 
+      month: 'short' 
     });
-    
-    // Si la fecha parece ser solo una fecha (YYYY-MM-DD) o es un dato manual, tratarla como local
-    if (!dateString.includes('T') || dateString.endsWith('T00:00:00')) {
-      // Es una fecha local (datos manuales), no convertir zona horaria
-      return date.toLocaleDateString('es-ES', { 
-        day: 'numeric', 
-        month: 'short' 
-      });
-    } else {
-      // Es un timestamp completo de Strava, convertir a zona horaria de Costa Rica
-      const costaRicaDate = toZonedTime(date, COSTA_RICA_TIMEZONE);
-      return format(costaRicaDate, 'dd MMM', { timeZone: COSTA_RICA_TIMEZONE, locale: require('date-fns/locale/es') });
-    }
   };
 
-  // Formatear hora - CORRECCIÓN: para datos manuales usar la hora tal como se guardó
+  // Formatear hora tal como está guardada en los datos
   const formatTime = (dateTimeString: string) => {
     if (!dateTimeString) return "-";
     
@@ -54,7 +36,7 @@ const RecentRuns: React.FC<RecentRunsProps> = ({
       horaLocal: date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: true })
     });
     
-    // Para datos manuales y de Strava, usar la hora local sin conversiones adicionales
+    // Usar la hora local sin conversiones adicionales
     return date.toLocaleTimeString('es-ES', { 
       hour: '2-digit', 
       minute: '2-digit',
