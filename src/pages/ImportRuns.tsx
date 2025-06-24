@@ -54,31 +54,21 @@ const ImportRuns = () => {
 
   const validateAndFormatDateTime = (dateTimeStr: string): string => {
     try {
-      console.log('🕐 Procesando fecha/hora original:', dateTimeStr);
+      console.log('🕐 Procesando fecha/hora original (sin conversiones):', dateTimeStr);
       
-      // Verificar que la fecha sea válida
-      const testDate = new Date(dateTimeStr);
-      if (isNaN(testDate.getTime())) {
-        throw new Error(`Formato de fecha inválido: ${dateTimeStr}`);
+      // Verificar que la fecha tenga un formato válido básico
+      const datePattern = /^\d{4}-\d{2}-\d{2}[\s|T]\d{2}:\d{2}:\d{2}$/;
+      if (!datePattern.test(dateTimeStr)) {
+        throw new Error(`Formato de fecha inválido: ${dateTimeStr}. Debe ser YYYY-MM-DD HH:MM:SS o YYYY-MM-DDTHH:MM:SS`);
       }
       
-      // Formatear la fecha/hora manteniendo la zona horaria local (Costa Rica: UTC-6)
-      // Si la fecha no tiene zona horaria, asumimos que es hora local de Costa Rica
-      let formattedDateTime: string;
-      
-      if (dateTimeStr.includes('T') && !dateTimeStr.includes('+') && !dateTimeStr.includes('Z')) {
-        // Si es formato ISO pero sin zona horaria, agregar -06:00 (Costa Rica)
-        formattedDateTime = `${dateTimeStr}-06:00`;
-      } else if (dateTimeStr.includes(' ') && !dateTimeStr.includes('+') && !dateTimeStr.includes('-', 10)) {
-        // Si es formato "YYYY-MM-DD HH:MM:SS" sin zona horaria, convertir a ISO con zona horaria
-        const isoFormat = dateTimeStr.replace(' ', 'T');
-        formattedDateTime = `${isoFormat}-06:00`;
-      } else {
-        // Si ya tiene zona horaria o es otro formato, usarlo tal como está
-        formattedDateTime = dateTimeStr;
+      // Convertir a formato ISO si viene con espacio en lugar de 'T'
+      let formattedDateTime = dateTimeStr;
+      if (dateTimeStr.includes(' ')) {
+        formattedDateTime = dateTimeStr.replace(' ', 'T');
       }
       
-      console.log('✅ Fecha formateada con zona horaria:', formattedDateTime);
+      console.log('✅ Fecha formateada SIN zona horaria:', formattedDateTime);
       return formattedDateTime;
       
     } catch (error) {
@@ -165,7 +155,7 @@ const ImportRuns = () => {
       
       const [fechaHora, titulo, descripcion, distancia, tiempo, elevacion] = columns;
       
-      // Validar y formatear la fecha/hora con zona horaria correcta
+      // Validar y formatear la fecha/hora SIN agregar zona horaria
       let fechaHoraValidada: string;
       try {
         fechaHoraValidada = validateAndFormatDateTime(fechaHora);

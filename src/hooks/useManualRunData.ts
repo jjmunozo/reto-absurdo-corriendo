@@ -33,34 +33,34 @@ export const useManualRunData = () => {
         // Convertir las horas, minutos y segundos a minutos totales para mantener compatibilidad
         const totalMinutes = (run.duration_hours || 0) * 60 + (run.duration_minutes || 0) + (run.duration_seconds || 0) / 60;
         
-        console.log('📊 Procesando carrera:', {
+        console.log('📊 Procesando carrera SIN conversiones de zona horaria:', {
           id: run.id,
           title: run.title,
           startTime: run.start_time
         });
         
-        // Usar la fecha tal como está guardada - sin conversiones de zona horaria
+        // Usar la fecha tal como está guardada - SIN conversiones de zona horaria
         const startDateTime = run.start_time;
         
-        // Extraer solo la fecha (YYYY-MM-DD) del timestamp
-        const dateOnly = startDateTime.split('T')[0];
+        // Extraer solo la fecha (YYYY-MM-DD) del timestamp directamente
+        const dateOnly = startDateTime.substring(0, 10);
         
         return {
           id: parseInt(run.id.replace(/-/g, '').substring(0, 10), 16), // Convertir UUID a número
-          date: dateOnly, // Solo la fecha YYYY-MM-DD
+          date: dateOnly, // Solo la fecha YYYY-MM-DD extraída directamente
           distance: run.distance_km, // Ya está en km
           duration: Math.round(totalMinutes), // Convertir a entero para compatibilidad
           elevation: run.total_elevation, // Ya está en metros
           avgPace: run.avg_pace, // Ya está en min/km
           location: run.title, // Usar el título como ubicación
-          startTimeLocal: startDateTime, // Mantener el timestamp completo para mostrar la hora
+          startTimeLocal: startDateTime, // Mantener el timestamp completo tal como está
           hasPR: run.has_pr || false,
           prType: run.pr_type,
           prDescription: run.pr_description
         };
       });
 
-      console.log('✅ Carreras procesadas:', convertedData.length);
+      console.log('✅ Carreras procesadas SIN conversiones:', convertedData.length);
 
       setActivities(convertedData);
       setLastSync(new Date());

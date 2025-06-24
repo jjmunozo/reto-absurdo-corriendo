@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -14,37 +15,49 @@ const RecentRuns: React.FC<RecentRunsProps> = ({
   title,
   description
 }) => {
-  // Formatear fecha respetando la zona horaria original
+  // Formatear fecha directamente del string de fecha SIN conversiones
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', { 
-      day: 'numeric', 
-      month: 'short',
-      timeZone: 'America/Costa_Rica' // Especificar zona horaria de Costa Rica
+    console.log('🔧 FORMATEANDO FECHA SIN CONVERSIONES:', {
+      original: dateString
     });
+    
+    // Usar directamente el string de fecha (YYYY-MM-DD) y convertir a formato legible
+    const [year, month, day] = dateString.split('-');
+    const monthNames = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 
+                       'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+    
+    const formattedDate = `${parseInt(day)} ${monthNames[parseInt(month) - 1]}`;
+    
+    console.log('✅ Fecha formateada final:', formattedDate);
+    return formattedDate;
   };
 
-  // Formatear hora respetando la zona horaria original del CSV
+  // Formatear hora directamente del timestamp SIN conversiones de zona horaria
   const formatTime = (dateTimeString: string) => {
     if (!dateTimeString) return "-";
     
-    console.log('🔧 FORMATEANDO HORA CORREGIDA:', {
+    console.log('🔧 FORMATEANDO HORA SIN CONVERSIONES:', {
       original: dateTimeString
     });
     
-    // Crear fecha respetando la zona horaria original
-    const date = new Date(dateTimeString);
+    // Extraer la hora directamente del string (formato: YYYY-MM-DDTHH:MM:SS)
+    const timePart = dateTimeString.includes('T') 
+      ? dateTimeString.split('T')[1] 
+      : dateTimeString.split(' ')[1];
     
-    // Usar toLocaleTimeString con zona horaria específica de Costa Rica
-    const horaFormateada = date.toLocaleTimeString('es-ES', { 
-      hour: '2-digit', 
-      minute: '2-digit',
-      hour12: true,
-      timeZone: 'America/Costa_Rica' // Forzar zona horaria de Costa Rica
-    });
+    if (!timePart) return "-";
+    
+    // Extraer hora y minuto
+    const [hour, minute] = timePart.split(':');
+    const hourNum = parseInt(hour);
+    
+    // Convertir a formato 12 horas
+    const period = hourNum >= 12 ? 'PM' : 'AM';
+    const displayHour = hourNum === 0 ? 12 : hourNum > 12 ? hourNum - 12 : hourNum;
+    
+    const horaFormateada = `${displayHour}:${minute} ${period}`;
     
     console.log('✅ Hora formateada final:', horaFormateada);
-    
     return horaFormateada;
   };
 
