@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
@@ -147,9 +148,9 @@ const PaceDistanceCorrelation: React.FC<PaceDistanceCorrelationProps> = ({
                       <strong>Correlación:</strong> Mide qué tan relacionados están el pace y la distancia.
                     </p>
                     <p className="text-xs mt-1">
-                      • <strong>Fuerte</strong> (|r| > 0.7): Relación muy clara<br/>
+                      • <strong>Fuerte</strong> (|r| {'>'} 0.7): Relación muy clara<br/>
                       • <strong>Moderada</strong> (|r| 0.5-0.7): Relación notable<br/>
-                      • <strong>Débil</strong> (|r| < 0.5): Poca relación
+                      • <strong>Débil</strong> (|r| {'<'} 0.5): Poca relación
                     </p>
                   </TooltipContent>
                 </Tooltip>
