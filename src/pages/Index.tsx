@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useManualRunData } from '@/hooks/useManualRunData';
 import { toast } from '@/hooks/use-toast';
@@ -13,6 +12,7 @@ import GitHubContributionTracker from '@/components/GitHubContributionTracker';
 import WeeklyPaceChart from '@/components/WeeklyPaceChart';
 import WeeklyDistanceChart from '@/components/WeeklyDistanceChart';
 import SectionNavigation from '@/components/SectionNavigation';
+import PaceDistanceCorrelation from '@/components/PaceDistanceCorrelation';
 import { 
   calculateRunsPerHour,
   calculateWeeklyPaceStats,
@@ -56,6 +56,7 @@ const Index = () => {
     { id: 'runs-per-hour', label: 'Distribución por Hora' },
     { id: 'personal-records', label: 'Récords Personales' },
     { id: 'activity-tracker', label: 'Actividad de Entrenamiento' },
+    { id: 'pace-distance-correlation', label: 'Correlación Pace vs Distancia' },
     { id: 'weekly-pace', label: 'Evolución del Pace' },
     { id: 'weekly-distance', label: 'Distancia Semanal' }
   ];
@@ -180,6 +181,17 @@ const Index = () => {
               runningData={activities}
               title="Actividad de Entrenamiento"
               description="Actividad de entrenamiento durante el año, similar al contribution tracker de GitHub"
+            />
+          </section>
+        )}
+
+        {/* Pace vs Distance Correlation */}
+        {!isLoading && activities.length > 0 && (
+          <section id="pace-distance-correlation" className="mb-10">
+            <PaceDistanceCorrelation 
+              runs={activities}
+              title="Correlación Pace vs Distancia"
+              description="Análisis de cómo tu pace cambia según la distancia de la carrera y predicción para 100km"
             />
           </section>
         )}

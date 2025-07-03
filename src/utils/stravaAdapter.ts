@@ -6,3 +6,9 @@ export { calculateRunsPerHour } from './runsPerHourCalculations';
 export { calculateWeeklyPaceStats } from './weeklyPaceCalculations';
 export { calculateWeeklyDistanceStats } from './weeklyDistanceCalculations';
 export { generateHeatmapData } from './heatmapCalculations';
+export { 
+  calculatePaceDistanceCorrelation, 
+  getDistanceRangeColor, 
+  getDistanceRangeLabel,
+  formatPaceForChart
+} from './paceDistanceAnalysis';
