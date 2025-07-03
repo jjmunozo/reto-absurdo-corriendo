@@ -95,6 +95,8 @@ const PaceDistanceCorrelation: React.FC<PaceDistanceCorrelationProps> = ({
                     name="Distancia"
                     unit="km"
                     domain={['dataMin - 1', 'dataMax + 2']}
+                    ticks={[0, 5, 10, 15, 20, 25, 30, 35]}
+                    tick={{ fontSize: 12 }}
                   />
                   <YAxis 
                     type="number" 
