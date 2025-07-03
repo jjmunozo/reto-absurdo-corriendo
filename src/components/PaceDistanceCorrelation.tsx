@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, ResponsiveContainer, ReferenceLine, Legend } from 'recharts';
+import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Line, LineChart, ComposedChart } from 'recharts';
 import { RunData } from '@/data/runningData';
 import { 
   calculatePaceDistanceCorrelation, 
@@ -35,11 +35,11 @@ const PaceDistanceCorrelation: React.FC<PaceDistanceCorrelationProps> = ({
     rangeLabel: getDistanceRangeLabel(run.distance)
   }));
 
-  // Datos para la línea de tendencia
-  const trendLineData = [
-    { distance: 3, pace: analysis.slope * 3 + analysis.intercept },
-    { distance: 42, pace: analysis.slope * 42 + analysis.intercept }
-  ];
+  // Datos para la línea de tendencia combinados con scatter data
+  const combinedData = chartData.map(point => ({
+    ...point,
+    trendPace: analysis.slope * point.distance + analysis.intercept
+  }));
 
   const chartConfig = {
     pace: {
@@ -54,7 +54,7 @@ const PaceDistanceCorrelation: React.FC<PaceDistanceCorrelationProps> = ({
     if (active && payload && payload.length > 0) {
       const data = payload[0].payload;
       return (
-        <div className="bg-white p-3 border rounded-lg shadow-lg z-50">
+        <div className="bg-white p-3 border rounded-lg shadow-lg">
           <p className="font-medium">{data.location}</p>
           <p className="text-sm text-gray-600">{data.date}</p>
           <p className="text-sm">
@@ -71,17 +71,23 @@ const PaceDistanceCorrelation: React.FC<PaceDistanceCorrelationProps> = ({
   };
 
   return (
-    <div className="space-y-6 relative">
-      <Card className="relative z-10">
+    <div className="space-y-6">
+      <Card>
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-gray-900">{title}</CardTitle>
           <CardDescription className="text-gray-600">{description}</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-96 w-full relative">
-            <ChartContainer config={chartConfig} className="relative z-0">
+          <div className="h-96 w-full overflow-hidden">
+            <ChartContainer 
+              config={chartConfig} 
+              className="w-full h-full [&_.recharts-wrapper]:!w-full [&_.recharts-wrapper]:!h-full"
+            >
               <ResponsiveContainer width="100%" height="100%">
-                <ScatterChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                <ComposedChart 
+                  data={combinedData} 
+                  margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis 
                     type="number" 
@@ -99,18 +105,20 @@ const PaceDistanceCorrelation: React.FC<PaceDistanceCorrelationProps> = ({
                     tickFormatter={formatPaceForChart}
                   />
                   <Scatter 
-                    name="Carreras" 
-                    data={chartData} 
+                    dataKey="pace"
                     fill="#8884d8"
                   />
-                  <ReferenceLine 
-                    segment={trendLineData.map(point => ({ x: point.distance, y: point.pace }))}
-                    stroke="#FF6B6B"
+                  <Line 
+                    type="monotone" 
+                    dataKey="trendPace" 
+                    stroke="#FF6B6B" 
                     strokeWidth={2}
                     strokeDasharray="5 5"
+                    dot={false}
+                    connectNulls={false}
                   />
                   <ChartTooltip content={<CustomTooltip />} />
-                </ScatterChart>
+                </ComposedChart>
               </ResponsiveContainer>
             </ChartContainer>
           </div>
