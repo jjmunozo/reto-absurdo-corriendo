@@ -54,7 +54,7 @@ const PaceDistanceCorrelation: React.FC<PaceDistanceCorrelationProps> = ({
     if (active && payload && payload.length > 0) {
       const data = payload[0].payload;
       return (
-        <div className="bg-white p-3 border rounded-lg shadow-lg">
+        <div className="bg-white p-3 border rounded-lg shadow-lg z-50">
           <p className="font-medium">{data.location}</p>
           <p className="text-sm text-gray-600">{data.date}</p>
           <p className="text-sm">
@@ -71,15 +71,15 @@ const PaceDistanceCorrelation: React.FC<PaceDistanceCorrelationProps> = ({
   };
 
   return (
-    <div className="space-y-6">
-      <Card>
+    <div className="space-y-6 relative">
+      <Card className="relative z-10">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-gray-900">{title}</CardTitle>
           <CardDescription className="text-gray-600">{description}</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="h-96 w-full">
-            <ChartContainer config={chartConfig}>
+          <div className="h-96 w-full relative">
+            <ChartContainer config={chartConfig} className="relative z-0">
               <ResponsiveContainer width="100%" height="100%">
                 <ScatterChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -118,7 +118,7 @@ const PaceDistanceCorrelation: React.FC<PaceDistanceCorrelationProps> = ({
       </Card>
 
       {/* Estadísticas de Correlación */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 relative z-10">
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-gray-600">Correlación (R)</CardTitle>
@@ -178,7 +178,7 @@ const PaceDistanceCorrelation: React.FC<PaceDistanceCorrelationProps> = ({
       </div>
 
       {/* Análisis por Rangos de Distancia */}
-      <Card>
+      <Card className="relative z-10">
         <CardHeader>
           <CardTitle className="text-lg font-semibold">Pace Promedio por Rango de Distancia</CardTitle>
           <CardDescription>Análisis detallado de tu rendimiento según la distancia</CardDescription>
@@ -201,7 +201,7 @@ const PaceDistanceCorrelation: React.FC<PaceDistanceCorrelationProps> = ({
       </Card>
 
       {/* Información Adicional */}
-      <Card>
+      <Card className="relative z-10">
         <CardHeader>
           <CardTitle className="text-lg font-semibold">Análisis de Tendencia</CardTitle>
         </CardHeader>
