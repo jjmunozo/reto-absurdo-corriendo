@@ -86,7 +86,7 @@ const PaceDistanceCorrelation: React.FC<PaceDistanceCorrelationProps> = ({
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart 
                   data={combinedData} 
-                  margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
+                  margin={{ top: 10, right: 10, left: 60, bottom: 10 }}
                 >
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis 
@@ -103,6 +103,9 @@ const PaceDistanceCorrelation: React.FC<PaceDistanceCorrelationProps> = ({
                     unit="min/km"
                     domain={['dataMin - 0.1', 'dataMax + 0.1']}
                     tickFormatter={formatPaceForChart}
+                    width={50}
+                    tick={{ fontSize: 12 }}
+                    interval={0}
                   />
                   <Scatter 
                     dataKey="pace"
