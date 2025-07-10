@@ -76,12 +76,54 @@ export const useManualRunData = () => {
     loadActivities();
   }, []);
 
+  const updateManualRun = async (id: string | number, updates: Partial<ManualRun>) => {
+    try {
+      console.log('📝 Actualizando carrera:', { id, updates });
+
+      const { error } = await supabase
+        .from('manual_runs')
+        .update(updates)
+        .eq('id', id.toString());
+
+      if (error) {
+        throw error;
+      }
+
+      console.log('✅ Carrera actualizada exitosamente');
+    } catch (err: any) {
+      console.error('Error updating manual run:', err);
+      throw err;
+    }
+  };
+
+  const deleteManualRun = async (id: string | number) => {
+    try {
+      console.log('🗑️ Eliminando carrera:', { id });
+
+      const { error } = await supabase
+        .from('manual_runs')
+        .delete()
+        .eq('id', id.toString());
+
+      if (error) {
+        throw error;
+      }
+
+      console.log('✅ Carrera eliminada exitosamente');
+    } catch (err: any) {
+      console.error('Error deleting manual run:', err);
+      throw err;
+    }
+  };
+
   return {
     activities,
     isLoading,
     isSyncing: false,
     lastSync,
     error,
-    syncActivities: loadActivities
+    syncActivities: loadActivities,
+    updateManualRun,
+    deleteManualRun
   };
 };

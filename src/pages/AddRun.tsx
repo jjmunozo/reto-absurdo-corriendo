@@ -9,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Lock, Plus } from 'lucide-react';
+import { ArrowLeft, Lock, Plus, Settings } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -255,6 +255,14 @@ const AddRun = () => {
               <p className="opacity-90">Registra los datos de tu última carrera</p>
             </div>
             <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => navigate('/manage-runs', { state: { fromAddRun: true } })}
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                Gestionar Carreras
+              </Button>
               <Button variant="secondary" size="sm" onClick={handleLogout}>
                 Cerrar Sesión
               </Button>
