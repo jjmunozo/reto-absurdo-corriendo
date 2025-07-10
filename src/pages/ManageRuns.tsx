@@ -163,7 +163,7 @@ const ManageRuns = () => {
       
       const localDateTimeString = `${data.date}T${data.time}:00`;
 
-      await updateManualRun(editingRun.id, {
+      await updateManualRun(editingRun.originalId || editingRun.id, {
         title: data.title,
         start_time: localDateTimeString,
         duration_hours: durationHours,
@@ -319,7 +319,7 @@ const ManageRuns = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => setDeleteRunId(run.id.toString())}
+                            onClick={() => setDeleteRunId(run.originalId || run.id.toString())}
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>

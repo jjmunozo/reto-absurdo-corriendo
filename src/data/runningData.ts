@@ -1,5 +1,6 @@
 export interface RunData {
   id: number;
+  originalId?: string; // UUID original para carreras manuales
   date: string;
   distance: number; // in kilometers
   duration: number; // in minutes

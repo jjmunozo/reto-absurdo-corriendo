@@ -47,6 +47,7 @@ export const useManualRunData = () => {
         
         return {
           id: parseInt(run.id.replace(/-/g, '').substring(0, 10), 16), // Convertir UUID a número
+          originalId: run.id, // Mantener el UUID original
           date: dateOnly, // Solo la fecha YYYY-MM-DD extraída directamente
           distance: run.distance_km, // Ya está en km
           duration: Math.round(totalMinutes), // Convertir a entero para compatibilidad
@@ -83,7 +84,7 @@ export const useManualRunData = () => {
       const { error } = await supabase
         .from('manual_runs')
         .update(updates)
-        .eq('id', id.toString());
+        .eq('id', typeof id === 'string' ? id : id.toString());
 
       if (error) {
         throw error;
@@ -103,7 +104,7 @@ export const useManualRunData = () => {
       const { error } = await supabase
         .from('manual_runs')
         .delete()
-        .eq('id', id.toString());
+        .eq('id', typeof id === 'string' ? id : id.toString());
 
       if (error) {
         throw error;
