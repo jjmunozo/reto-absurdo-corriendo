@@ -179,6 +179,11 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Training Title */}
+      <section className="container mx-auto px-4 py-6">
+        <h2 className="text-3xl font-bold text-center text-gray-800">Mi entrenamiento</h2>
+      </section>
+
       {/* Section Navigation */}
       <SectionNavigation sections={navigationSections} />
 
