@@ -155,12 +155,17 @@ export default function Apoyo() {
                 {registrations.map((registration) => (
                   <div 
                     key={registration.id}
-                    className="p-6 border border-brand-coral/20 rounded-lg hover:bg-brand-coral/5 transition-colors"
+                    className="relative p-6 border border-brand-coral/20 rounded-lg hover:bg-brand-coral/5 transition-colors"
                   >
-                    <p className="font-semibold text-lg text-brand-gray-purple mb-3">
+                    {/* Emoji en esquina superior derecha */}
+                    <div className="absolute top-4 right-4 text-2xl">
+                      {registration.participation_type === 'run' ? '🏃‍♂️' : '❤️'}
+                    </div>
+                    
+                    <p className="font-semibold text-lg text-brand-gray-purple mb-3 pr-12">
                       {formatRegistrationText(registration)}
                     </p>
-                    <p className="text-brand-gray-purple/80 italic text-lg">
+                    <p className="text-brand-gray-purple/80 italic text-lg pr-12">
                       "{registration.motivation_message}"
                     </p>
                   </div>
