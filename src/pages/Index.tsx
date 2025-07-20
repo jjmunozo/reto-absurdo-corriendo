@@ -1,8 +1,11 @@
 import React from 'react';
 import { useManualRunData } from '@/hooks/useManualRunData';
+import { useSupportRegistrations } from '@/hooks/useSupportRegistrations';
 import { toast } from '@/hooks/use-toast';
 import { ChevronDown } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 import HeroSection from '@/components/HeroSection';
 import StatsSummary from '@/components/StatsSummary';
 import RecentRuns from '@/components/RecentRuns';
@@ -20,6 +23,7 @@ import {
 } from '@/utils/stravaAdapter';
 
 const Index = () => {
+  const navigate = useNavigate();
   const { 
     activities, 
     isLoading, 
@@ -27,6 +31,8 @@ const Index = () => {
     error,
     syncActivities 
   } = useManualRunData();
+
+  const { registrations, loading: loadingRegistrations } = useSupportRegistrations();
 
   const handleRefresh = async () => {
     try {
@@ -140,6 +146,35 @@ const Index = () => {
             <p>
               ¡Pero también se pueden apuntar a correr algunos tramos conmigo!
             </p>
+
+            {/* Registration stats */}
+            <div className="space-y-3 pt-4 border-t border-gray-200">
+              <p>
+                <strong>Se han apuntado:</strong> {loadingRegistrations ? '...' : registrations.length} personas
+              </p>
+              
+              {!loadingRegistrations && registrations.length > 0 && (
+                <p>
+                  <strong>Los últimos apoyadores épicos:</strong>{' '}
+                  <em>
+                    {registrations
+                      .slice(-5)
+                      .reverse()
+                      .map(reg => reg.full_name)
+                      .join(', ')}
+                  </em>
+                </p>
+              )}
+              
+              <div className="pt-2">
+                <Button 
+                  onClick={() => navigate('/apoyo')}
+                  className="bg-brand-coral hover:bg-brand-red text-white"
+                >
+                  ¡Ir a apuntarme para apoyar!
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
