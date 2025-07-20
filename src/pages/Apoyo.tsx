@@ -341,7 +341,7 @@ export default function Apoyo() {
                     </FormItem>} />
 
                 <Button type="submit" disabled={submitting} className="w-full text-xl py-8 bg-brand-coral hover:bg-brand-red text-white font-bold rounded-lg transition-colors">
-                  {submitting ? 'Registrando...' : '¡Registrarme para el Reto!'}
+                  {submitting ? 'Registrando...' : 'Apuntarme para apoyar a Juan'}
                 </Button>
               </form>
             </Form>
