@@ -113,6 +113,20 @@ export default function Apoyo() {
           <h1 className="text-5xl font-bold text-brand-gray-purple mb-6">
             ¡Apóyenme en el Reto Más Absurdo Que Me He Puesto En La Vida!
           </h1>
+
+          {/* Botones para scroll */}
+          <div className="mb-8">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button onClick={scrollToForm} className="bg-brand-coral hover:bg-brand-red text-white text-xl py-6 px-8 rounded-lg font-bold transition-colors flex items-center gap-3">
+                <MousePointer className="w-6 h-6" />
+                Apuntarme a apoyar a Juan
+              </Button>
+              <Button onClick={scrollToList} variant="outline" className="border-brand-coral text-brand-coral hover:bg-brand-coral hover:text-white text-xl py-6 px-8 rounded-lg font-bold transition-colors flex items-center gap-3">
+                <Users className="w-6 h-6" />
+                Ver lista de apoyo
+              </Button>
+            </div>
+          </div>
           <div className="text-lg text-brand-gray-purple leading-relaxed max-w-4xl mx-auto space-y-4">
             <p>
               El 6 de diciembre 2025 voy a hacer un reto que me da miedo — un <strong className="text-brand-coral">misogi</strong>: correr 100km en un tiempo de 24hrs.
@@ -147,19 +161,6 @@ export default function Apoyo() {
           </div>
         </div>
 
-        {/* Botones para scroll */}
-        <div className="text-center mb-8">
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button onClick={scrollToForm} className="bg-brand-coral hover:bg-brand-red text-white text-xl py-6 px-8 rounded-lg font-bold transition-colors flex items-center gap-3">
-              <MousePointer className="w-6 h-6" />
-              Apuntarme a apoyar a Juan
-            </Button>
-            <Button onClick={scrollToList} variant="outline" className="border-brand-coral text-brand-coral hover:bg-brand-coral hover:text-white text-xl py-6 px-8 rounded-lg font-bold transition-colors flex items-center gap-3">
-              <Users className="w-6 h-6" />
-              Ver lista de apoyo
-            </Button>
-          </div>
-        </div>
 
         {/* Lista de personas registradas */}
         <Card id="registration-list" className="border-brand-coral/20 shadow-lg mb-12">
