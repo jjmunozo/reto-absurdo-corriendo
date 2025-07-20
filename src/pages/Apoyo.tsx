@@ -112,7 +112,7 @@ export default function Apoyo() {
         {/* Hero Section */}
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold text-brand-gray-purple mb-6">
-            🏃‍♂️ Únete al Reto 🏃‍♂️
+            ¡Apóyenme en el Reto Más Absurdo Que Me He Puesto En La Vida!
           </h1>
           <p className="text-xl text-brand-gray-purple leading-relaxed max-w-2xl mx-auto">
             ¿Quieres acompañarme en mi <strong className="text-brand-coral">misogi</strong> de 100km en 24 horas? 
