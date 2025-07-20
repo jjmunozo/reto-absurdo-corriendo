@@ -11,7 +11,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useSupportRegistrations, type NewRegistration } from '@/hooks/useSupportRegistrations';
 import { Separator } from '@/components/ui/separator';
-import { Heart, Users, Trophy } from 'lucide-react';
+import { Heart, Users, Trophy, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const formSchema = z.object({
   full_name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
@@ -83,36 +84,52 @@ export default function Apoyo() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/5">
+    <div className="min-h-screen bg-brand-cream">
+      {/* Header con navegación */}
+      <div className="bg-white border-b border-brand-coral/10">
+        <div className="container mx-auto px-4 py-4">
+          <Link 
+            to="/" 
+            className="inline-flex items-center gap-2 text-brand-coral hover:text-brand-red transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Volver al reto</span>
+          </Link>
+        </div>
+      </div>
+
       <div className="container mx-auto px-4 py-8 max-w-4xl">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-4">
-            🏃‍♂️ Únete al Reto de Juan 🏃‍♂️
+        {/* Hero Section */}
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-bold text-brand-gray-purple mb-6">
+            🏃‍♂️ Únete al Reto 🏃‍♂️
           </h1>
-          <p className="text-lg text-muted-foreground">
-            ¿Quieres acompañarme en este increíble desafío? ¡Regístrate aquí!
+          <p className="text-xl text-brand-gray-purple leading-relaxed max-w-2xl mx-auto">
+            ¿Quieres acompañarme en mi <strong className="text-brand-coral">misogi</strong> de 100km en 24 horas? 
+            ¡Regístrate aquí para correr conmigo o darme apoyo moral!
           </p>
         </div>
 
         {/* Formulario de registro */}
-        <Card className="mb-12">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-xl">
-              <Heart className="w-5 h-5 text-primary" />
+        <Card className="mb-12 border-brand-coral/20 shadow-lg">
+          <CardHeader className="bg-brand-coral text-white rounded-t-lg">
+            <CardTitle className="flex items-center gap-2 text-2xl">
+              <Heart className="w-6 h-6" />
               Formulario de Registro
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-8 bg-white">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
                 {/* Tipo de participación */}
                 <FormField
                   control={form.control}
                   name="participation_type"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-base font-semibold">¿Cómo quieres participar?</FormLabel>
+                      <FormLabel className="text-lg font-semibold text-brand-gray-purple">
+                        ¿Cómo quieres participar?
+                      </FormLabel>
                       <FormControl>
                         <RadioGroup
                           onValueChange={(value) => {
@@ -120,20 +137,20 @@ export default function Apoyo() {
                             setParticipationType(value as 'run' | 'moral_support');
                           }}
                           value={field.value}
-                          className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                          className="grid grid-cols-1 md:grid-cols-2 gap-6"
                         >
-                          <div className="flex items-center space-x-2 p-4 border rounded-lg hover:bg-muted/50">
-                            <RadioGroupItem value="run" id="run" />
-                            <label htmlFor="run" className="font-medium cursor-pointer flex items-center gap-2">
-                              <Trophy className="w-4 h-4" />
-                              Quiero correr con Juan
+                          <div className="flex items-center space-x-3 p-6 border-2 border-brand-coral/20 rounded-lg hover:border-brand-coral/40 hover:bg-brand-coral/5 transition-all cursor-pointer">
+                            <RadioGroupItem value="run" id="run" className="border-brand-coral" />
+                            <label htmlFor="run" className="font-medium cursor-pointer flex items-center gap-3 text-brand-gray-purple">
+                              <Trophy className="w-5 h-5 text-brand-coral" />
+                              <span className="text-lg">Quiero correr con Juan</span>
                             </label>
                           </div>
-                          <div className="flex items-center space-x-2 p-4 border rounded-lg hover:bg-muted/50">
-                            <RadioGroupItem value="moral_support" id="moral_support" />
-                            <label htmlFor="moral_support" className="font-medium cursor-pointer flex items-center gap-2">
-                              <Heart className="w-4 h-4" />
-                              Quiero dar apoyo moral
+                          <div className="flex items-center space-x-3 p-6 border-2 border-brand-coral/20 rounded-lg hover:border-brand-coral/40 hover:bg-brand-coral/5 transition-all cursor-pointer">
+                            <RadioGroupItem value="moral_support" id="moral_support" className="border-brand-coral" />
+                            <label htmlFor="moral_support" className="font-medium cursor-pointer flex items-center gap-3 text-brand-gray-purple">
+                              <Heart className="w-5 h-5 text-brand-coral" />
+                              <span className="text-lg">Quiero dar apoyo moral</span>
                             </label>
                           </div>
                         </RadioGroup>
@@ -150,17 +167,19 @@ export default function Apoyo() {
                     name="laps_count"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>¿Cuántas vueltas quieres correr?</FormLabel>
+                        <FormLabel className="text-lg font-medium text-brand-gray-purple">
+                          ¿Cuántas vueltas quieres correr?
+                        </FormLabel>
                         <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
-                            <SelectTrigger>
+                            <SelectTrigger className="text-lg p-6 border-brand-coral/30">
                               <SelectValue placeholder="Selecciona el número de vueltas" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="unknown">No sé / Ya veré</SelectItem>
+                            <SelectItem value="unknown" className="text-lg">No sé / Ya veré</SelectItem>
                             {Array.from({ length: 24 }, (_, i) => i + 1).map((num) => (
-                              <SelectItem key={num} value={num.toString()}>
+                              <SelectItem key={num} value={num.toString()} className="text-lg">
                                 {num} {num === 1 ? 'vuelta' : 'vueltas'}
                               </SelectItem>
                             ))}
@@ -178,9 +197,15 @@ export default function Apoyo() {
                   name="full_name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Nombre completo</FormLabel>
+                      <FormLabel className="text-lg font-medium text-brand-gray-purple">
+                        Nombre completo
+                      </FormLabel>
                       <FormControl>
-                        <Input placeholder="Tu nombre completo" {...field} />
+                        <Input 
+                          placeholder="Tu nombre completo" 
+                          {...field} 
+                          className="text-lg p-6 border-brand-coral/30"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -193,11 +218,18 @@ export default function Apoyo() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email</FormLabel>
+                      <FormLabel className="text-lg font-medium text-brand-gray-purple">
+                        Email
+                      </FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="tu@email.com" {...field} />
+                        <Input 
+                          type="email" 
+                          placeholder="tu@email.com" 
+                          {...field} 
+                          className="text-lg p-6 border-brand-coral/30"
+                        />
                       </FormControl>
-                      <FormDescription>
+                      <FormDescription className="text-brand-gray-purple/70">
                         Solo para mantenerte informado sobre la logística antes del evento
                       </FormDescription>
                       <FormMessage />
@@ -211,11 +243,17 @@ export default function Apoyo() {
                   name="whatsapp"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>WhatsApp</FormLabel>
+                      <FormLabel className="text-lg font-medium text-brand-gray-purple">
+                        WhatsApp
+                      </FormLabel>
                       <FormControl>
-                        <Input placeholder="+506 1234 5678" {...field} />
+                        <Input 
+                          placeholder="+506 1234 5678" 
+                          {...field} 
+                          className="text-lg p-6 border-brand-coral/30"
+                        />
                       </FormControl>
-                      <FormDescription>
+                      <FormDescription className="text-brand-gray-purple/70">
                         Solo para mantenerte informado sobre la logística antes del evento
                       </FormDescription>
                       <FormMessage />
@@ -229,12 +267,15 @@ export default function Apoyo() {
                   name="motivation_message"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Mensaje de motivación para Juan</FormLabel>
+                      <FormLabel className="text-lg font-medium text-brand-gray-purple">
+                        Mensaje de motivación para Juan
+                      </FormLabel>
                       <FormControl>
                         <Textarea 
                           placeholder="Escribe un mensaje motivacional para Juan durante lo que falta de su entrenamiento..."
-                          rows={4}
+                          rows={5}
                           {...field} 
+                          className="text-lg p-6 border-brand-coral/30"
                         />
                       </FormControl>
                       <FormMessage />
@@ -245,45 +286,47 @@ export default function Apoyo() {
                 <Button 
                   type="submit" 
                   disabled={submitting}
-                  className="w-full text-lg py-6"
+                  className="w-full text-xl py-8 bg-brand-coral hover:bg-brand-red text-white font-bold rounded-lg transition-colors"
                 >
-                  {submitting ? 'Registrando...' : '¡Registrarme!'}
+                  {submitting ? 'Registrando...' : '¡Registrarme para el Reto!'}
                 </Button>
               </form>
             </Form>
           </CardContent>
         </Card>
 
-        <Separator className="my-8" />
+        <Separator className="my-12 bg-brand-coral/20" />
 
         {/* Lista de personas registradas */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-xl">
-              <Users className="w-5 h-5 text-primary" />
+        <Card className="border-brand-coral/20 shadow-lg">
+          <CardHeader className="bg-brand-coral text-white rounded-t-lg">
+            <CardTitle className="flex items-center gap-2 text-2xl">
+              <Users className="w-6 h-6" />
               Personas que se han apuntado ({registrations.length})
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-8 bg-white">
             {loading ? (
-              <div className="text-center py-8">
-                <p className="text-muted-foreground">Cargando registros...</p>
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-coral mx-auto mb-4"></div>
+                <p className="text-brand-gray-purple">Cargando registros...</p>
               </div>
             ) : registrations.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-muted-foreground">Aún no hay registros</p>
+              <div className="text-center py-12">
+                <p className="text-brand-gray-purple text-lg">Aún no hay registros</p>
+                <p className="text-brand-gray-purple/70 mt-2">¡Sé el primero en apuntarte!</p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {registrations.map((registration) => (
                   <div 
                     key={registration.id}
-                    className="p-4 border rounded-lg hover:bg-muted/30 transition-colors"
+                    className="p-6 border border-brand-coral/20 rounded-lg hover:bg-brand-coral/5 transition-colors"
                   >
-                    <p className="font-medium text-foreground">
+                    <p className="font-semibold text-lg text-brand-gray-purple mb-3">
                       {formatRegistrationText(registration)}
                     </p>
-                    <p className="text-muted-foreground italic mt-2">
+                    <p className="text-brand-gray-purple/80 italic text-lg">
                       "{registration.motivation_message}"
                     </p>
                   </div>
@@ -293,6 +336,13 @@ export default function Apoyo() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Footer */}
+      <footer className="bg-white py-6 px-4 mt-12 border-t border-brand-coral/10">
+        <div className="container mx-auto text-center text-brand-gray-purple">
+          <p className="text-sm">&copy; 2025 El reto más absurdo | ¡Únete al misogi!</p>
+        </div>
+      </footer>
     </div>
   );
 }
