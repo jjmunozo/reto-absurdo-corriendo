@@ -11,7 +11,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useSupportRegistrations, type NewRegistration } from '@/hooks/useSupportRegistrations';
 import { Separator } from '@/components/ui/separator';
-import { Heart, Users, Trophy, ArrowLeft, MousePointer } from 'lucide-react';
+import { Heart, Users, Trophy, ArrowLeft, MousePointer, Footprints } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const formSchema = z.object({
@@ -202,7 +202,7 @@ export default function Apoyo() {
                           <div className="flex items-center space-x-3 p-6 border-2 border-brand-coral/20 rounded-lg hover:border-brand-coral/40 hover:bg-brand-coral/5 transition-all cursor-pointer">
                             <RadioGroupItem value="run" id="run" className="border-brand-coral" />
                             <label htmlFor="run" className="font-medium cursor-pointer flex items-center gap-3 text-brand-gray-purple">
-                              <Trophy className="w-5 h-5 text-brand-coral" />
+                              <Footprints className="w-5 h-5 text-brand-coral" />
                               <span className="text-lg">Quiero correr con Juan</span>
                             </label>
                           </div>
