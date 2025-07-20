@@ -195,6 +195,24 @@ export default function Apoyo() {
           </CardContent>
         </Card>
 
+        {/* Links de texto para navegación */}
+        <div className="text-center mb-8">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
+            <button 
+              onClick={scrollToForm} 
+              className="text-brand-coral hover:text-brand-red text-lg font-medium underline transition-colors"
+            >
+              Ir a apuntarme para apoyar a Juan
+            </button>
+            <button 
+              onClick={scrollToList} 
+              className="text-brand-coral hover:text-brand-red text-lg font-medium underline transition-colors"
+            >
+              Ver la lista de apoyo
+            </button>
+          </div>
+        </div>
+
         {/* Formulario de registro */}
         <Card id="registration-form" className="border-brand-coral/20 shadow-lg">
           <CardHeader className="bg-brand-coral text-white rounded-t-lg">
