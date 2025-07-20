@@ -11,7 +11,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useSupportRegistrations, type NewRegistration } from '@/hooks/useSupportRegistrations';
 import { Separator } from '@/components/ui/separator';
-import { Heart, Users, Trophy, ArrowLeft } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Heart, Users, Trophy, ArrowLeft, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const formSchema = z.object({
@@ -110,190 +111,192 @@ export default function Apoyo() {
           </p>
         </div>
 
-        {/* Formulario de registro */}
-        <Card className="mb-12 border-brand-coral/20 shadow-lg">
-          <CardHeader className="bg-brand-coral text-white rounded-t-lg">
-            <CardTitle className="flex items-center gap-2 text-2xl">
-              <Heart className="w-6 h-6" />
-              Formulario de Registro
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-8 bg-white">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                {/* Tipo de participación */}
-                <FormField
-                  control={form.control}
-                  name="participation_type"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-lg font-semibold text-brand-gray-purple">
-                        ¿Cómo quieres participar?
-                      </FormLabel>
-                      <FormControl>
-                        <RadioGroup
-                          onValueChange={(value) => {
-                            field.onChange(value);
-                            setParticipationType(value as 'run' | 'moral_support');
-                          }}
-                          value={field.value}
-                          className="grid grid-cols-1 md:grid-cols-2 gap-6"
-                        >
-                          <div className="flex items-center space-x-3 p-6 border-2 border-brand-coral/20 rounded-lg hover:border-brand-coral/40 hover:bg-brand-coral/5 transition-all cursor-pointer">
-                            <RadioGroupItem value="run" id="run" className="border-brand-coral" />
-                            <label htmlFor="run" className="font-medium cursor-pointer flex items-center gap-3 text-brand-gray-purple">
-                              <Trophy className="w-5 h-5 text-brand-coral" />
-                              <span className="text-lg">Quiero correr con Juan</span>
-                            </label>
-                          </div>
-                          <div className="flex items-center space-x-3 p-6 border-2 border-brand-coral/20 rounded-lg hover:border-brand-coral/40 hover:bg-brand-coral/5 transition-all cursor-pointer">
-                            <RadioGroupItem value="moral_support" id="moral_support" className="border-brand-coral" />
-                            <label htmlFor="moral_support" className="font-medium cursor-pointer flex items-center gap-3 text-brand-gray-purple">
-                              <Heart className="w-5 h-5 text-brand-coral" />
-                              <span className="text-lg">Quiero dar apoyo moral</span>
-                            </label>
-                          </div>
-                        </RadioGroup>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* Campo condicional para vueltas */}
-                {participationType === 'run' && (
+        {/* Botón colapsable para el formulario */}
+        <section className="container mx-auto px-4 py-3 mb-8">
+          <Collapsible>
+            <CollapsibleTrigger className="w-full bg-brand-coral hover:bg-brand-red text-white rounded-lg p-4 transition-colors group">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-left">🏃‍♂️ Apuntarme a apoyar a Juan</h2>
+                <ChevronDown className="h-5 w-5 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+              </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="bg-white border-x-2 border-b-2 border-brand-coral/20 rounded-b-lg p-8">
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+                  {/* Tipo de participación */}
                   <FormField
                     control={form.control}
-                    name="laps_count"
+                    name="participation_type"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-lg font-medium text-brand-gray-purple">
-                          ¿Cuántas vueltas quieres correr?
+                        <FormLabel className="text-lg font-semibold text-brand-gray-purple">
+                          ¿Cómo quieres participar?
                         </FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger className="text-lg p-6 border-brand-coral/30">
-                              <SelectValue placeholder="Selecciona el número de vueltas" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="unknown" className="text-lg">No sé / Ya veré</SelectItem>
-                            {Array.from({ length: 24 }, (_, i) => i + 1).map((num) => (
-                              <SelectItem key={num} value={num.toString()} className="text-lg">
-                                {num} {num === 1 ? 'vuelta' : 'vueltas'}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <FormControl>
+                          <RadioGroup
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              setParticipationType(value as 'run' | 'moral_support');
+                            }}
+                            value={field.value}
+                            className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                          >
+                            <div className="flex items-center space-x-3 p-6 border-2 border-brand-coral/20 rounded-lg hover:border-brand-coral/40 hover:bg-brand-coral/5 transition-all cursor-pointer">
+                              <RadioGroupItem value="run" id="run" className="border-brand-coral" />
+                              <label htmlFor="run" className="font-medium cursor-pointer flex items-center gap-3 text-brand-gray-purple">
+                                <Trophy className="w-5 h-5 text-brand-coral" />
+                                <span className="text-lg">Quiero correr con Juan</span>
+                              </label>
+                            </div>
+                            <div className="flex items-center space-x-3 p-6 border-2 border-brand-coral/20 rounded-lg hover:border-brand-coral/40 hover:bg-brand-coral/5 transition-all cursor-pointer">
+                              <RadioGroupItem value="moral_support" id="moral_support" className="border-brand-coral" />
+                              <label htmlFor="moral_support" className="font-medium cursor-pointer flex items-center gap-3 text-brand-gray-purple">
+                                <Heart className="w-5 h-5 text-brand-coral" />
+                                <span className="text-lg">Quiero dar apoyo moral</span>
+                              </label>
+                            </div>
+                          </RadioGroup>
+                        </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                )}
 
-                {/* Nombre completo */}
-                <FormField
-                  control={form.control}
-                  name="full_name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-lg font-medium text-brand-gray-purple">
-                        Nombre completo
-                      </FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="Tu nombre completo" 
-                          {...field} 
-                          className="text-lg p-6 border-brand-coral/30"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
+                  {/* Campo condicional para vueltas */}
+                  {participationType === 'run' && (
+                    <FormField
+                      control={form.control}
+                      name="laps_count"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="text-lg font-medium text-brand-gray-purple">
+                            ¿Cuántas vueltas quieres correr?
+                          </FormLabel>
+                          <Select onValueChange={field.onChange} value={field.value}>
+                            <FormControl>
+                              <SelectTrigger className="text-lg p-6 border-brand-coral/30">
+                                <SelectValue placeholder="Selecciona el número de vueltas" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="unknown" className="text-lg">No sé / Ya veré</SelectItem>
+                              {Array.from({ length: 24 }, (_, i) => i + 1).map((num) => (
+                                <SelectItem key={num} value={num.toString()} className="text-lg">
+                                  {num} {num === 1 ? 'vuelta' : 'vueltas'}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   )}
-                />
 
-                {/* Email */}
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-lg font-medium text-brand-gray-purple">
-                        Email
-                      </FormLabel>
-                      <FormControl>
-                        <Input 
-                          type="email" 
-                          placeholder="tu@email.com" 
-                          {...field} 
-                          className="text-lg p-6 border-brand-coral/30"
-                        />
-                      </FormControl>
-                      <FormDescription className="text-brand-gray-purple/70">
-                        Solo para mantenerte informado sobre la logística antes del evento
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  {/* Nombre completo */}
+                  <FormField
+                    control={form.control}
+                    name="full_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-lg font-medium text-brand-gray-purple">
+                          Nombre completo
+                        </FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="Tu nombre completo" 
+                            {...field} 
+                            className="text-lg p-6 border-brand-coral/30"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                {/* WhatsApp */}
-                <FormField
-                  control={form.control}
-                  name="whatsapp"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-lg font-medium text-brand-gray-purple">
-                        WhatsApp
-                      </FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="+506 1234 5678" 
-                          {...field} 
-                          className="text-lg p-6 border-brand-coral/30"
-                        />
-                      </FormControl>
-                      <FormDescription className="text-brand-gray-purple/70">
-                        Solo para mantenerte informado sobre la logística antes del evento
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  {/* Email */}
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-lg font-medium text-brand-gray-purple">
+                          Email
+                        </FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="email" 
+                            placeholder="tu@email.com" 
+                            {...field} 
+                            className="text-lg p-6 border-brand-coral/30"
+                          />
+                        </FormControl>
+                        <FormDescription className="text-brand-gray-purple/70">
+                          Solo para mantenerte informado sobre la logística antes del evento
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                {/* Mensaje de motivación */}
-                <FormField
-                  control={form.control}
-                  name="motivation_message"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-lg font-medium text-brand-gray-purple">
-                        Mensaje de motivación para Juan
-                      </FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Escribe un mensaje motivacional para Juan durante lo que falta de su entrenamiento..."
-                          rows={5}
-                          {...field} 
-                          className="text-lg p-6 border-brand-coral/30"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                  {/* WhatsApp */}
+                  <FormField
+                    control={form.control}
+                    name="whatsapp"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-lg font-medium text-brand-gray-purple">
+                          WhatsApp
+                        </FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="+506 1234 5678" 
+                            {...field} 
+                            className="text-lg p-6 border-brand-coral/30"
+                          />
+                        </FormControl>
+                        <FormDescription className="text-brand-gray-purple/70">
+                          Solo para mantenerte informado sobre la logística antes del evento
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                <Button 
-                  type="submit" 
-                  disabled={submitting}
-                  className="w-full text-xl py-8 bg-brand-coral hover:bg-brand-red text-white font-bold rounded-lg transition-colors"
-                >
-                  {submitting ? 'Registrando...' : '¡Registrarme para el Reto!'}
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
+                  {/* Mensaje de motivación */}
+                  <FormField
+                    control={form.control}
+                    name="motivation_message"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-lg font-medium text-brand-gray-purple">
+                          Mensaje de motivación para Juan
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Escribe un mensaje motivacional para Juan durante lo que falta de su entrenamiento..."
+                            rows={5}
+                            {...field} 
+                            className="text-lg p-6 border-brand-coral/30"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button 
+                    type="submit" 
+                    disabled={submitting}
+                    className="w-full text-xl py-8 bg-brand-coral hover:bg-brand-red text-white font-bold rounded-lg transition-colors"
+                  >
+                    {submitting ? 'Registrando...' : '¡Registrarme para el Reto!'}
+                  </Button>
+                </form>
+              </Form>
+            </CollapsibleContent>
+          </Collapsible>
+        </section>
 
         <Separator className="my-12 bg-brand-coral/20" />
 
