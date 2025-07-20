@@ -89,6 +89,19 @@ const Index = () => {
               </p>
               
               <p>
+                No voy a correr 24hrs continuas, voy a hacerlo en estilo "Back Yard Ultra" o "Last Man Standing", pero solo yo.
+              </p>
+              
+              <div className="space-y-2 text-sm">
+                <p>🏃‍♂️ Voy a correr una vuelta de 4.5 - 5km cada hora por 24 horas.</p>
+                <p>🕐 Tengo máximo 1 hora para terminar cada vuelta.</p>
+                <p>🔁 Cada hora empieza otra vuelta.</p>
+                <p>💆‍♂️ Si termino antes de que se cumpla la hora, puedo descansar hasta que empiece la próxima vuelta.</p>
+                <p>🚫 Si no termino la vuelta dentro de 1 hora o no empiezo la vuelta a tiempo, termina mi reto.</p>
+                <p>🧍‍♂️ La meta es terminar 24hrs.</p>
+              </div>
+              
+              <p>
                 Este es el resumen de mi entrenamiento que comencé el 7 de enero.
               </p>
               
