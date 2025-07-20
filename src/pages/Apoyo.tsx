@@ -114,10 +114,40 @@ export default function Apoyo() {
           <h1 className="text-5xl font-bold text-brand-gray-purple mb-6">
             ¡Apóyenme en el Reto Más Absurdo Que Me He Puesto En La Vida!
           </h1>
-          <p className="text-xl text-brand-gray-purple leading-relaxed max-w-2xl mx-auto">
-            ¿Quieres acompañarme en mi <strong className="text-brand-coral">misogi</strong> de 100km en 24 horas? 
-            ¡Regístrate aquí para correr conmigo o darme apoyo moral!
-          </p>
+          <div className="text-lg text-brand-gray-purple leading-relaxed max-w-4xl mx-auto space-y-4">
+            <p>
+              El 6 de diciembre 2025 voy a hacer un reto que me da miedo — un <strong className="text-brand-coral">misogi</strong>: correr 100km en un tiempo de 24hrs.
+            </p>
+            
+            <p>
+              No voy a correr 24hrs continuas, voy a hacerlo en estilo "Back Yard Ultra" o "Last Man Standing", pero solo yo.
+            </p>
+
+            <div className="bg-white/50 p-6 rounded-lg border border-brand-coral/20 space-y-2">
+              <p>🏃‍♂️ Voy a correr una vuelta de 4.5 - 5km cada hora por 24 horas.</p>
+              <p>🕐 Tengo máximo 1 hora para terminar cada vuelta.</p>
+              <p>🔁 Cada hora empieza otra vuelta.</p>
+              <p>💆‍♂️ Si termino antes de que se cumpla la hora, puedo descansar hasta que empiece la próxima vuelta.</p>
+              <p>🚫 Si no termino la vuelta dentro de 1 hora o no empiezo la vuelta a tiempo, termina mi reto.</p>
+              <p>🧍‍♂️ La meta es terminar 24hrs.</p>
+            </div>
+
+            <p>
+              La verdad me encantaría tener <strong className="text-brand-coral">apoyo moral humano</strong>. No es una carrera, entonces no va a haber público y quiero crear una atmósfera chiva de hacer cosas difíciles.
+            </p>
+
+            <p>
+              Va a ser en <strong className="text-brand-coral">Santa Ana</strong>. Pueden llegar a ver y aplaudir en cualquier punto de las 24hrs — hasta pueden llegar a tomarse una birra tardeada (o a media noche) o a verme alucinar a las 3am por no dormir 👻😂
+            </p>
+
+            <p className="text-xl font-semibold text-brand-coral">
+              ¡Pero también se pueden apuntar a correr algunos tramos conmigo!
+            </p>
+
+            <p className="text-2xl font-bold text-brand-gray-purple">
+              ¿Quien se apunta?
+            </p>
+          </div>
         </div>
 
         {/* Botón para scroll al formulario */}
