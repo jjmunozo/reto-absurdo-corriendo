@@ -65,70 +65,65 @@ const Index = () => {
     <div className="min-h-screen bg-brand-cream">
       <HeroSection lastSync={lastSync} />
 
-      {/* Challenge Description Dropdown */}
+      {/* Challenge Description Section */}
       <section className="container mx-auto px-4 py-3">
-        <Collapsible>
-          <CollapsibleTrigger className="w-full bg-brand-coral hover:bg-brand-red text-white rounded-lg p-4 transition-colors group">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-left">¿Cuál es el reto más absurdo?</h2>
-              <ChevronDown className="h-5 w-5 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+        <div className="bg-brand-coral text-white rounded-t-lg p-4">
+          <h2 className="text-xl font-bold">¿Cuál es el reto más absurdo?</h2>
+        </div>
+        <div className="bg-white border-x-2 border-b-2 border-brand-coral/20 rounded-b-lg p-6">
+          <div className="space-y-4 text-gray-800 leading-relaxed">
+            <p>
+              ¡Hola, soy Juan! Me puse un reto épico este año porque creo en el valor de hacer <strong className="text-brand-coral">Cosas Difíciles</strong>.
+            </p>
+            
+            <p>
+              Yo "odiaba" correr entonces no corría pero hay algo que odio más que correr: odiar hacer cosas y que me obstaculicen.
+            </p>
+            
+            <p>
+              Decidí ponerme un reto que me diera miedo — un <strong className="text-brand-coral">misogi</strong>: correr 100km en un tiempo de 24hrs.
+            </p>
+            
+            <p>
+              No voy a correr 24hrs continuas, voy a hacerlo en estilo "Back Yard Ultra" o "Last Man Standing", pero solo yo.
+            </p>
+            
+            <div className="space-y-2 text-sm">
+              <p>🏃‍♂️ Voy a correr una vuelta de 4.5 - 5km cada hora por 24 horas.</p>
+              <p>🕐 Tengo máximo 1 hora para terminar cada vuelta.</p>
+              <p>🔁 Cada hora empieza otra vuelta.</p>
+              <p>💆‍♂️ Si termino antes de que se cumpla la hora, puedo descansar hasta que empiece la próxima vuelta.</p>
+              <p>🚫 Si no termino la vuelta dentro de 1 hora o no empiezo la vuelta a tiempo, termina mi reto.</p>
+              <p>🧍‍♂️ La meta es terminar 24hrs.</p>
             </div>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="bg-white border-x-2 border-b-2 border-brand-coral/20 rounded-b-lg p-6">
-            <div className="space-y-4 text-gray-800 leading-relaxed">
-              <p>
-                ¡Hola, soy Juan! Me puse un reto épico este año porque creo en el valor de hacer <strong className="text-brand-coral">Cosas Difíciles</strong>.
-              </p>
-              
-              <p>
-                Yo "odiaba" correr entonces no corría pero hay algo que odio más que correr: odiar hacer cosas y que me obstaculicen.
-              </p>
-              
-              <p>
-                Decidí ponerme un reto que me diera miedo — un <strong className="text-brand-coral">misogi</strong>: correr 100km en un tiempo de 24hrs.
-              </p>
-              
-              <p>
-                No voy a correr 24hrs continuas, voy a hacerlo en estilo "Back Yard Ultra" o "Last Man Standing", pero solo yo.
-              </p>
-              
-              <div className="space-y-2 text-sm">
-                <p>🏃‍♂️ Voy a correr una vuelta de 4.5 - 5km cada hora por 24 horas.</p>
-                <p>🕐 Tengo máximo 1 hora para terminar cada vuelta.</p>
-                <p>🔁 Cada hora empieza otra vuelta.</p>
-                <p>💆‍♂️ Si termino antes de que se cumpla la hora, puedo descansar hasta que empiece la próxima vuelta.</p>
-                <p>🚫 Si no termino la vuelta dentro de 1 hora o no empiezo la vuelta a tiempo, termina mi reto.</p>
-                <p>🧍‍♂️ La meta es terminar 24hrs.</p>
-              </div>
-              
-              <p>
-                Este es el resumen de mi entrenamiento que comencé el 7 de enero.
-              </p>
-              
-              <p className="text-sm text-gray-600 italic">
-                Mi programación la hace{' '}
-                <a 
-                  href="https://www.instagram.com/marioperezcoaching/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-brand-coral hover:text-brand-red underline"
-                >
-                  Mario Perez
-                </a>
-                {' '}y mi nutrición{' '}
-                <a 
-                  href="https://www.instagram.com/midietanoesdieta/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-brand-coral hover:text-brand-red underline"
-                >
-                  Natalia Villalobos
-                </a>
-                {' '}— ¡gracias a ambos!
-              </p>
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
+            
+            <p>
+              Este es el resumen de mi entrenamiento que comencé el 7 de enero.
+            </p>
+            
+            <p className="text-sm text-gray-600 italic">
+              Mi programación la hace{' '}
+              <a 
+                href="https://www.instagram.com/marioperezcoaching/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-brand-coral hover:text-brand-red underline"
+              >
+                Mario Perez
+              </a>
+              {' '}y mi nutrición{' '}
+              <a 
+                href="https://www.instagram.com/midietanoesdieta/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-brand-coral hover:text-brand-red underline"
+              >
+                Natalia Villalobos
+              </a>
+              {' '}— ¡gracias a ambos!
+            </p>
+          </div>
+        </div>
       </section>
 
       {/* Section Navigation */}
