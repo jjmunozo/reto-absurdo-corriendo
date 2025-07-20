@@ -126,6 +126,24 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Support Section */}
+      <section className="container mx-auto px-4 py-3">
+        <div className="bg-brand-coral text-white rounded-t-lg p-4">
+          <h2 className="text-xl font-bold">¡Sería épico verlos durante mi reto!</h2>
+        </div>
+        <div className="bg-white border-x-2 border-b-2 border-brand-coral/20 rounded-b-lg p-6">
+          <div className="space-y-4 text-gray-800 leading-relaxed">
+            <p>
+              Vengan a apoyar el 6 de diciembre 2025 en Santa Ana. Pueden llegar a ver y aplaudir en cualquier punto de las 24hrs — hasta pueden llegar a tomarse una birra tardeada (o a media noche) o a verme alucinar a las 3am por no dormir 👻😂
+            </p>
+            
+            <p>
+              ¡Pero también se pueden apuntar a correr algunos tramos conmigo!
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Section Navigation */}
       <SectionNavigation sections={navigationSections} />
 
