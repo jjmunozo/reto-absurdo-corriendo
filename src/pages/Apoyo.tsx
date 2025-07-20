@@ -151,21 +151,21 @@ export default function Apoyo() {
                 <p className="text-brand-gray-purple/70 mt-2">¡Sé el primero en apuntarte!</p>
               </div>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {registrations.map((registration) => (
                   <div 
                     key={registration.id}
-                    className="relative p-6 border border-brand-coral/20 rounded-lg hover:bg-brand-coral/5 transition-colors"
+                    className="relative p-4 border border-brand-coral/20 rounded-lg hover:bg-brand-coral/5 transition-colors"
                   >
                     {/* Emoji en esquina superior derecha */}
-                    <div className="absolute top-4 right-4 text-2xl">
+                    <div className="absolute top-3 right-3 text-xl">
                       {registration.participation_type === 'run' ? '🏃‍♂️' : '❤️'}
                     </div>
                     
-                    <p className="font-semibold text-lg text-brand-gray-purple mb-3 pr-12">
+                    <p className="font-semibold text-base text-brand-gray-purple mb-2 pr-10">
                       {formatRegistrationText(registration)}
                     </p>
-                    <p className="text-brand-gray-purple/80 italic text-lg pr-12">
+                    <p className="text-brand-gray-purple/80 italic text-sm pr-10">
                       "{registration.motivation_message}"
                     </p>
                   </div>
