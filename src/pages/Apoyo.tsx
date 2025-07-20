@@ -86,6 +86,16 @@ export default function Apoyo() {
       });
     }
   };
+
+  const scrollToList = () => {
+    const listElement = document.getElementById('registration-list');
+    if (listElement) {
+      listElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
   return <div className="min-h-screen bg-brand-cream">
       {/* Header con navegación */}
       <div className="bg-white border-b border-brand-coral/10">
@@ -137,16 +147,22 @@ export default function Apoyo() {
           </div>
         </div>
 
-        {/* Botón para scroll al formulario */}
+        {/* Botones para scroll */}
         <div className="text-center mb-8">
-          <Button onClick={scrollToForm} className="bg-brand-coral hover:bg-brand-red text-white text-xl py-6 px-8 rounded-lg font-bold transition-colors flex items-center gap-3 mx-auto">
-            <MousePointer className="w-6 h-6" />
-            Apuntarme a apoyar a Juan
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Button onClick={scrollToForm} className="bg-brand-coral hover:bg-brand-red text-white text-xl py-6 px-8 rounded-lg font-bold transition-colors flex items-center gap-3">
+              <MousePointer className="w-6 h-6" />
+              Apuntarme a apoyar a Juan
+            </Button>
+            <Button onClick={scrollToList} variant="outline" className="border-brand-coral text-brand-coral hover:bg-brand-coral hover:text-white text-xl py-6 px-8 rounded-lg font-bold transition-colors flex items-center gap-3">
+              <Users className="w-6 h-6" />
+              Ver lista de apoyo
+            </Button>
+          </div>
         </div>
 
         {/* Lista de personas registradas */}
-        <Card className="border-brand-coral/20 shadow-lg mb-12">
+        <Card id="registration-list" className="border-brand-coral/20 shadow-lg mb-12">
           <CardHeader className="bg-brand-coral text-white rounded-t-lg">
             <CardTitle className="flex items-center gap-2 text-2xl">
               <Users className="w-6 h-6" />
