@@ -73,7 +73,7 @@ const Index = () => {
 
       {/* Challenge Description Section */}
       <section className="container mx-auto px-4 py-3">
-        <div className="bg-brand-coral text-white rounded-t-lg p-4">
+        <div className="bg-gray-800 text-white rounded-t-lg p-4">
           <h2 className="text-xl font-bold">¿Cuál es el reto más absurdo?</h2>
         </div>
         <div className="bg-white border-x-2 border-b-2 border-brand-coral/20 rounded-b-lg p-6">
