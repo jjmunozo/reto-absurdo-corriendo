@@ -32,7 +32,9 @@ export default function Apoyo() {
     submitting,
     createRegistration
   } = useSupportRegistrations();
-  const { toast } = useToast();
+  const {
+    toast
+  } = useToast();
   const [participationType, setParticipationType] = useState<'run' | 'moral_support' | ''>('');
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -64,13 +66,12 @@ export default function Apoyo() {
         motivation_message: data.motivation_message
       };
       await createRegistration(newRegistration);
-      
+
       // Mostrar popup de éxito
       toast({
         title: "¡Épicooooooo! Mil gracias por el apoyo. — Juan",
-        duration: 5000,
+        duration: 5000
       });
-      
       form.reset();
       setParticipationType('');
     } catch (error) {
@@ -95,7 +96,6 @@ export default function Apoyo() {
       });
     }
   };
-
   const scrollToList = () => {
     const listElement = document.getElementById('registration-list');
     if (listElement) {
@@ -175,16 +175,10 @@ export default function Apoyo() {
         {/* Links de texto para navegación */}
         <div className="text-center mb-8">
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <button 
-              onClick={scrollToForm} 
-              className="text-brand-coral hover:text-brand-red text-lg font-medium underline transition-colors"
-            >
+            <button onClick={scrollToForm} className="text-brand-coral hover:text-brand-red text-lg font-medium underline transition-colors">
               Ir a apuntarme para apoyar a Juan
             </button>
-            <button 
-              onClick={scrollToList} 
-              className="text-brand-coral hover:text-brand-red text-lg font-medium underline transition-colors"
-            >
+            <button onClick={scrollToList} className="text-brand-coral hover:text-brand-red text-lg font-medium underline transition-colors">
               Ver la lista de apoyo
             </button>
           </div>
@@ -361,7 +355,7 @@ export default function Apoyo() {
       {/* Footer */}
       <footer className="bg-white py-6 px-4 mt-12 border-t border-brand-coral/10">
         <div className="container mx-auto text-center text-brand-gray-purple">
-          <p className="text-sm">&copy; 2025 El reto más absurdo | ¡Únete al misogi!</p>
+          <p className="text-sm">© 2025 El reto más absurdo | Apuntate a apoyar.</p>
         </div>
       </footer>
     </div>;
