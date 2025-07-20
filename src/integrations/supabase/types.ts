@@ -176,15 +176,57 @@ export type Database = {
         }
         Relationships: []
       }
+      support_registrations: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          laps_count: number | null
+          motivation_message: string
+          participation_type: Database["public"]["Enums"]["participation_type"]
+          registration_number: number
+          updated_at: string
+          whatsapp: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          laps_count?: number | null
+          motivation_message: string
+          participation_type: Database["public"]["Enums"]["participation_type"]
+          registration_number: number
+          updated_at?: string
+          whatsapp: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          laps_count?: number | null
+          motivation_message?: string
+          participation_type?: Database["public"]["Enums"]["participation_type"]
+          registration_number?: number
+          updated_at?: string
+          whatsapp?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_next_registration_number: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
     }
     Enums: {
-      [_ in never]: never
+      participation_type: "run" | "moral_support"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -311,6 +353,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      participation_type: ["run", "moral_support"],
+    },
   },
 } as const
