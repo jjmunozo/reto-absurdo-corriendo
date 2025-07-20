@@ -13,6 +13,7 @@ import { useSupportRegistrations, type NewRegistration } from '@/hooks/useSuppor
 import { Separator } from '@/components/ui/separator';
 import { Heart, Users, Trophy, ArrowLeft, MousePointer, Footprints } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 const formSchema = z.object({
   full_name: z.string().min(2, 'El nombre debe tener al menos 2 caracteres'),
   email: z.string().email('Email inválido'),
@@ -31,6 +32,7 @@ export default function Apoyo() {
     submitting,
     createRegistration
   } = useSupportRegistrations();
+  const { toast } = useToast();
   const [participationType, setParticipationType] = useState<'run' | 'moral_support' | ''>('');
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -62,6 +64,13 @@ export default function Apoyo() {
         motivation_message: data.motivation_message
       };
       await createRegistration(newRegistration);
+      
+      // Mostrar popup de éxito
+      toast({
+        title: "¡Épicooooooo! Mil gracias por el apoyo. — Juan",
+        duration: 5000,
+      });
+      
       form.reset();
       setParticipationType('');
     } catch (error) {
