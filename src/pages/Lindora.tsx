@@ -1,26 +1,21 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-
 const Lindora = () => {
-  return (
-    <div className="min-h-screen bg-brand-cream">
+  return <div className="min-h-screen bg-brand-cream">
       {/* Header Section */}
       <section className="container mx-auto px-4 py-6">
         <div className="bg-gray-800 text-white rounded-t-lg p-6">
           <h1 className="text-3xl md:text-4xl font-bold text-center mb-4">
             Tips para Correr en Lindora
           </h1>
-          <p className="text-lg md:text-xl text-gray-300 text-center leading-relaxed">
+          <p className="text-lg md:text-xl text-gray-300 text-center leading-relaxed font-light">
             escrito por Juan J. Muñoz O, un corredor primerizo que está entrenando en Lindora para El Reto Más Absurdo Que Se Ha Puesto En La Vida
           </p>
         </div>
         <div className="bg-white border-x-2 border-b-2 border-brand-coral/20 rounded-b-lg p-6 text-center">
           <Link to="/apoyo">
-            <Button 
-              className="bg-brand-coral hover:bg-brand-red text-white"
-              size="lg"
-            >
+            <Button className="bg-brand-coral hover:bg-brand-red text-white" size="lg">
               Saber más sobre el reto
             </Button>
           </Link>
@@ -30,13 +25,7 @@ const Lindora = () => {
       {/* PDF Embed Section */}
       <section className="container mx-auto px-4 py-6">
         <div className="bg-white rounded-lg border-2 border-brand-coral/20 shadow-lg">
-          <iframe
-            src="/Correr_en_Lindora.pdf"
-            width="100%"
-            height="800"
-            className="rounded-lg"
-            title="Tips para Correr en Lindora"
-          >
+          <iframe src="/Correr_en_Lindora.pdf" width="100%" height="800" className="rounded-lg" title="Tips para Correr en Lindora">
             <p>Tu navegador no soporta la visualización de PDFs. 
               <a href="/Correr_en_Lindora.pdf" target="_blank" rel="noopener noreferrer" className="text-brand-coral hover:text-brand-red underline">
                 Haz clic aquí para descargar el PDF
@@ -52,8 +41,6 @@ const Lindora = () => {
           <p className="text-sm">&copy; 2025 El reto más absurdo | Datos verificados por Strava</p>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Lindora;
