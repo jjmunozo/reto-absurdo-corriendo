@@ -124,6 +124,35 @@ export function useSupportRegistrations() {
 
   useEffect(() => {
     fetchRegistrations();
+
+    // Listen for real-time updates when new registrations are added
+    const channel = supabase
+      .channel('support-registrations-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'support_registrations'
+        },
+        (payload) => {
+          console.log('New registration added:', payload.new);
+          // Add the new registration to the list
+          const newRegistration = payload.new as PublicRegistration;
+          setRegistrations(prev => [...prev, newRegistration]);
+          
+          // Update public stats
+          setPublicStats(prev => ({
+            total_count: prev.total_count + 1,
+            recent_names: [newRegistration.full_name, ...prev.recent_names.slice(0, 4)]
+          }));
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return {
