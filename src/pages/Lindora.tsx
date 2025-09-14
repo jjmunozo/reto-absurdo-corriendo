@@ -30,12 +30,19 @@ const Lindora = () => {
       {/* PDF Embed Section */}
       <section className="container mx-auto px-4 py-6">
         <div className="bg-white rounded-lg border-2 border-brand-coral/20 shadow-lg">
-          <div className="w-full h-[800px] rounded-lg flex items-center justify-center bg-gray-50">
-            <div className="text-center text-gray-500">
-              <p className="text-lg mb-2 text-gray-800 font-semibold">PDF Embed Area</p>
-              <p className="text-sm">Aquí se mostrará el PDF cuando lo subas</p>
-            </div>
-          </div>
+          <iframe
+            src="/Correr_en_Lindora.pdf"
+            width="100%"
+            height="800"
+            className="rounded-lg"
+            title="Tips para Correr en Lindora"
+          >
+            <p>Tu navegador no soporta la visualización de PDFs. 
+              <a href="/Correr_en_Lindora.pdf" target="_blank" rel="noopener noreferrer" className="text-brand-coral hover:text-brand-red underline">
+                Haz clic aquí para descargar el PDF
+              </a>
+            </p>
+          </iframe>
         </div>
       </section>
 
