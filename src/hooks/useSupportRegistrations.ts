@@ -14,6 +14,16 @@ export interface SupportRegistration {
   created_at: string;
 }
 
+export interface PublicRegistration {
+  id: string;
+  full_name: string;
+  participation_type: 'run' | 'moral_support';
+  laps_count: number | null;
+  motivation_message: string;
+  registration_number: number;
+  created_at: string;
+}
+
 export interface NewRegistration {
   full_name: string;
   email: string;
@@ -29,46 +39,40 @@ export interface PublicRegistrationStats {
 }
 
 export function useSupportRegistrations() {
-  const [registrations, setRegistrations] = useState<SupportRegistration[]>([]);
+  const [registrations, setRegistrations] = useState<PublicRegistration[]>([]);
   const [publicStats, setPublicStats] = useState<PublicRegistrationStats>({ total_count: 0, recent_names: [] });
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const fetchPublicStats = async () => {
+  const fetchRegistrations = async () => {
     try {
-      const { data, error } = await supabase.rpc('get_public_registration_stats');
+      // Fetch all registrations with public data only (no personal info like email/whatsapp)
+      const { data: registrationsData, error: registrationsError } = await supabase
+        .from('support_registrations')
+        .select('id, full_name, participation_type, laps_count, motivation_message, registration_number, created_at')
+        .order('created_at', { ascending: true });
 
-      if (error) throw error;
+      if (registrationsError) throw registrationsError;
+
+      // Set registrations with full data
+      setRegistrations(registrationsData as PublicRegistration[] || []);
       
-      // Parse the data since it comes as JSON
-      const parsedData = typeof data === 'string' ? JSON.parse(data) : data;
+      // Create public stats for backward compatibility
       const stats: PublicRegistrationStats = {
-        total_count: parsedData?.total_count || 0,
-        recent_names: parsedData?.recent_names || []
+        total_count: registrationsData?.length || 0,
+        recent_names: (registrationsData || [])
+          .slice(-5)
+          .reverse()
+          .map(reg => reg.full_name)
       };
       
       setPublicStats(stats);
-      
-      // Create minimal registration objects for backward compatibility
-      const fakeRegistrations = (stats.recent_names || []).map((name: string, index: number) => ({
-        id: `fake-${index}`,
-        full_name: name,
-        email: '',
-        whatsapp: '',
-        participation_type: 'moral_support' as const,
-        laps_count: null,
-        motivation_message: '',
-        registration_number: index + 1,
-        created_at: new Date().toISOString()
-      }));
-      
-      setRegistrations(fakeRegistrations);
     } catch (error) {
-      console.error('Error fetching public stats:', error);
+      console.error('Error fetching registrations:', error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las estadísticas",
+        description: "No se pudieron cargar los registros",
         variant: "destructive",
       });
     } finally {
@@ -96,8 +100,8 @@ export function useSupportRegistrations() {
 
       if (error) throw error;
 
-      // Refresh public stats after successful registration
-      await fetchPublicStats();
+      // Refresh registrations after successful registration
+      await fetchRegistrations();
       
       toast({
         title: "¡Registro exitoso!",
@@ -119,7 +123,7 @@ export function useSupportRegistrations() {
   };
 
   useEffect(() => {
-    fetchPublicStats();
+    fetchRegistrations();
   }, []);
 
   return {
@@ -128,6 +132,6 @@ export function useSupportRegistrations() {
     loading,
     submitting,
     createRegistration,
-    refetch: fetchPublicStats
+    refetch: fetchRegistrations
   };
 }
