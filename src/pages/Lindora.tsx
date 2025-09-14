@@ -28,7 +28,25 @@ const Lindora = () => {
       {/* PDF Embed Section */}
       <section className="container mx-auto px-4 py-6">
         <div className="bg-white rounded-lg border-2 border-brand-coral/20 shadow-lg">
-          <iframe src="/Correr_en_Lindora.pdf" width="100%" height="800" className="rounded-lg" title="Tips para Correr en Lindora">
+          {/* Mobile Download Link */}
+          <div className="md:hidden p-4 text-center border-b border-gray-200">
+            <a 
+              href="/Correr_en_Lindora.pdf" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="inline-block bg-brand-coral hover:bg-brand-red text-white px-4 py-2 rounded-lg transition-colors"
+            >
+              📄 Descargar PDF
+            </a>
+          </div>
+          
+          <iframe 
+            src="/Correr_en_Lindora.pdf" 
+            width="100%" 
+            height="600" 
+            className="rounded-lg md:h-[800px]" 
+            title="Tips para Correr en Lindora"
+          >
             <p>Tu navegador no soporta la visualización de PDFs. 
               <a href="/Correr_en_Lindora.pdf" target="_blank" rel="noopener noreferrer" className="text-brand-coral hover:text-brand-red underline">
                 Haz clic aquí para descargar el PDF
