@@ -4,35 +4,47 @@ import { Button } from "@/components/ui/button";
 
 const Lindora = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-brand-cream">
       {/* Header Section */}
-      <div className="bg-gray-800 text-white py-8">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4">
+      <section className="container mx-auto px-4 py-6">
+        <div className="bg-gray-800 text-white rounded-t-lg p-6">
+          <h1 className="text-3xl md:text-4xl font-bold text-center mb-4">
             Tips para Correr en Lindora
           </h1>
-          <p className="text-lg md:text-xl text-gray-300 mb-6">
+          <p className="text-lg md:text-xl text-gray-300 text-center leading-relaxed">
             escrito por Juan J. Muñoz O, un corredor primerizo que está entrenando en Lindora para El Reto Más Absurdo Que Se Ha Puesto En La Vida
           </p>
+        </div>
+        <div className="bg-white border-x-2 border-b-2 border-brand-coral/20 rounded-b-lg p-6 text-center">
           <Link to="/apoyo">
-            <Button variant="default" size="lg">
+            <Button 
+              className="bg-brand-coral hover:bg-brand-red text-white"
+              size="lg"
+            >
               Saber más sobre el reto
             </Button>
           </Link>
         </div>
-      </div>
+      </section>
 
       {/* PDF Embed Section */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow-lg p-4">
-          <div className="w-full h-[800px] border border-gray-200 rounded-lg flex items-center justify-center bg-gray-50">
+      <section className="container mx-auto px-4 py-6">
+        <div className="bg-white rounded-lg border-2 border-brand-coral/20 shadow-lg">
+          <div className="w-full h-[800px] rounded-lg flex items-center justify-center bg-gray-50">
             <div className="text-center text-gray-500">
-              <p className="text-lg mb-2">PDF Embed Area</p>
+              <p className="text-lg mb-2 text-gray-800 font-semibold">PDF Embed Area</p>
               <p className="text-sm">Aquí se mostrará el PDF cuando lo subas</p>
             </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-white py-6 px-4">
+        <div className="container mx-auto text-center text-brand-gray-purple">
+          <p className="text-sm">&copy; 2025 El reto más absurdo | Datos verificados por Strava</p>
+        </div>
+      </footer>
     </div>
   );
 };
