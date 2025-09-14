@@ -16,6 +16,7 @@ import ImportRuns from "./pages/ImportRuns";
 import ManageRuns from "./pages/ManageRuns";
 import Secreto from "./pages/Secreto";
 import Apoyo from "./pages/Apoyo";
+import Lindora from "./pages/Lindora";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/import-runs" element={<ImportRuns />} />
             <Route path="/manage-runs" element={<ManageRuns />} />
             <Route path="/apoyo" element={<Apoyo />} />
+            <Route path="/lindora" element={<Lindora />} />
             <Route path="/secreto" element={<Secreto />} />
             <Route path="/strava-tokens" element={<StravaTokens />} />
             <Route path="/strava/callback" element={<StravaCallback />} />
