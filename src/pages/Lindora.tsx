@@ -1,7 +1,16 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { usePageMetadata } from "@/hooks/usePageMetadata";
+
 const Lindora = () => {
+  usePageMetadata({
+    title: "Tips para Correr en Lindora - El reto más absurdo",
+    description: "Guía completa con tips y mapas para correr en Lindora, escrita por Juan J. Muñoz O. Incluye rutas recomendadas, lugares para parquear y consejos prácticos.",
+    ogTitle: "Tips para Correr en Lindora 🏃‍♂️",
+    ogDescription: "Descubre los mejores consejos para correr en Lindora con mapas detallados y rutas recomendadas. Escrito por un corredor primerizo para la comunidad.",
+    ogImage: `${window.location.origin}/lindora/page_1.jpg`
+  });
   return <div className="min-h-screen bg-brand-cream">
       {/* Header Section */}
       <section className="container mx-auto px-4 py-6">
