@@ -19,6 +19,9 @@ const Lindora = () => {
               Saber más sobre el reto
             </Button>
           </Link>
+          <p className="mt-4 text-gray-600">
+            Pueden ver y descargar el PDF de abajo, si les parece útil compártanlo 🙏
+          </p>
         </div>
       </section>
 
