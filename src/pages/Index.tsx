@@ -32,7 +32,7 @@ const Index = () => {
     syncActivities 
   } = useManualRunData();
 
-  const { registrations, loading: loadingRegistrations } = useSupportRegistrations();
+  const { registrations, publicStats, loading: loadingRegistrations } = useSupportRegistrations();
 
   const handleRefresh = async () => {
     try {
@@ -150,18 +150,14 @@ const Index = () => {
             {/* Registration stats */}
             <div className="space-y-3 pt-4 border-t border-gray-200">
               <p>
-                <strong>Se han apuntado:</strong> {loadingRegistrations ? '...' : registrations.length} personas
+                <strong>Se han apuntado:</strong> {loadingRegistrations ? '...' : publicStats.total_count} personas
               </p>
               
-              {!loadingRegistrations && registrations.length > 0 && (
+              {!loadingRegistrations && publicStats.recent_names.length > 0 && (
                 <p>
                   <strong>Los últimos apoyadores épicos:</strong>{' '}
                   <em>
-                    {registrations
-                      .slice(-5)
-                      .reverse()
-                      .map(reg => reg.full_name)
-                      .join(', ')}
+                    {publicStats.recent_names.join(', ')}
                   </em>
                 </p>
               )}

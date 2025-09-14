@@ -23,26 +23,52 @@ export interface NewRegistration {
   motivation_message: string;
 }
 
+export interface PublicRegistrationStats {
+  total_count: number;
+  recent_names: string[];
+}
+
 export function useSupportRegistrations() {
   const [registrations, setRegistrations] = useState<SupportRegistration[]>([]);
+  const [publicStats, setPublicStats] = useState<PublicRegistrationStats>({ total_count: 0, recent_names: [] });
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const fetchRegistrations = async () => {
+  const fetchPublicStats = async () => {
     try {
-      const { data, error } = await supabase
-        .from('support_registrations')
-        .select('*')
-        .order('registration_number', { ascending: true });
+      const { data, error } = await supabase.rpc('get_public_registration_stats');
 
       if (error) throw error;
-      setRegistrations(data || []);
+      
+      // Parse the data since it comes as JSON
+      const parsedData = typeof data === 'string' ? JSON.parse(data) : data;
+      const stats: PublicRegistrationStats = {
+        total_count: parsedData?.total_count || 0,
+        recent_names: parsedData?.recent_names || []
+      };
+      
+      setPublicStats(stats);
+      
+      // Create minimal registration objects for backward compatibility
+      const fakeRegistrations = (stats.recent_names || []).map((name: string, index: number) => ({
+        id: `fake-${index}`,
+        full_name: name,
+        email: '',
+        whatsapp: '',
+        participation_type: 'moral_support' as const,
+        laps_count: null,
+        motivation_message: '',
+        registration_number: index + 1,
+        created_at: new Date().toISOString()
+      }));
+      
+      setRegistrations(fakeRegistrations);
     } catch (error) {
-      console.error('Error fetching registrations:', error);
+      console.error('Error fetching public stats:', error);
       toast({
         title: "Error",
-        description: "No se pudieron cargar las registraciones",
+        description: "No se pudieron cargar las estadísticas",
         variant: "destructive",
       });
     } finally {
@@ -70,8 +96,8 @@ export function useSupportRegistrations() {
 
       if (error) throw error;
 
-      // Actualizar la lista local
-      setRegistrations(prev => [...prev, data].sort((a, b) => a.registration_number - b.registration_number));
+      // Refresh public stats after successful registration
+      await fetchPublicStats();
       
       toast({
         title: "¡Registro exitoso!",
@@ -93,14 +119,15 @@ export function useSupportRegistrations() {
   };
 
   useEffect(() => {
-    fetchRegistrations();
+    fetchPublicStats();
   }, []);
 
   return {
     registrations,
+    publicStats,
     loading,
     submitting,
     createRegistration,
-    refetch: fetchRegistrations
+    refetch: fetchPublicStats
   };
 }
